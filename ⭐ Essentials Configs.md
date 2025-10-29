@@ -1,6 +1,6 @@
 # Documentación de Archivos de Configuración
 
-> Generado automáticamente el Sat Oct 25 07:17:31 PM CEST 2025
+> Generado automáticamente el Wed Oct 29 08:33:25 PM CET 2025
 
 ## vscode_keybindings
 
@@ -568,7 +568,7 @@ window_padding_width 4
 shell_integration enabled
 tab_bar_edge bottom
 tab_bar_style powerline
-tab_title_template "{index} {title}"
+tab_title_template "{index} {title.split(':',1)[-1]}"
 tab_bar_min_tabs 1
 active_tab_title_template "{title[title.rfind('/')+1:]}"
 repaint_delay 10
@@ -646,6 +646,8 @@ inactive_border_color #5bd13e
 allow_remote_control yes
 map f1 copy_to_buffer a
 map f2 paste_from_buffer a
+debug_config no
+debug_font_fallback no
  
 ```
 
@@ -714,7 +716,7 @@ alias mserv="systemctl list-units --type=service --state=running --no-pager --no
 alias mmemo="ps -u \$USER -o pid,ppid,%cpu,%mem,cmd --sort=-%mem 2>/dev/null | head -n 15"
 alias mcpup="ps -u \$USER -o pid,ppid,%cpu,%mem,cmd --sort=-%cpu 2>/dev/null | head -n 15"
 alias mtree="tree -C"
-alias rm="trash-put"
+alias rmtr="trash-put"
 alias blame="systemd-analyze blame"
 alias docker="podman"
 alias docker-compose="podman-compose"
@@ -1326,6 +1328,8 @@ set casesensitive
 		}
 	},
 	"python.analysis.autoIndent": false,
+	"workbench.secondarySideBar.defaultVisibility": "hidden",
+	"flake8.enabled": false,
 	/*
 	"terminal.integrated.profiles.linux": {
 		"bash": {
