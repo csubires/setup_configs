@@ -1,6 +1,6 @@
 # Documentación de Archivos de Configuración
 
-> Generado automáticamente el Wed Dec 31 09:50:28 AM CET 2025
+> Generado automáticamente el Sun Feb  1 10:36:47 AM CET 2026
 
 ## vscode_keybindings
 
@@ -34,11 +34,6 @@
 		"command": "workbench.action.quickOpen",
 		"args": "**/Makefile",
 		"when": "editorTextFocus"
-	},
-	{
-		"key": "backspace",
-		"command": "workbench.action.search.toggleQueryDetails",
-		"when": "inSearchEditor || searchViewletFocus"
 	},
 	{
 		"key": "ctrl+shift+j",
@@ -89,11 +84,11 @@ repaint_delay 2
 sync_to_monitor no
 shell /bin/zsh
 editor vim
-font_family FiraCode Nerd Font
+font_family FiraMono Nerd Font
 bold_font auto
 italic_font auto
 bold_italic_font auto
-font_size 14.0
+font_size 22.0
 cursor_shape block
 cursor_blink_interval 0
 scrollback_lines 500
@@ -123,10 +118,10 @@ open_url_with default
 map ctrl+shift+c send_text all \x03
 map ctrl+c copy_to_clipboard
 map ctrl+v paste_from_clipboard
-map alt+left neighboring_window left
-map alt+right neighboring_window right
-map alt+up neighboring_window up
-map alt+down neighboring_window down
+map shift+left neighboring_window left
+map shift+right neighboring_window right
+map shift+up neighboring_window up
+map shift+down neighboring_window down
 map alt+| launch --location=hsplit --cwd=current
 map alt+minus launch --location=vsplit --cwd=current
 enabled_layouts *
@@ -137,8 +132,8 @@ map alt+shift+right resize_window wider
 map alt+shift+up resize_window taller
 map alt+shift+down resize_window shorter
 map ctrl+t new_tab_with_cwd
-map ctrl+shift+left previous_tab
-map ctrl+shift+right next_tab
+map alt+left previous_tab
+map alt+right next_tab
 map alt+q close_window
 map alt+1 goto_tab 1
 map alt+2 goto_tab 2
@@ -159,9 +154,11 @@ map alt+f send_text all \x1b\x66
 map ctrl+plus change_font_size all +1.0
 map ctrl+minus change_font_size all -1.0
 map ctrl+0 change_font_size all 0
-map ctrl+space next_layout
+map shift+space next_layout
 map f1 copy_to_buffer a
 map f2 paste_from_buffer a
+mouse_enabled yes
+allow_selection yes
 mouse_map left click ungrabbed mouse_handle_click selection link prompt
 mouse_map left doublepress ungrabbed mouse_handle_click selection word
 mouse_map left triplepress ungrabbed mouse_handle_click selection line
@@ -211,69 +208,6 @@ selection_foreground  #2b2b2b
 
 ---
 
-## frofi
-
-**Archivo:** `/home/user/.config/rofi/favorites.sh`
-
-### Contenido
-
-``` bash
- 
-FAVDIR="$HOME/.config/rofi/favorites"
-if [ -z "$@" ]; then
-    if [ -d "$FAVDIR" ] && [ "$(ls -A "$FAVDIR"/*.desktop 2>/dev/null)" ]; then
-        for f in "$FAVDIR"/*.desktop; do
-            if [ -f "$f" ]; then
-                NAME=$(grep -m1 '^Name=' "$f" | cut -d= -f2-)
-                ICON=$(grep -m1 '^Icon=' "$f" | cut -d= -f2-)
-                if [ -n "$NAME" ]; then
-                    echo -e "$NAME\0icon\x1f${ICON:-application-x-executable}"
-                fi
-            fi
-        done
-    else
-        echo "No favorites yet"
-        echo "Add .desktop files to ~/.config/rofi/favorites/"
-    fi
-else
-    SELECTION="$@"
-    if [[ "$SELECTION" == "No favorites yet"* ]] || [[ "$SELECTION" == "Add .desktop"* ]]; then
-        exit 0
-    fi
-    for f in "$FAVDIR"/*.desktop; do
-        if [ -f "$f" ]; then
-            NAME=$(grep -m1 '^Name=' "$f" | cut -d= -f2-)
-            if [ "$NAME" = "$SELECTION" ]; then
-                EXEC=$(grep -m1 '^Exec=' "$f" | cut -d= -f2-)
-                if [[ "$EXEC" == *"flatpak run"* ]]; then
-                    FLATPAK_ID=$(echo "$EXEC" | grep -oP '(?<=flatpak run )[^ ]+' | tail -1)
-                    if [ -z "$FLATPAK_ID" ]; then
-                        FLATPAK_ID=$(echo "$EXEC" | awk '{print $NF}' | grep -E '^[a-z]+\.[a-z]+\.[A-Za-z]+')
-                    fi
-                    if [ -n "$FLATPAK_ID" ]; then
-                        (flatpak run "$FLATPAK_ID" &) > /dev/null 2>&1
-                    else
-                        CLEAN_EXEC=$(echo "$EXEC" | sed 's/ --file-forwarding//g' | sed 's/ @@[^@]*@@//g' | sed 's/ %[FfUu].*$//g')
-                        (eval "$CLEAN_EXEC" &) > /dev/null 2>&1
-                    fi
-                else
-                    CLEAN_EXEC=$(echo "$EXEC" | sed 's/ %[FfUu].*$//g')
-                    (eval "$CLEAN_EXEC" &) > /dev/null 2>&1
-                fi
-                if command -v wmctrl &> /dev/null; then
-                    sleep 0.5
-                    wmctrl -a "$NAME" 2>/dev/null
-                fi
-                exit 0
-            fi
-        fi
-    done
-fi
-exit 0 
-```
-
----
-
 ## obsidian
 
 **Archivo:** `/home/user/.var/app/md.obsidian.Obsidian/config/obsidian/Preferences`
@@ -317,6 +251,7 @@ alias lc="ls -d */ | xargs realpath"
 alias grep="grep --color=auto"
 alias latr="ls --color=auto -latr"
 alias rezsh="source ~/.zshrc"
+alias fd="/usr/bin/fdfind"
 alias vi="vim"
 alias rczsh="vim ~/.zshrc"
 alias rcali="vim ~/.aliasrc.zsh"
@@ -349,7 +284,7 @@ alias cpwd="pwd | xclip -selection clipboard"
 alias glog='git log --oneline --graph --decorate --all -n 15'
 alias glogd='git log --graph --pretty=format:"%C(yellow)%h%Creset -%C(red)%d%Creset %s %C(green)(%cr)%Creset %C(blue)<%an>%Creset" --abbrev-commit -10'
 alias gstats='git shortlog -sn --all'
-gbla() {
+gblame() {
     local extension="$1"
     if [[ -z "$extension" ]]; then
         echo "Use: gbla <extension>"
@@ -449,8 +384,6 @@ fzfname() {
         --preview="bat --color=always --style=numbers {} 2>/dev/null || head -100 {} 2>/dev/null" \
         --preview-window=right:60%:wrap
 }
-alias francinette="/home/user/francinette/tester.sh"
-alias paco="/home/user/francinette/tester.sh"
 alias cursus="cd ~/Documents/GIT/cursus"
 alias help42="cd ~/Documents/GIT/help"
 alias cdgit="cd ~/Documents/GIT"
@@ -546,6 +479,8 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
+export PATH=$PATH:/usr/local/go/bin
+. "$HOME/.cargo/env"
  
 ```
 
@@ -586,6 +521,7 @@ fi
 
 ``` bash
  
+autocmd VimEnter * startinsert
 autocmd BufNewFile,BufRead * startinsert
 filetype on
 syntax on
@@ -733,38 +669,7 @@ nnoremap <silent> <Leader>/ :nohlsearch<CR>
     "update_check": false,
     "theme": "auto",
     "color_scheme": "Mariana.sublime-color-scheme",
-}
- 
-```
-
----
-
-## rofi
-
-**Archivo:** `/home/user/.config/rofi/config.rasi`
-
-### Contenido
-
-``` bash
- 
-@theme "/usr/share/rofi/themes/Monokai.rasi"
-configuration {
-    modi: "favorites:~/.config/rofi/favorites.sh,drun,window";
-    show-icons: true;
-    icon-theme: "Papirus";
-    width: 50;
-    sidebar-mode: true;
-    drun-display-format: "{icon} {name}";
-    run-command: "{cmd}";
-    run-shell-command: "{terminal} -e {cmd}";
-    hide-scrollbar: false;
-    case-sensitive: false;
-    sorting-method: "fzf";
-    matching: "fuzzy";
-    timeout {
-        action: "kb-cancel";
-        delay: 0;
-    }
+    "font_face": "FiraMono Nerd Font",
 }
  
 ```
@@ -1067,6 +972,7 @@ set casesensitive
 	"python.analysis.autoIndent": false,
 	"workbench.secondarySideBar.defaultVisibility": "hidden",
 	"flake8.enabled": false,
+	"editor.fontFamily": "'FiraMono Nerd Font', monospace",
 	/*
 	"terminal.integrated.profiles.linux": {
 		"bash": {
@@ -1123,16 +1029,18 @@ else
 fi
 zstyle ':completion:*' use-cache on
 zstyle ':completion:*' cache-path ~/.zsh/cache
-eval "$(starship init zsh)"
 ZSH_CUSTOM="$HOME/.oh-my-zsh/custom"
-if [ -f "$ZSH_CUSTOM/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" ]; then
-    source "$ZSH_CUSTOM/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
-    ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
+if [ -f /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]; then
+    source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+	ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
 fi
-if [ -f "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]; then
-    source "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+if [ -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
+    source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fi
 export PATH=$HOME/.brew/bin:$PATH
+export PATH="$PATH:/usr/local/go/bin"
+export PATH="$PATH:$(go env GOPATH)/bin"
+export PATH="$HOME/.local/bin:$PATH"
 if [ -d "$HOME/.nvm" ]; then
     export NVM_DIR="$HOME/.nvm"
     nvm() {
@@ -1168,6 +1076,7 @@ bindkey '^[[F' end-of-line
 bindkey '^[[1;5C' forward-word
 bindkey '^[[1;5D' backward-word
 bindkey '^[^?' backward-kill-word
+eval "$(starship init zsh)"
  
 ```
 
