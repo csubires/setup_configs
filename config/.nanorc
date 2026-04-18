@@ -1,0 +1,15 @@
+include /usr/share/nano/default.nanorc
+include /usr/share/nano/*.nanorc
+
+set tabsize 4
+set tabstospaces
+set autoindent
+set trimblanks
+set linenumbers
+set softwrap
+set multibuffer
+set mouse
+set positionlog
+set historylog
+set nowrap
+set casesensitive

@@ -1,6 +1,6 @@
 # Documentación de Archivos de Configuración
 
-> Generado automáticamente el Sun Feb  1 10:36:47 AM CET 2026
+> Generado automáticamente el Fri Apr  3 09:50:39 AM CEST 2026
 
 ## vscode_keybindings
 
@@ -242,8 +242,6 @@ alias 6="cd ../../../../../.."
 alias 7="cd ../../../../../../.."
 alias 8="cd ../../../../../../../.."
 alias 9="cd ../../../../../../../../.."
-alias cdtmp="cd /tmp"
-alias cdocs="cd ~/Documents"
 alias ls="ls --color=auto"
 alias ll="ls -alF"
 alias la="ls --color=auto -la"
@@ -255,23 +253,21 @@ alias fd="/usr/bin/fdfind"
 alias vi="vim"
 alias rczsh="vim ~/.zshrc"
 alias rcali="vim ~/.aliasrc.zsh"
-alias rcmux="vim ~/.tmux.conf"
 alias rcvim="vim ~/.vimrc"
 alias rckit="vim ~/.config/kitty/kitty.conf"
 alias rcnft="sudo vim /etc/nftables.conf"
-alias mnet="ss -tupan"
-alias mcat="batcat"
-alias mcnx="lsof -i"
-alias mfop="lsof -u \$USER"
-alias msess="tmux new -A -s my_session"
-alias mgrep="grep -rniI --color=auto"
-alias mfind="find . -iname"
-alias mpass="openssl rand -base64"
-alias mkpwd="openssl rand -base64 32"
-alias mserv="systemctl list-units --type=service --state=running --no-pager --no-legend 2>/dev/null | head -n 20"
-alias mmemo="ps -u \$USER -o pid,ppid,%cpu,%mem,cmd --sort=-%mem 2>/dev/null | head -n 15"
-alias mcpup="ps -u \$USER -o pid,ppid,%cpu,%mem,cmd --sort=-%cpu 2>/dev/null | head -n 15"
-alias mtree="tree -C"
+alias .bat="batcat"
+alias .net="ss -tupan"
+alias .cnx="lsof -i"
+alias .fop="lsof -u \$USER"
+alias .grep="grep -rniI --color=auto"
+alias .find="find . -iname"
+alias .pwd="openssl rand -base64"
+alias .kpwd="openssl rand -base64 32"
+alias .demo="systemctl list-units --type=service --state=running --no-pager --no-legend 2>/dev/null | head -n 20"
+alias .memo="ps -u \$USER -o pid,ppid,%cpu,%mem,cmd --sort=-%mem 2>/dev/null | head -n 15"
+alias .cpup="ps -u \$USER -o pid,ppid,%cpu,%mem,cmd --sort=-%cpu 2>/dev/null | head -n 15"
+alias .tree="tree -C"
 alias rmtr="trash-put"
 alias blame="systemd-analyze blame"
 alias code="flatpak run com.visualstudio.code"
@@ -351,6 +347,13 @@ fzfhi() {
         echo "Not found"
     fi
 }
+backupf() {
+  if [ ! -f "$1" ]; then
+    echo "File not found: $1"
+    return 1
+  fi
+  cp -a "$1" "$1.bak.$(date +%F_%T)"
+}
 fzfpv() {
     find . -type f 2>/dev/null | fzf --preview="bat --style=numbers --color=always {} 2>/dev/null || head -100 {} 2>/dev/null || echo 'Cannot preview: {}'" \
         --preview-window=right:60%:wrap
@@ -392,7 +395,8 @@ alias cdscr="cd ~/Documents/Scripts"
 alias cdpro="cd ~/Documents/Projects"
 alias cdrep="cd ~/Documents/Repository"
 alias cdsha="cd /mnt/hgfs"
- 
+alias cdtmp="cd /tmp"
+alias cdocs="cd ~/Documents" 
 ```
 
 ---
@@ -1084,7 +1088,7 @@ eval "$(starship init zsh)"
 
 ## vscode_git
 
-**Archivo:** `/home/user/Documents/GIT/cursus/.vscode/settings.json`
+**Archivo:** `/home/user/Documents/GIT/commoncore/.vscode/settings.json`
 
 ### Contenido
 
@@ -1171,8 +1175,8 @@ eval "$(starship init zsh)"
 		{ "path": "cub3d", "color": "yellow", "symbol": "11", "tooltip": "PROJECT42" },
 		{ "path": "inception", "color": "green", "symbol": "13", "tooltip": "PROJECT42" },
 		{ "path": "webserv", "color": "yellow", "symbol": "12", "tooltip": "PROJECT42" },
-		{ "path": "ft_transcendence", "color": "red", "symbol": "⭐", "tooltip": "PROJECT42" },
-		{ "path": "42_Collaborative_resume", "color": "red", "symbol": "⭐", "tooltip": "PROJECT42" },
+		{ "path": "ft_transcendence", "color": "red", "symbol": "13", "tooltip": "PROJECT42" },
+		{ "path": "42_Collaborative_resume", "color": "red", "symbol": "14", "tooltip": "PROJECT42" },
 	],
 	"[python]": {
 		"editor.formatOnSave": false,

@@ -1,0 +1,20 @@
+Port 22
+Protocol 2
+
+PermitRootLogin no
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+UsePAM no
+
+PubkeyAuthentication yes
+AuthorizedKeysFile .ssh/authorized_keys
+
+AllowUsers pentester
+
+X11Forwarding no
+AllowTcpForwarding yes
+
+ClientAliveInterval 300
+ClientAliveCountMax 2
+
+LogLevel VERBOSE

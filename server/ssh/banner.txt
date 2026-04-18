@@ -1,0 +1,4 @@
+*******************************************************************
+  ACCESO RESTRINGIDO – SISTEMA MONITORIZADO
+  Solo personal autorizado. Toda sesión es registrada.
+*******************************************************************

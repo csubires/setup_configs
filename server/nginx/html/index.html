@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stack · Nginx + SSH</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:      #0a0e13;
+      --surface: #111820;
+      --border:  #1e2d3d;
+      --accent:  #00d4a1;
+      --accent2: #0077ff;
+      --text:    #c9d8e8;
+      --muted:   #4a6275;
+      --danger:  #ff4d6a;
+      --ok:      #00d4a1;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* ─── grid bg ─── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: .35;
+      pointer-events: none;
+    }
+
+    /* ─── header ─── */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 1.2rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: .05em;
+      color: #fff;
+    }
+    .logo span { color: var(--accent); }
+    .badge {
+      font-size: .65rem;
+      padding: .2rem .55rem;
+      border-radius: 2px;
+      border: 1px solid;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    .badge.ok  { border-color: var(--ok);     color: var(--ok);    background: rgba(0,212,161,.08); }
+    .badge.inf { border-color: var(--accent2); color: var(--accent2); background: rgba(0,119,255,.08); }
+
+    /* ─── main ─── */
+    main {
+      flex: 1;
+      padding: 3rem 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      line-height: 1.05;
+      color: #fff;
+      margin-bottom: 1rem;
+    }
+    h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: .85rem;
+      margin-bottom: 3rem;
+      line-height: 1.7;
+    }
+
+    /* ─── cards ─── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1px;
+      border: 1px solid var(--border);
+      background: var(--border);
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      background: var(--surface);
+      padding: 1.6rem;
+      transition: background .2s;
+    }
+    .card:hover { background: #15202d; }
+
+    .card-icon {
+      font-size: 1.4rem;
+      margin-bottom: .8rem;
+    }
+    .card-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      color: #fff;
+      margin-bottom: .4rem;
+      letter-spacing: .03em;
+    }
+    .card-desc {
+      font-size: .75rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+    .card-tag {
+      display: inline-block;
+      margin-top: .8rem;
+      font-size: .65rem;
+      color: var(--accent);
+      border: 1px solid rgba(0,212,161,.3);
+      padding: .15rem .45rem;
+      border-radius: 2px;
+    }
+
+    /* ─── terminal block ─── */
+    .terminal {
+      background: #070b0f;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+    .terminal-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: .6rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      font-size: .7rem;
+      color: var(--muted);
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot.r { background: var(--danger); }
+    .dot.y { background: #f5a623; }
+    .dot.g { background: var(--ok); }
+    .terminal-body {
+      padding: 1.2rem 1.4rem;
+      font-size: .78rem;
+      line-height: 2;
+    }
+    .prompt  { color: var(--accent); }
+    .cmd     { color: #fff; }
+    .comment { color: var(--muted); }
+    .out     { color: #7ab8f5; }
+
+    /* ─── status bar ─── */
+    .status-bar {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+    .status-item {
+      flex: 1;
+      min-width: 160px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1rem 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: .3rem;
+    }
+    .status-label { font-size: .65rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
+    .status-value { font-size: 1rem; color: #fff; font-weight: 700; }
+    .status-value .dot-inline {
+      display: inline-block; width: 8px; height: 8px;
+      border-radius: 50%; background: var(--ok);
+      margin-right: .4rem;
+      box-shadow: 0 0 6px var(--ok);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; } 50% { opacity: .4; }
+    }
+
+    /* ─── footer ─── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.2rem 2rem;
+      font-size: .7rem;
+      color: var(--muted);
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: .5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">srv<span>.</span>stack</div>
+    <span class="badge ok">● ONLINE</span>
+    <span class="badge inf">Alpine Linux</span>
+  </header>
+
+  <main>
+    <h1>Servidor<br><em>operativo.</em></h1>
+    <p class="subtitle">
+      Entorno Docker Compose · Nginx Alpine + OpenSSH Alpine<br>
+      Hardened · Read-only filesystem · Non-root users
+    </p>
+
+    <!-- Status -->
+    <div class="status-bar">
+      <div class="status-item">
+        <span class="status-label">Nginx</span>
+        <span class="status-value"><span class="dot-inline"></span>Running</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">SSH</span>
+        <span class="status-value"><span class="dot-inline"></span>Running</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Imagen base</span>
+        <span class="status-value" style="font-size:.85rem">nginx:alpine</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Seguridad</span>
+        <span class="status-value" style="color:var(--accent);font-size:.85rem">no-new-privs</span>
+      </div>
+    </div>
+
+    <!-- Cards -->
+    <div class="grid">
+      <div class="card">
+        <div class="card-icon">🌐</div>
+        <div class="card-title">Nginx Web Server</div>
+        <div class="card-desc">Sirviendo contenido estático con headers de seguridad (CSP, HSTS-ready, X-Frame-Options) y sistema de archivos en solo lectura.</div>
+        <span class="card-tag">puerto 8080</span>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔐</div>
+        <div class="card-title">OpenSSH Server</div>
+        <div class="card-desc">Solo autenticación por clave pública, usuario no-root, sin contraseñas, sin reenvío X11, sin AgentForwarding.</div>
+        <span class="card-tag">puerto 2222</span>
+      </div>
+      <div class="card">
+        <div class="card-icon">🏔️</div>
+        <div class="card-title">Alpine Base</div>
+        <div class="card-desc">Imagen mínima (~5 MB). Sin shell innecesario, sin paquetes extra. Superficie de ataque reducida al mínimo.</div>
+        <span class="card-tag">~20 MB total</span>
+      </div>
+      <div class="card">
+        <div class="card-icon">🛡️</div>
+        <div class="card-title">Hardening</div>
+        <div class="card-desc">cap_drop ALL, no-new-privileges, healthchecks, red interna aislada, volúmenes solo lectura.</div>
+        <span class="card-tag">CIS-aligned</span>
+      </div>
+    </div>
+
+    <!-- Terminal -->
+    <div class="terminal">
+      <div class="terminal-bar">
+        <span class="dot r"></span>
+        <span class="dot y"></span>
+        <span class="dot g"></span>
+        <span style="margin-left:.5rem">bash — acceso rápido</span>
+      </div>
+      <div class="terminal-body">
+        <div><span class="prompt">$ </span><span class="cmd">docker compose up -d</span></div>
+        <div><span class="out">✔ Container stack_nginx  Started</span></div>
+        <div><span class="out">✔ Container stack_sshd   Started</span></div>
+        <div>&nbsp;</div>
+        <div><span class="comment"># Conectar por SSH</span></div>
+        <div><span class="prompt">$ </span><span class="cmd">ssh -p 2222 sysadmin@localhost</span></div>
+        <div>&nbsp;</div>
+        <div><span class="comment"># Ver logs en tiempo real</span></div>
+        <div><span class="prompt">$ </span><span class="cmd">docker compose logs -f nginx</span></div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    <span>srv.stack · Docker Compose</span>
+    <span id="ts"></span>
+  </footer>
+
+  <script>
+    const ts = document.getElementById('ts');
+    const fmt = () => new Date().toISOString().replace('T',' ').slice(0,19) + ' UTC';
+    ts.textContent = fmt();
+    setInterval(() => ts.textContent = fmt(), 1000);
+  </script>
+</body>
+</html>

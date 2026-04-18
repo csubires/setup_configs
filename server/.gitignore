@@ -1,0 +1,8 @@
+# Claves SSH de host (autogeneradas, no versionar)
+ssh/keys/
+
+# Variables de entorno con datos sensibles
+.env
+
+# Logs
+*.log

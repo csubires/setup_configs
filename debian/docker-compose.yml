@@ -1,0 +1,49 @@
+# =============================================================================
+#  docker-compose.yml — Dev environment
+#  Usage:
+#    docker compose up -d --build   # build + start
+#    docker compose exec dev zsh    # attach a zsh session
+#    docker compose down            # stop & remove container
+# =============================================================================
+
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DEV_USER: dev
+        DEV_UID:  "${UID:-1000}"      # inherits host UID to avoid permission issues
+        DEV_GID:  "${GID:-1000}"
+
+    image: devsetup:latest
+    container_name: devsetup
+
+    # ── Keep alive without a process ─────────────────────────────────────────
+    stdin_open: true
+    tty: true
+
+    # ── Volumes ───────────────────────────────────────────────────────────────
+    volumes:
+      # Persist the home directory across rebuilds
+      - dev-home:/home/dev
+
+      # Mount your local workspace (read-write)
+      - ./workspace:/home/dev/workspace
+
+    # ── Environment ───────────────────────────────────────────────────────────
+    environment:
+      TERM: xterm-256color
+      LANG: en_US.UTF-8
+
+    # ── Resource limits (optional, lightweight) ───────────────────────────────
+    mem_limit: 512m
+    cpus: "1.0"
+
+    # ── Restart policy ────────────────────────────────────────────────────────
+    restart: unless-stopped
+
+# ── Named volumes ─────────────────────────────────────────────────────────────
+volumes:
+  dev-home:
+    driver: local

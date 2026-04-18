@@ -1,0 +1,14 @@
+// Settings in here override those in "Default/Preferences.sublime-settings",
+// and are overridden in turn by syntax-specific settings.
+{
+    "font_size": 11,
+    "ignored_packages":
+    [
+        "Vintage"
+    ],
+    "trim_automatic_white_space": false,
+    "update_check": false,
+    "theme": "auto",
+    "color_scheme": "Mariana.sublime-color-scheme",
+    "font_face": "FiraMono Nerd Font",
+}

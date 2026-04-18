@@ -1,0 +1,57 @@
+# ─── sshd_config – configuración endurecida ────────────────────────────
+
+# Claves de host (montadas como volumen para persistencia)
+HostKey /etc/ssh/host_keys/ssh_host_ed25519_key
+HostKey /etc/ssh/host_keys/ssh_host_rsa_key
+
+# Puerto y protocolo
+Port 22
+AddressFamily inet
+
+# ── Autenticación ────────────────────────────────────────────────────────
+PubkeyAuthentication yes
+AuthorizedKeysFile   .ssh/authorized_keys
+
+# Deshabilitar TODO lo que no sea clave pública
+PasswordAuthentication     no
+PermitEmptyPasswords       no
+ChallengeResponseAuthentication no
+KbdInteractiveAuthentication    no
+UsePAM                     no
+
+# Bloquear login de root
+PermitRootLogin no
+
+# ── Seguridad adicional ──────────────────────────────────────────────────
+X11Forwarding          no
+AllowAgentForwarding   no
+AllowTcpForwarding     no
+PermitTunnel           no
+GatewayPorts           no
+PermitUserEnvironment  no
+StrictModes            yes
+
+# Tiempo de gracia de autenticación reducido
+LoginGraceTime  20
+MaxAuthTries    3
+MaxSessions     5
+
+# ── Algoritmos modernos ──────────────────────────────────────────────────
+KexAlgorithms          curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512
+Ciphers                chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com
+MACs                   hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com
+
+# ── Keepalive ────────────────────────────────────────────────────────────
+ClientAliveInterval  60
+ClientAliveCountMax  3
+TCPKeepAlive         yes
+
+# ── Logging ─────────────────────────────────────────────────────────────
+SyslogFacility AUTH
+LogLevel       VERBOSE
+
+# ── Banner disuasorio ────────────────────────────────────────────────────
+Banner /etc/ssh/banner.txt
+
+# Subsistema SFTP desactivado (activar si se necesita)
+# Subsystem sftp /usr/lib/ssh/sftp-server

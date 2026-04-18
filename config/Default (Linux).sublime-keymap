@@ -1,0 +1,14 @@
+[
+	{ "keys": ["alt+up"], "command": "swap_line_up" },
+	{ "keys": ["alt+down"], "command": "swap_line_down" },
+	{ "keys": ["alt+shift+i"], "command": "split_selection_into_lines" },
+	{ "keys": ["shift+space"], "command": "single_selection", "context":
+		[
+			{ "key": "num_selections", "operator": "not_equal", "operand": 1 }
+		]
+	},
+	{ "keys": ["ctrl+shift+up"], "command": "select_lines", "args": {"forward": false} },
+	{ "keys": ["ctrl+shift+down"], "command": "select_lines", "args": {"forward": true} },
+	{ "keys": ["ctrl+shift+l"], "command": "find_all_under" },
+	{ "keys": ["ctrl+w+k"], "command": "close_all" },
+]
