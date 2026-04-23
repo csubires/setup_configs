@@ -1,0 +1,75 @@
+Categoria,AppID,Nombre_Descripcion,Accion
+Microsoft Bloat,Microsoft.3DBuilder,3D Builder,DESINSTALAR
+Microsoft Bloat,Microsoft.AppConnector,App Connector,DESINSTALAR
+Microsoft Bloat,Microsoft.BingFinance,Bing Finance,DESINSTALAR
+Microsoft Bloat,Microsoft.BingNews,Bing Noticias,DESINSTALAR
+Microsoft Bloat,Microsoft.BingSports,Bing Deportes,DESINSTALAR
+Microsoft Bloat,Microsoft.BingWeather,Bing El Tiempo,DESINSTALAR
+Microsoft Bloat,Microsoft.CommsPhone,Comunicaciones / Telefono,DESINSTALAR
+Microsoft Bloat,Microsoft.ConnectivityStore,Connectivity Store,DESINSTALAR
+Microsoft Bloat,Microsoft.Getstarted,Introduccion a Windows,DESINSTALAR
+Microsoft Bloat,Microsoft.Messaging,Mensajeria,DESINSTALAR
+Microsoft Bloat,Microsoft.Microsoft3DViewer,Visor 3D,DESINSTALAR
+Microsoft Bloat,Microsoft.MicrosoftOfficeHub,Office Hub,DESINSTALAR
+Microsoft Bloat,Microsoft.MicrosoftPowerBIForWindows,Power BI,DESINSTALAR
+Microsoft Bloat,Microsoft.MicrosoftSolitaireCollection,Solitario,DESINSTALAR
+Microsoft Bloat,Microsoft.MicrosoftStickyNotes,Notas Adhesivas,DESINSTALAR
+Microsoft Bloat,Microsoft.MinecraftUWP,Minecraft UWP,DESINSTALAR
+Microsoft Bloat,Microsoft.NetworkSpeedTest,Test de Velocidad de Red,DESINSTALAR
+Microsoft Bloat,Microsoft.Office.OneNote,OneNote,DESINSTALAR
+Microsoft Bloat,Microsoft.Office.Sway,Sway,DESINSTALAR
+Microsoft Bloat,Microsoft.OneConnect,OneConnect,DESINSTALAR
+Microsoft Bloat,Microsoft.People,Personas / Contactos,DESINSTALAR
+Microsoft Bloat,Microsoft.Print3D,Print 3D,DESINSTALAR
+Microsoft Bloat,Microsoft.RemoteDesktop,Escritorio Remoto,DESINSTALAR
+Microsoft Bloat,Microsoft.SkypeApp,Skype,DESINSTALAR
+Microsoft Bloat,Microsoft.WindowsCamera,Camara de Windows,DESINSTALAR
+Microsoft Bloat,microsoft.windowscommunicationsapps,Correo y Calendario,DESINSTALAR
+Microsoft Bloat,Microsoft.WindowsFeedback,Feedback de Windows,DESINSTALAR
+Microsoft Bloat,Microsoft.WindowsFeedbackHub,Hub de Comentarios,DESINSTALAR
+Microsoft Bloat,Microsoft.WindowsMaps,Mapas de Windows,DESINSTALAR
+Microsoft Bloat,Microsoft.WindowsPhone,Windows Phone Companion,DESINSTALAR
+Microsoft Bloat,Microsoft.ZuneMusic,Groove Musica,DESINSTALAR
+Microsoft Bloat,Microsoft.ZuneVideo,Peliculas y TV,DESINSTALAR
+Microsoft Bloat,Windows.ContactSupport,Soporte de Contacto,DESINSTALAR
+Microsoft Bloat,Windows.PurchaseDialog,Purchase Dialog,DESINSTALAR
+Microsoft Bloat,Microsoft.Wallet_2.1.18009.0_x64__8wekyb3d8bbwe,Microsoft Wallet,DESINSTALAR
+Microsoft Bloat,excel.office.com-72EAE3D_1.0.0.0_neutral__2vp2pd36ganw2,Excel office,DESINSTALAR
+Microsoft Bloat,powerpoint.office.com-3532D2AB_1.0.0.0_neutral__sxc7ffma4ybfy,Microsoft powerpoint,DESINSTALAR
+Microsoft Bloat,outlook.com-39C7C96A_1.0.0.1_neutral__3t89ybq5n4y7r,Microsoft outlook,DESINSTALAR
+Microsoft Bloat,word.office.com-51E922F2_1.0.0.0_neutral__jc2kecmnkxwqc,Microsoft word,DESINSTALAR
+Xbox,Microsoft.XboxApp,Xbox,DESINSTALAR
+Xbox,Microsoft.XboxIdentityProvider,Xbox Identity Provider,DESINSTALAR
+Xbox,Microsoft.XboxSpeechToTextOverlay,Xbox Speech To Text,DESINSTALAR
+Xbox,Microsoft.XboxGameOverlay,Xbox Game Overlay,DESINSTALAR
+Xbox,Microsoft.Xbox.TCUI,Xbox TCUI,DESINSTALAR
+Xbox,Microsoft.XboxGamingOverlay,Xbox Gaming Overlay,DESINSTALAR
+Xbox,Microsoft.XboxGameCallableUI,Xbox Game Callable UI,DESINSTALAR
+Terceros,9E2F88E3.Twitter,Twitter,DESINSTALAR
+Terceros,king.com.CandyCrushSodaSaga,Candy Crush Soda Saga,DESINSTALAR
+Terceros,4DF9E0F8.Netflix,Netflix,DESINSTALAR
+Terceros,Drawboard.DrawboardPDF,Drawboard PDF,DESINSTALAR
+Terceros,D52A8D61.FarmVille2CountryEscape,FarmVille 2,DESINSTALAR
+Terceros,GAMELOFTSA.Asphalt8Airborne,Asphalt 8 Airborne,DESINSTALAR
+Terceros,flaregamesGmbH.RoyalRevolt2,Royal Revolt 2,DESINSTALAR
+Terceros,AdobeSystemsIncorporated.AdobePhotoshopExpress,Adobe Photoshop Express,DESINSTALAR
+Terceros,ActiproSoftwareLLC.562882FEEB491,Actipro Software,DESINSTALAR
+Terceros,D5EA27B7.Duolingo-LearnLanguagesforFree,Duolingo,DESINSTALAR
+Terceros,Facebook.Facebook,Facebook,DESINSTALAR
+Terceros,46928bounde.EclipseManager,Eclipse Manager,DESINSTALAR
+Terceros,A278AB0D.MarchofEmpires,March of Empires,DESINSTALAR
+Terceros,KeeperSecurityInc.Keeper,Keeper Password Manager,DESINSTALAR
+Terceros,king.com.BubbleWitch3Saga,Bubble Witch 3 Saga,DESINSTALAR
+Terceros,89006A2E.AutodeskSketchBook,Autodesk Sketchbook,DESINSTALAR
+Terceros,CAF9E577.Plex,Plex,DESINSTALAR
+Terceros,A278AB0D.DisneyMagicKingdoms,Disney Magic Kingdoms,DESINSTALAR
+Terceros,828B5831.HiddenCityMysteryofShadows,Hidden City Mystery,DESINSTALAR
+Terceros,WinZipComputing.WinZipUniversal,WinZip Universal,DESINSTALAR
+Terceros,SpotifyAB.SpotifyMusic,Spotify,DESINSTALAR
+Terceros,PandoraMediaInc.29680B314EFC2,Pandora,DESINSTALAR
+Terceros,2414FC7A.Viber,Viber,DESINSTALAR
+Terceros,64885BlueEdge.OneCalendar,One Calendar,DESINSTALAR
+Terceros,41038Axilesoft.ACGMediaPlayer,ACG Media Player,DESINSTALAR
+OneDrive,OneDrive,Microsoft OneDrive,DESINSTALAR
+Store,Microsoft.DesktopAppInstaller,Desktop App Installer,DESINSTALAR
+Store,Microsoft.WindowsStore,Windows Store,DESINSTALAR

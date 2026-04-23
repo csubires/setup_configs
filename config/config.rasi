@@ -1,0 +1,26 @@
+// Create shotcut Ctrl + Space
+// rofi -show favorites
+// /usr/share/applications/
+// /var/lib/flatpak/exports/share/applications/
+// ~/.local/share/applications/
+
+@theme "/usr/share/rofi/themes/Monokai.rasi"
+
+configuration {
+    modi: "favorites:~/.config/rofi/favorites.sh,drun,window";
+    show-icons: true;
+    icon-theme: "Papirus";
+    width: 50;
+    sidebar-mode: true;
+    drun-display-format: "{icon} {name}";
+    run-command: "{cmd}";
+    run-shell-command: "{terminal} -e {cmd}";
+    hide-scrollbar: false;
+    case-sensitive: false;
+    sorting-method: "fzf";
+    matching: "fuzzy";
+    timeout {
+        action: "kb-cancel";
+        delay: 0;
+    }
+}

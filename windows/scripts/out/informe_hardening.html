@@ -1,0 +1,1815 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Informe Hardening - DESKTOP-NOTUPOG</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;600&display=swap');
+  :root{
+    --bg:#080b0f;--surface:#0d1117;--surface2:#111820;--border:#1e2a38;
+    --accent:#e63946;--accent2:#00b4d8;--amber:#f4a261;--green:#2dc653;
+    --purple:#a78bfa;--text:#c9d1d9;--dim:#8b949e;
+    --mono:'Share Tech Mono',monospace;
+    --head:'Barlow Condensed',sans-serif;
+    --body:'Barlow',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:13px;line-height:1.5;}
+
+  /* HEADER */
+  header{padding:44px 52px 36px;background:linear-gradient(135deg,#080b0f 0%,#0d1520 50%,#0a0010 100%);border-bottom:2px solid var(--accent);position:relative;overflow:hidden;}
+  header::before{content:'';position:absolute;top:-100px;right:-100px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(230,57,70,.1) 0%,transparent 65%);pointer-events:none;}
+  header::after{content:'HARDENING';position:absolute;right:48px;bottom:-10px;font-family:var(--head);font-size:120px;font-weight:900;color:rgba(255,255,255,.02);letter-spacing:-4px;pointer-events:none;}
+  .h-label{font-family:var(--mono);font-size:10px;letter-spacing:4px;color:var(--accent);text-transform:uppercase;margin-bottom:6px;}
+  header h1{font-family:var(--head);font-size:42px;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1;}
+  header h1 em{color:var(--accent);font-style:normal;}
+  .h-meta{margin-top:14px;font-family:var(--mono);font-size:11px;color:var(--dim);display:flex;gap:28px;flex-wrap:wrap;}
+  .h-meta b{color:var(--accent2);}
+
+  /* STATS */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;padding:28px 52px;background:var(--surface);border-bottom:1px solid var(--border);}
+  .sc{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:16px 20px;position:relative;overflow:hidden;}
+  .sc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;}
+  .sc.s-total::after{background:var(--accent2);}
+  .sc.s-pend::after{background:var(--accent);}
+  .sc.s-diff::after{background:var(--amber);}
+  .sc.s-done::after{background:var(--green);}
+  .sc.s-menu::after{background:var(--purple);}
+  .sc-num{font-family:var(--head);font-size:44px;font-weight:900;line-height:1;margin-bottom:2px;}
+  .sc.s-total .sc-num{color:var(--accent2);}
+  .sc.s-pend  .sc-num{color:var(--accent);}
+  .sc.s-diff  .sc-num{color:var(--amber);}
+  .sc.s-done  .sc-num{color:var(--green);}
+  .sc.s-menu  .sc-num{color:var(--purple);}
+  .sc-lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--dim);}
+
+  /* TABS */
+  .tabs{display:flex;gap:0;padding:0 52px;background:var(--surface);border-bottom:1px solid var(--border);}
+  .tab-btn{padding:12px 22px;border:none;background:transparent;color:var(--dim);font-family:var(--body);font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;}
+  .tab-btn:hover{color:var(--text);}
+  .tab-btn.active{color:var(--accent2);border-bottom-color:var(--accent2);}
+
+  /* PANELS */
+  .panel{display:none;padding:28px 52px 52px;}
+  .panel.active{display:block;}
+
+  /* TOOLBAR */
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:20px;}
+  .toolbar label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin-right:2px;}
+  .filter-btn{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 12px;border-radius:4px;cursor:pointer;font-family:var(--body);font-size:12px;font-weight:600;transition:all .15s;}
+  .filter-btn:hover,.filter-btn.active{border-color:var(--accent2);color:var(--accent2);background:rgba(0,180,216,.08);}
+  input.search{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 12px;border-radius:4px;font-family:var(--mono);font-size:11px;width:280px;outline:none;}
+  input.search:focus{border-color:var(--accent2);}
+
+  /* SUMMARY TABLE */
+  .progress-wrap{position:relative;height:18px;background:var(--border);border-radius:3px;overflow:hidden;min-width:100px;}
+  .progress-bar{height:100%;border-radius:3px;transition:width .3s;}
+  .progress-label{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:10px;font-weight:700;color:#fff;mix-blend-mode:difference;}
+
+  /* TABLES */
+  table{width:100%;border-collapse:collapse;font-size:12px;}
+  thead th{background:#080b0f;border-bottom:2px solid var(--border);padding:10px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--dim);white-space:nowrap;}
+  tbody tr{border-bottom:1px solid var(--border);transition:background .1s;}
+  tbody tr:hover{background:rgba(255,255,255,.025);}
+  tbody td{padding:8px 12px;vertical-align:middle;}
+  .row-pending{background:rgba(230,57,70,.035);}
+  .row-diff{background:rgba(244,162,97,.035);}
+  .row-done{background:rgba(45,198,83,.02);}
+
+  /* BADGES */
+  .badge{display:inline-block;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;font-family:var(--mono);white-space:nowrap;}
+  .badge-pending{background:rgba(230,57,70,.2);color:#ff6b78;border:1px solid rgba(230,57,70,.35);}
+  .badge-diff{background:rgba(244,162,97,.2);color:#f4a261;border:1px solid rgba(244,162,97,.35);}
+  .badge-done{background:rgba(45,198,83,.15);color:#4ade80;border:1px solid rgba(45,198,83,.3);}
+
+  .op{display:inline-block;padding:1px 6px;border-radius:2px;font-size:9px;font-weight:700;font-family:var(--mono);}
+  .op-set{background:#1a2a3a;color:#60a5fa;}
+  .op-del{background:#2e1a1a;color:#f87171;}
+
+  /* CAT COLORS - generated dynamically via class */
+  .cat{display:inline-block;padding:2px 7px;border-radius:2px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;}
+  .cat-telemetr{background:#1a0a2e;color:#c084fc;}
+  .cat-wifisen{background:#1a2a1a;color:#34d399;}
+  .cat-smartsc{background:#2e2a1a;color:#fbbf24;}
+  .cat-busqued{background:#1a2a3a;color:#60a5fa;}
+  .cat-sugeren{background:#2e1a28;color:#e879f9;}
+  .cat-pantall{background:#1a1a2e;color:#818cf8;}
+  .cat-ubicaci{background:#1a2e2a;color:#2dd4bf;}
+  .cat-mapas{background:#1a2e2e;color:#06b6d4;}
+  .cat-feedbac{background:#2e1a1a;color:#fca5a5;}
+  .cat-publici{background:#2a1a1a;color:#fb923c;}
+  .cat-cortana{background:#1a0a2e;color:#a78bfa;}
+  .cat-errorre{background:#2a1a00;color:#f97316;}
+  .cat-windows{background:#1a2038;color:#7dd3fc;}
+  .cat-uac{background:#2e2010;color:#fcd34d;}
+  .cat-red{background:#102020;color:#5eead4;}
+  .cat-firewal{background:#2e0a0a;color:#fca5a5;}
+  .cat-defende{background:#0a2e1a;color:#6ee7b7;}
+  .cat-experie{background:#2a1a2e;color:#d8b4fe;}
+  .cat-accesore{background:#2e1a1a;color:#f87171;}
+  .cat-medios{background:#1a2e1a;color:#86efac;}
+  .cat-sistema{background:#1e2530;color:#8b949e;}
+  .cat-explora{background:#1a2838;color:#7dd3fc;}
+  .cat-rendimi{background:#2e2808;color:#fde68a;}
+  .cat-adminis{background:#1a1a2e;color:#a5b4fc;}
+  .cat-onedri{background:#1c1460;color:#a5b4fc;}
+  .cat-hiberna{background:#1a1a2e;color:#818cf8;}
+  .cat-superfe{background:#2e2010;color:#fcd34d;}
+  .cat-desfrag{background:#1a0a00;color:#fed7aa;}
+  .cat-memoria{background:#2a1a2e;color:#d8b4fe;}
+  .cat-privaci{background:#0a1a2e;color:#93c5fd;}
+
+  /* TAG sub */
+  .tag-sub{display:inline-block;padding:2px 8px;border-radius:2px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+  .tag-privacidad{background:#1a0a2e;color:#c084fc;}
+  .tag-estetica{background:#1a2838;color:#7dd3fc;}
+  .tag-desinstalacion{background:#2e1a1a;color:#fca5a5;}
+  .tag-ssdoptimizacion{background:#1a2e1a;color:#6ee7b7;}
+
+  .mono{font-family:var(--mono);}
+  .small{font-size:11px;}
+  .center{text-align:center;}
+  .dim{color:var(--dim);}
+  .path{max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--dim);}
+  .desc{max-width:240px;color:var(--dim);}
+  .curr{color:#f87171;}
+  .obj{color:#4ade80;}
+
+  .section-title{font-family:var(--head);font-size:18px;font-weight:700;color:#fff;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+
+  footer{text-align:center;padding:20px;font-family:var(--mono);font-size:10px;color:var(--dim);border-top:1px solid var(--border);}
+  footer span{color:var(--accent);}
+  ::-webkit-scrollbar{width:5px;height:5px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-label">// Windows 10 // Registry Hardening & Setup</div>
+  <h1>Hardening & <em>Configuracion</em></h1>
+  <div class="h-meta">
+    <div><b>Host</b> DESKTOP-NOTUPOG</div>
+    <div><b>Usuario</b> user</div>
+    <div><b>Fecha</b> 17/04/2026 18:56:47</div>
+    <div><b>CSV</b> C:\Users\user\Desktop\registry\hardening_registry.csv</div>
+  </div>
+</header>
+
+<div class="stats">
+  <div class="sc s-total"><div class="sc-num">106</div><div class="sc-lbl">Entradas totales</div></div>
+  <div class="sc s-pend"><div class="sc-num">2</div><div class="sc-lbl">Pendientes</div></div>
+  <div class="sc s-diff"><div class="sc-num">26</div><div class="sc-lbl">Valor diferente</div></div>
+  <div class="sc s-done"><div class="sc-num">78</div><div class="sc-lbl">Ya aplicadas</div></div>
+  <div class="sc s-menu"><div class="sc-num">4</div><div class="sc-lbl">Categorias</div></div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('summary',this)">Resumen por funcion</button>
+  <button class="tab-btn" onclick="showTab('detail',this)">Detalle de claves</button>
+</div>
+
+<!-- TAB RESUMEN -->
+<div id="tab-summary" class="panel active">
+  <div class="section-title">Estado de aplicacion por funcion</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Menu</th>
+        <th>Funcion</th>
+        <th>Total claves</th>
+        <th>Pendientes</th>
+        <th>Aplicadas</th>
+        <th>Progreso</th>
+      </tr>
+    </thead>
+    <tbody>
+              <tr>
+            <td><span class="tag-sub tag-desinstalacion">Desinstalacion</span></td>
+            <td><strong>DisableOneDrive</strong></td>
+            <td class="center">1</td>
+            <td class="center" style="color:#e63946"></td>
+            <td class="center" style="color:#2dc653">0</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:0%;background:#e63946"></div>
+                <span class="progress-label">0%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-estetica">Estetica</span></td>
+            <td><strong>EnableAdminAndHidde</strong></td>
+            <td class="center">1</td>
+            <td class="center" style="color:#e63946">0</td>
+            <td class="center" style="color:#2dc653"></td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:0%;background:#e63946"></div>
+                <span class="progress-label">0%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-estetica">Estetica</span></td>
+            <td><strong>EnableFileDeleteConfirm</strong></td>
+            <td class="center">1</td>
+            <td class="center" style="color:#e63946"></td>
+            <td class="center" style="color:#2dc653">0</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:0%;background:#e63946"></div>
+                <span class="progress-label">0%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-estetica">Estetica</span></td>
+            <td><strong>HideRecentShortcuts</strong></td>
+            <td class="center">2</td>
+            <td class="center" style="color:#e63946">0</td>
+            <td class="center" style="color:#2dc653">2</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:100%;background:#2dc653"></div>
+                <span class="progress-label">100%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-estetica">Estetica</span></td>
+            <td><strong>HideTaskbarSearchBox</strong></td>
+            <td class="center">1</td>
+            <td class="center" style="color:#e63946">0</td>
+            <td class="center" style="color:#2dc653"></td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:0%;background:#e63946"></div>
+                <span class="progress-label">0%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-estetica">Estetica</span></td>
+            <td><strong>SetExplorerThisPC</strong></td>
+            <td class="center">1</td>
+            <td class="center" style="color:#e63946"></td>
+            <td class="center" style="color:#2dc653">0</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:0%;background:#e63946"></div>
+                <span class="progress-label">0%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-estetica">Estetica</span></td>
+            <td><strong>SetVisualFXPerformance</strong></td>
+            <td class="center">9</td>
+            <td class="center" style="color:#e63946">4</td>
+            <td class="center" style="color:#2dc653">5</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:56%;background:#f4a261"></div>
+                <span class="progress-label">56%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-estetica">Estetica</span></td>
+            <td><strong>ShowHiddenFiles</strong></td>
+            <td class="center">1</td>
+            <td class="center" style="color:#e63946">0</td>
+            <td class="center" style="color:#2dc653"></td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:0%;background:#e63946"></div>
+                <span class="progress-label">0%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-estetica">Estetica</span></td>
+            <td><strong>ShowKnownExtensions</strong></td>
+            <td class="center">1</td>
+            <td class="center" style="color:#e63946">0</td>
+            <td class="center" style="color:#2dc653"></td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:0%;background:#e63946"></div>
+                <span class="progress-label">0%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>DisableAdminShares</strong></td>
+            <td class="center">1</td>
+            <td class="center" style="color:#e63946">0</td>
+            <td class="center" style="color:#2dc653"></td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:0%;background:#e63946"></div>
+                <span class="progress-label">0%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>DisableAdvertisingID</strong></td>
+            <td class="center">2</td>
+            <td class="center" style="color:#e63946">0</td>
+            <td class="center" style="color:#2dc653">2</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:100%;background:#2dc653"></div>
+                <span class="progress-label">100%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>DisableAppSuggestions</strong></td>
+            <td class="center">14</td>
+            <td class="center" style="color:#e63946"></td>
+            <td class="center" style="color:#2dc653">13</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:93%;background:#f4a261"></div>
+                <span class="progress-label">93%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>DisableAutoplay</strong></td>
+            <td class="center">1</td>
+            <td class="center" style="color:#e63946">0</td>
+            <td class="center" style="color:#2dc653"></td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:0%;background:#e63946"></div>
+                <span class="progress-label">0%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>DisableAutorun</strong></td>
+            <td class="center">1</td>
+            <td class="center" style="color:#e63946"></td>
+            <td class="center" style="color:#2dc653">0</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:0%;background:#e63946"></div>
+                <span class="progress-label">0%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>DisableCortana</strong></td>
+            <td class="center">9</td>
+            <td class="center" style="color:#e63946">3</td>
+            <td class="center" style="color:#2dc653">6</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:67%;background:#f4a261"></div>
+                <span class="progress-label">67%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>DisableDefenderCloud</strong></td>
+            <td class="center">2</td>
+            <td class="center" style="color:#e63946"></td>
+            <td class="center" style="color:#2dc653"></td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:0%;background:#e63946"></div>
+                <span class="progress-label">0%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>DisableErrorReporting</strong></td>
+            <td class="center">1</td>
+            <td class="center" style="color:#e63946"></td>
+            <td class="center" style="color:#2dc653">0</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:0%;background:#e63946"></div>
+                <span class="progress-label">0%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>DisableFastStartup</strong></td>
+            <td class="center">1</td>
+            <td class="center" style="color:#e63946">0</td>
+            <td class="center" style="color:#2dc653"></td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:0%;background:#e63946"></div>
+                <span class="progress-label">0%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>DisableFeedback</strong></td>
+            <td class="center">2</td>
+            <td class="center" style="color:#e63946"></td>
+            <td class="center" style="color:#2dc653"></td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:0%;background:#e63946"></div>
+                <span class="progress-label">0%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>DisableFirewall</strong></td>
+            <td class="center">1</td>
+            <td class="center" style="color:#e63946">0</td>
+            <td class="center" style="color:#2dc653"></td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:0%;background:#e63946"></div>
+                <span class="progress-label">0%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>DisableLastlivedat</strong></td>
+            <td class="center">1</td>
+            <td class="center" style="color:#e63946">0</td>
+            <td class="center" style="color:#2dc653"></td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:0%;background:#e63946"></div>
+                <span class="progress-label">0%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>DisableLocationTracking</strong></td>
+            <td class="center">3</td>
+            <td class="center" style="color:#e63946">0</td>
+            <td class="center" style="color:#2dc653">3</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:100%;background:#2dc653"></div>
+                <span class="progress-label">100%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>DisableLockScreenSpotlight</strong></td>
+            <td class="center">3</td>
+            <td class="center" style="color:#e63946">0</td>
+            <td class="center" style="color:#2dc653">3</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:100%;background:#2dc653"></div>
+                <span class="progress-label">100%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>DisableMapUpdates</strong></td>
+            <td class="center">1</td>
+            <td class="center" style="color:#e63946">0</td>
+            <td class="center" style="color:#2dc653"></td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:0%;background:#e63946"></div>
+                <span class="progress-label">0%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>DisableRemoteAssistance</strong></td>
+            <td class="center">3</td>
+            <td class="center" style="color:#e63946">0</td>
+            <td class="center" style="color:#2dc653">3</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:100%;background:#2dc653"></div>
+                <span class="progress-label">100%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>DisableRemoteDesktop</strong></td>
+            <td class="center">2</td>
+            <td class="center" style="color:#e63946">0</td>
+            <td class="center" style="color:#2dc653">2</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:100%;background:#2dc653"></div>
+                <span class="progress-label">100%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>DisableSharedExperiences</strong></td>
+            <td class="center">1</td>
+            <td class="center" style="color:#e63946">0</td>
+            <td class="center" style="color:#2dc653"></td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:0%;background:#e63946"></div>
+                <span class="progress-label">0%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>DisableSharingMappedDrives</strong></td>
+            <td class="center">1</td>
+            <td class="center" style="color:#e63946"></td>
+            <td class="center" style="color:#2dc653">0</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:0%;background:#e63946"></div>
+                <span class="progress-label">0%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>DisableSmartScreen</strong></td>
+            <td class="center">2</td>
+            <td class="center" style="color:#e63946"></td>
+            <td class="center" style="color:#2dc653"></td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:0%;background:#e63946"></div>
+                <span class="progress-label">0%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>DisableStorageSense</strong></td>
+            <td class="center">1</td>
+            <td class="center" style="color:#e63946"></td>
+            <td class="center" style="color:#2dc653">0</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:0%;background:#e63946"></div>
+                <span class="progress-label">0%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>DisableTelemetry</strong></td>
+            <td class="center">3</td>
+            <td class="center" style="color:#e63946">0</td>
+            <td class="center" style="color:#2dc653">3</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:100%;background:#2dc653"></div>
+                <span class="progress-label">100%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>DisableWebSearch</strong></td>
+            <td class="center">2</td>
+            <td class="center" style="color:#e63946"></td>
+            <td class="center" style="color:#2dc653"></td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:0%;background:#e63946"></div>
+                <span class="progress-label">0%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>DisableWiFiSense</strong></td>
+            <td class="center">4</td>
+            <td class="center" style="color:#e63946">0</td>
+            <td class="center" style="color:#2dc653">4</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:100%;background:#2dc653"></div>
+                <span class="progress-label">100%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>EnableAllPrivacy</strong></td>
+            <td class="center">9</td>
+            <td class="center" style="color:#e63946">5</td>
+            <td class="center" style="color:#2dc653">4</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:44%;background:#e63946"></div>
+                <span class="progress-label">44%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>SetP2PUpdateLocal</strong></td>
+            <td class="center">2</td>
+            <td class="center" style="color:#e63946">2</td>
+            <td class="center" style="color:#2dc653">0</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:0%;background:#e63946"></div>
+                <span class="progress-label">0%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-privacidad">Privacidad</span></td>
+            <td><strong>SetUACHigh</strong></td>
+            <td class="center">5</td>
+            <td class="center" style="color:#e63946"></td>
+            <td class="center" style="color:#2dc653">4</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:80%;background:#f4a261"></div>
+                <span class="progress-label">80%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-ssdoptimizacion">SSD Optimizacion</span></td>
+            <td><strong>DisableDefragmentation</strong></td>
+            <td class="center">2</td>
+            <td class="center" style="color:#e63946"></td>
+            <td class="center" style="color:#2dc653"></td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:0%;background:#e63946"></div>
+                <span class="progress-label">0%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-ssdoptimizacion">SSD Optimizacion</span></td>
+            <td><strong>DisableHibernation</strong></td>
+            <td class="center">3</td>
+            <td class="center" style="color:#e63946">0</td>
+            <td class="center" style="color:#2dc653">3</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:100%;background:#2dc653"></div>
+                <span class="progress-label">100%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-ssdoptimizacion">SSD Optimizacion</span></td>
+            <td><strong>DisablePageFileLargeCache</strong></td>
+            <td class="center">2</td>
+            <td class="center" style="color:#e63946">0</td>
+            <td class="center" style="color:#2dc653">2</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:100%;background:#2dc653"></div>
+                <span class="progress-label">100%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-ssdoptimizacion">SSD Optimizacion</span></td>
+            <td><strong>DisableSuperfetch</strong></td>
+            <td class="center">2</td>
+            <td class="center" style="color:#e63946">0</td>
+            <td class="center" style="color:#2dc653">2</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:100%;background:#2dc653"></div>
+                <span class="progress-label">100%</span>
+              </div>
+            </td>
+        </tr>        <tr>
+            <td><span class="tag-sub tag-ssdoptimizacion">SSD Optimizacion</span></td>
+            <td><strong>DisableSwapFile</strong></td>
+            <td class="center">1</td>
+            <td class="center" style="color:#e63946">0</td>
+            <td class="center" style="color:#2dc653"></td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:0%;background:#e63946"></div>
+                <span class="progress-label">0%</span>
+              </div>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- TAB DETALLE -->
+<div id="tab-detail" class="panel">
+  <div class="toolbar">
+    <label>Estado:</label>
+    <button class="filter-btn active" onclick="filterDetail('all',this)">Todas</button>
+    <button class="filter-btn" onclick="filterDetail('row-pending',this)">Pendientes</button>
+    <button class="filter-btn" onclick="filterDetail('row-diff',this)">Valor diferente</button>
+    <button class="filter-btn" onclick="filterDetail('row-done',this)">Aplicadas</button>
+    &nbsp;
+    <input class="search" id="detailSearch" placeholder="Filtrar por clave, ruta, funcion..." oninput="searchDetail()" />
+  </div>
+  <div style="overflow-x:auto;">
+  <table id="detailTable">
+    <thead>
+      <tr>
+        <th>Categoria</th>
+        <th>Ruta del registro</th>
+        <th>Clave</th>
+        <th>Tipo</th>
+        <th>Valor actual</th>
+        <th>Valor objetivo</th>
+        <th>Op.</th>
+        <th>Descripcion</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody id="detailBody">
+              <tr class="row-diff">
+            <td><span class="cat cat-onedrive">OneDrive</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Policies\Microsoft\Windows\OneDrive">HKLM:\SOFTWARE\Policies\Microsoft\Windows\OneDrive</td>
+            <td class="mono small"><strong>DisableFileSyncNGSC</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">1</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita la sincronizacion de OneDrive via GPO</td>
+            <td class="center"><span class="badge badge-diff">Valor diferente</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-administ">Administrador</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList">HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList</td>
+            <td class="mono small"><strong>Administrador</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Activa cuenta Administrador y la oculta de la pantalla de inicio de sesion</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-diff">
+            <td><span class="cat cat-explorad">Explorador</span></td>
+            <td class="mono small path" title="HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer">HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer</td>
+            <td class="mono small"><strong>ConfirmFileDelete</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">1</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Activa dialogo de confirmacion al eliminar archivos</td>
+            <td class="center"><span class="badge badge-diff">Valor diferente</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-explorad">Explorador</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer</td>
+            <td class="mono small"><strong>ShowFrequent</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Oculta carpetas frecuentes en el Explorador</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-explorad">Explorador</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer</td>
+            <td class="mono small"><strong>ShowRecent</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Oculta archivos recientes en el Explorador</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-explorad">Explorador</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search</td>
+            <td class="mono small"><strong>SearchboxTaskbarMode</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Oculta la barra de busqueda de Cortana en la taskbar</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-diff">
+            <td><span class="cat cat-explorad">Explorador</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced</td>
+            <td class="mono small"><strong>LaunchTo</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">1</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">El Explorador se abre en Este Equipo en lugar de Acceso Rapido</td>
+            <td class="center"><span class="badge badge-diff">Valor diferente</span></td>
+        </tr>        <tr class="row-diff">
+            <td><span class="cat cat-rendimie">Rendimiento Visual</span></td>
+            <td class="mono small path" title="HKCU:\Control Panel\Desktop">HKCU:\Control Panel\Desktop</td>
+            <td class="mono small"><strong>DragFullWindows</strong></td>
+            <td class="center mono small">String</td>
+            <td class="center mono small curr"></td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita arrastre de ventanas con contenido (mejora rendimiento)</td>
+            <td class="center"><span class="badge badge-diff">Valor diferente</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-rendimie">Rendimiento Visual</span></td>
+            <td class="mono small path" title="HKCU:\Software\Microsoft\Windows\DWM">HKCU:\Software\Microsoft\Windows\DWM</td>
+            <td class="mono small"><strong>EnableAeroPeek</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita Aero Peek (vista previa del escritorio)</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-rendimie">Rendimiento Visual</span></td>
+            <td class="mono small path" title="HKCU:\Control Panel\Keyboard">HKCU:\Control Panel\Keyboard</td>
+            <td class="mono small"><strong>KeyboardDelay</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Minimiza el retardo de repeticion del teclado</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-rendimie">Rendimiento Visual</span></td>
+            <td class="mono small path" title="HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced">HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced</td>
+            <td class="mono small"><strong>ListviewAlphaSelect</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita seleccion translucida en vistas de lista</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-rendimie">Rendimiento Visual</span></td>
+            <td class="mono small path" title="HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced">HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced</td>
+            <td class="mono small"><strong>ListviewShadow</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita sombras en iconos del Explorador</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-diff">
+            <td><span class="cat cat-rendimie">Rendimiento Visual</span></td>
+            <td class="mono small path" title="HKCU:\Control Panel\Desktop">HKCU:\Control Panel\Desktop</td>
+            <td class="mono small"><strong>MenuShowDelay</strong></td>
+            <td class="center mono small">String</td>
+            <td class="center mono small curr"></td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Elimina el retardo en la aparicion de menus</td>
+            <td class="center"><span class="badge badge-diff">Valor diferente</span></td>
+        </tr>        <tr class="row-diff">
+            <td><span class="cat cat-rendimie">Rendimiento Visual</span></td>
+            <td class="mono small path" title="HKCU:\Control Panel\Desktop\WindowMetrics">HKCU:\Control Panel\Desktop\WindowMetrics</td>
+            <td class="mono small"><strong>MinAnimate</strong></td>
+            <td class="center mono small">String</td>
+            <td class="center mono small curr"></td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita animacion al minimizar y maximizar ventanas</td>
+            <td class="center"><span class="badge badge-diff">Valor diferente</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-rendimie">Rendimiento Visual</span></td>
+            <td class="mono small path" title="HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced">HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced</td>
+            <td class="mono small"><strong>TaskbarAnimations</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita animaciones en la barra de tareas</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-diff">
+            <td><span class="cat cat-rendimie">Rendimiento Visual</span></td>
+            <td class="mono small path" title="HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects">HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects</td>
+            <td class="mono small"><strong>VisualFXSetting</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">3</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Establece efectos visuales en modo rendimiento (valor 3)</td>
+            <td class="center"><span class="badge badge-diff">Valor diferente</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-explorad">Explorador</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced</td>
+            <td class="mono small"><strong>Hidden</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">1</td>
+            <td class="center mono small obj">1</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Muestra archivos y carpetas ocultos</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-explorad">Explorador</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced</td>
+            <td class="mono small"><strong>HideFileExt</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Muestra extensiones de archivos conocidos</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-red">Red</span></td>
+            <td class="mono small path" title="HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters">HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters</td>
+            <td class="mono small"><strong>AutoShareWks</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita recursos compartidos administrativos implicitos (C$ D$ etc)</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-publicid">Publicidad</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo</td>
+            <td class="mono small"><strong>Enabled</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita el ID publicitario unico de Windows</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-publicid">Publicidad</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Privacy">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Privacy</td>
+            <td class="mono small"><strong>TailoredExperiencesWithDiagnosticDataEnabled</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita experiencias personalizadas con datos de diagnostico</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-sugerenc">Sugerencias</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager</td>
+            <td class="mono small"><strong>ContentDeliveryAllowed</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita entrega de contenido sugerido</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-diff">
+            <td><span class="cat cat-sugerenc">Sugerencias</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent">HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent</td>
+            <td class="mono small"><strong>DisableWindowsConsumerFeatures</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">1</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita funciones de consumer cloud de Windows</td>
+            <td class="center"><span class="badge badge-diff">Valor diferente</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-sugerenc">Sugerencias</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager</td>
+            <td class="mono small"><strong>OemPreInstalledAppsEnabled</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Impide apps preinstaladas por OEM</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-sugerenc">Sugerencias</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager</td>
+            <td class="mono small"><strong>PreInstalledAppsEnabled</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Impide apps preinstaladas por Microsoft</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-sugerenc">Sugerencias</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager</td>
+            <td class="mono small"><strong>PreInstalledAppsEverEnabled</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Marca apps preinstaladas como nunca habilitadas</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-sugerenc">Sugerencias</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager</td>
+            <td class="mono small"><strong>SilentInstalledAppsEnabled</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Impide instalacion silenciosa de apps</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-sugerenc">Sugerencias</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager</td>
+            <td class="mono small"><strong>SubscribedContent-310093Enabled</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita contenido suscrito 310093</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-sugerenc">Sugerencias</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager</td>
+            <td class="mono small"><strong>SubscribedContent-338387Enabled</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita contenido suscrito 338387</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-sugerenc">Sugerencias</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager</td>
+            <td class="mono small"><strong>SubscribedContent-338388Enabled</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita contenido suscrito 338388</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-sugerenc">Sugerencias</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager</td>
+            <td class="mono small"><strong>SubscribedContent-338389Enabled</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita contenido suscrito 338389</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-sugerenc">Sugerencias</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager</td>
+            <td class="mono small"><strong>SubscribedContent-338393Enabled</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita contenido suscrito 338393</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-sugerenc">Sugerencias</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager</td>
+            <td class="mono small"><strong>SubscribedContent-353696Enabled</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita contenido suscrito 353696</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-sugerenc">Sugerencias</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager</td>
+            <td class="mono small"><strong>SubscribedContent-353698Enabled</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita contenido suscrito 353698</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-sugerenc">Sugerencias</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager</td>
+            <td class="mono small"><strong>SystemPaneSuggestionsEnabled</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita sugerencias en panel del sistema</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-medios">Medios</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers</td>
+            <td class="mono small"><strong>DisableAutoplay</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">1</td>
+            <td class="center mono small obj">1</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita la reproduccion automatica de medios</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-diff">
+            <td><span class="cat cat-medios">Medios</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer">HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer</td>
+            <td class="mono small"><strong>NoDriveTypeAutoRun</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">255</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita Autorun en todos los tipos de unidad (valor 255)</td>
+            <td class="center"><span class="badge badge-diff">Valor diferente</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-cortana">Cortana</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Personalization\Settings">HKCU:\SOFTWARE\Microsoft\Personalization\Settings</td>
+            <td class="mono small"><strong>AcceptedPrivacyPolicy</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Revoca aceptacion de politica de privacidad de Cortana</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-cortana">Cortana</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search">HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search</td>
+            <td class="mono small"><strong>AllowCortana</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita Cortana via GPO</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-cortana">Cortana</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search">HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search</td>
+            <td class="mono small"><strong>AllowSearchToUseLocation</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Impide que la busqueda use la ubicacion</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-cortana">Cortana</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search">HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search</td>
+            <td class="mono small"><strong>ConnectedSearchUseWeb</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Impide que la busqueda conectada use internet</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-diff">
+            <td><span class="cat cat-cortana">Cortana</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search">HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search</td>
+            <td class="mono small"><strong>DisableWebSearch</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">1</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita busqueda web en Cortana</td>
+            <td class="center"><span class="badge badge-diff">Valor diferente</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-cortana">Cortana</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore">HKCU:\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore</td>
+            <td class="mono small"><strong>HarvestContacts</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Impide a Cortana recopilar contactos del usuario</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-diff">
+            <td><span class="cat cat-cortana">Cortana</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\InputPersonalization">HKCU:\SOFTWARE\Microsoft\InputPersonalization</td>
+            <td class="mono small"><strong>RestrictImplicitInkCollection</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">1</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Restringe recopilacion implicita de tinta para Cortana</td>
+            <td class="center"><span class="badge badge-diff">Valor diferente</span></td>
+        </tr>        <tr class="row-diff">
+            <td><span class="cat cat-cortana">Cortana</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\InputPersonalization">HKCU:\SOFTWARE\Microsoft\InputPersonalization</td>
+            <td class="mono small"><strong>RestrictImplicitTextCollection</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">1</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Restringe recopilacion implicita de texto para Cortana</td>
+            <td class="center"><span class="badge badge-diff">Valor diferente</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-cortana">Cortana</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search">HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search</td>
+            <td class="mono small"><strong>SearchboxTaskbarMode</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Oculta el cuadro de busqueda de la barra de tareas</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-defender">Defender Cloud</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet">HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet</td>
+            <td class="mono small"><strong>SpynetReporting</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita reporte de SpyNet a Microsoft</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-diff">
+            <td><span class="cat cat-defender">Defender Cloud</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet">HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet</td>
+            <td class="mono small"><strong>SubmitSamplesConsent</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">2</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Impide envio automatico de muestras a Defender Cloud</td>
+            <td class="center"><span class="badge badge-diff">Valor diferente</span></td>
+        </tr>        <tr class="row-diff">
+            <td><span class="cat cat-errorrep">Error Reporting</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting">HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting</td>
+            <td class="mono small"><strong>Disabled</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">1</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita el envio de informes de errores a Microsoft</td>
+            <td class="center"><span class="badge badge-diff">Valor diferente</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-sistema">Sistema</span></td>
+            <td class="mono small path" title="HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power">HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power</td>
+            <td class="mono small"><strong>HiberbootEnabled</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita el inicio rapido hibrido de Windows</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-diff">
+            <td><span class="cat cat-feedback">Feedback</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection">HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection</td>
+            <td class="mono small"><strong>DoNotShowFeedbackNotifications</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">1</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Oculta notificaciones de feedback de Microsoft</td>
+            <td class="center"><span class="badge badge-diff">Valor diferente</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-feedback">Feedback</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Siuf\Rules">HKCU:\SOFTWARE\Microsoft\Siuf\Rules</td>
+            <td class="mono small"><strong>NumberOfSIUFInPeriod</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Establece a 0 el numero de peticiones de feedback</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-firewall">Firewall</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\StandardProfile">HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\StandardProfile</td>
+            <td class="mono small"><strong>EnableFirewall</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita el firewall de Windows (instalar alternativa)</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-sistema">Sistema</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Reliability">HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Reliability</td>
+            <td class="mono small"><strong>TimeStampInterval</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita escritura del archivo lastlive.dat de fiabilidad</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-ubicacio">Ubicacion</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Sensor\Overrides\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}">HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Sensor\Overrides\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}</td>
+            <td class="mono small"><strong>SensorPermissionState</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita permisos del sensor de ubicacion</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-ubicacio">Ubicacion</span></td>
+            <td class="mono small path" title="HKLM:\SYSTEM\CurrentControlSet\Services\lfsvc\Service\Configuration">HKLM:\SYSTEM\CurrentControlSet\Services\lfsvc\Service\Configuration</td>
+            <td class="mono small"><strong>Status</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Desactiva el servicio de localizacion lfsvc</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-ubicacio">Ubicacion</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location">HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location</td>
+            <td class="mono small"><strong>Value</strong></td>
+            <td class="center mono small">String</td>
+            <td class="center mono small curr">Deny</td>
+            <td class="center mono small obj">Deny</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deniega acceso a ubicacion a todas las apps</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-pantalla">Pantalla Bloqueo</span></td>
+            <td class="mono small path" title="HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager">HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager</td>
+            <td class="mono small"><strong>RotatingLockScreenEnabled</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita fondo rotatorio en pantalla de bloqueo</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-pantalla">Pantalla Bloqueo</span></td>
+            <td class="mono small path" title="HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager">HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager</td>
+            <td class="mono small"><strong>RotatingLockScreenOverlayEnabled</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita overlay de Spotlight en bloqueo</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-pantalla">Pantalla Bloqueo</span></td>
+            <td class="mono small path" title="HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager">HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager</td>
+            <td class="mono small"><strong>SubscribedContent-338387Enabled</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita contenido suscrito en pantalla de bloqueo</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-mapas">Mapas</span></td>
+            <td class="mono small path" title="HKLM:\SYSTEM\Maps">HKLM:\SYSTEM\Maps</td>
+            <td class="mono small"><strong>AutoUpdateEnabled</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita actualizacion automatica de mapas offline</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-accesore">Acceso Remoto</span></td>
+            <td class="mono small path" title="HKLM:\SYSTEM\CurrentControlSet\Control\Remote Assistance">HKLM:\SYSTEM\CurrentControlSet\Control\Remote Assistance</td>
+            <td class="mono small"><strong>fAllowFullControl</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Impide control total en sesiones de asistencia remota</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-accesore">Acceso Remoto</span></td>
+            <td class="mono small path" title="HKLM:\SYSTEM\CurrentControlSet\Control\Remote Assistance">HKLM:\SYSTEM\CurrentControlSet\Control\Remote Assistance</td>
+            <td class="mono small"><strong>fAllowToGetHelp</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita la asistencia remota entrante</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-accesore">Acceso Remoto</span></td>
+            <td class="mono small path" title="HKLM:\SYSTEM\CurrentControlSet\Control\Remote Assistance">HKLM:\SYSTEM\CurrentControlSet\Control\Remote Assistance</td>
+            <td class="mono small"><strong>fEnableChatControl</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita chat en asistencia remota</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-accesore">Acceso Remoto</span></td>
+            <td class="mono small path" title="HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server">HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server</td>
+            <td class="mono small"><strong>fDenyTSConnections</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">1</td>
+            <td class="center mono small obj">1</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deniega conexiones de Escritorio Remoto (RDP)</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-accesore">Acceso Remoto</span></td>
+            <td class="mono small path" title="HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp">HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp</td>
+            <td class="mono small"><strong>UserAuthentication</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">1</td>
+            <td class="center mono small obj">1</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Fuerza NLA (autenticacion previa) para RDP</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-experien">Experiencias</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\CDP">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\CDP</td>
+            <td class="mono small"><strong>RomeSdkChannelUserAuthzPolicy</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita experiencias compartidas entre dispositivos (CDP)</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-pending">
+            <td><span class="cat cat-red">Red</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System">HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System</td>
+            <td class="mono small"><strong>EnableLinkedConnections</strong></td>
+            <td class="center mono small">-</td>
+            <td class="center mono small curr">(existe)</td>
+            <td class="center mono small obj">-</td>
+            <td class="center"><span class="op op-del">DELETE</span></td>
+            <td class="desc small">Elimina mapeo de unidades compartidas entre sesiones de usuario</td>
+            <td class="center"><span class="badge badge-pending">Pendiente</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-smartscr">SmartScreen</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost</td>
+            <td class="mono small"><strong>EnableWebContentEvaluation</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita evaluacion de contenido web SmartScreen</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-diff">
+            <td><span class="cat cat-smartscr">SmartScreen</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer">HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer</td>
+            <td class="mono small"><strong>SmartScreenEnabled</strong></td>
+            <td class="center mono small">String</td>
+            <td class="center mono small curr"></td>
+            <td class="center mono small obj">Off</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita SmartScreen en el Explorador</td>
+            <td class="center"><span class="badge badge-diff">Valor diferente</span></td>
+        </tr>        <tr class="row-pending">
+            <td><span class="cat cat-sistema">Sistema</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\StorageSense\Parameters\StoragePolicy">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\StorageSense\Parameters\StoragePolicy</td>
+            <td class="mono small"><strong>-</strong></td>
+            <td class="center mono small">-</td>
+            <td class="center mono small curr">(existe)</td>
+            <td class="center mono small obj">-</td>
+            <td class="center"><span class="op op-del">DELETE</span></td>
+            <td class="desc small">Elimina la clave de politica de Storage Sense</td>
+            <td class="center"><span class="badge badge-pending">Pendiente</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-telemetr">Telemetria</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection">HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection</td>
+            <td class="mono small"><strong>AllowTelemetry</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita la telemetria nivel 0</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-telemetr">Telemetria</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection">HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection</td>
+            <td class="mono small"><strong>AllowTelemetry</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita telemetria via GPO</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-telemetr">Telemetria</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Policies\DataCollection">HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Policies\DataCollection</td>
+            <td class="mono small"><strong>AllowTelemetry</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita telemetria en WOW64</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-busqueda">Busqueda Bing</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search</td>
+            <td class="mono small"><strong>BingSearchEnabled</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita busqueda Bing desde el menu inicio</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-diff">
+            <td><span class="cat cat-busqueda">Busqueda Bing</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search">HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search</td>
+            <td class="mono small"><strong>DisableWebSearch</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">1</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita busqueda web via GPO</td>
+            <td class="center"><span class="badge badge-diff">Valor diferente</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-wifisens">WiFi Sense</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Microsoft\WcmSvc\wifinetworkmanager\config">HKLM:\SOFTWARE\Microsoft\WcmSvc\wifinetworkmanager\config</td>
+            <td class="mono small"><strong>AutoConnectAllowedOEM</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Bloquea conexion WiFi automatica OEM</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-wifisens">WiFi Sense</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Microsoft\PolicyManager\default\WiFi\AllowWiFiHotSpotReporting">HKLM:\SOFTWARE\Microsoft\PolicyManager\default\WiFi\AllowWiFiHotSpotReporting</td>
+            <td class="mono small"><strong>Value</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Impide reportar hotspots WiFi a Microsoft</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-wifisens">WiFi Sense</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Microsoft\PolicyManager\default\WiFi\AllowAutoConnectToWiFiSenseHotspots">HKLM:\SOFTWARE\Microsoft\PolicyManager\default\WiFi\AllowAutoConnectToWiFiSenseHotspots</td>
+            <td class="mono small"><strong>Value</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Impide conexion automatica a hotspots WiFi Sense</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-wifisens">WiFi Sense</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Microsoft\WcmSvc\wifinetworkmanager\config">HKLM:\SOFTWARE\Microsoft\WcmSvc\wifinetworkmanager\config</td>
+            <td class="mono small"><strong>WiFISenseAllowed</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita WiFi Sense completamente</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-privacid">Privacidad Extra</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Input\TIPC">HKCU:\SOFTWARE\Microsoft\Input\TIPC</td>
+            <td class="mono small"><strong>Enabled</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita TIPC en contexto de usuario</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-privacid">Privacidad Extra</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Microsoft\Input\TIPC">HKLM:\SOFTWARE\Microsoft\Input\TIPC</td>
+            <td class="mono small"><strong>Enabled</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita TIPC (Text Input Privacy Collection) sistema</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-privacid">Privacidad Extra</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore">HKCU:\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore</td>
+            <td class="mono small"><strong>HarvestContacts</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Impide recopilacion de contactos para personalizacion</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-diff">
+            <td><span class="cat cat-privacid">Privacidad Extra</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\PushNotifications">HKCU:\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\PushNotifications</td>
+            <td class="mono small"><strong>NoTileApplicationNotification</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">1</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita notificaciones push de tiles de aplicaciones</td>
+            <td class="center"><span class="badge badge-diff">Valor diferente</span></td>
+        </tr>        <tr class="row-diff">
+            <td><span class="cat cat-privacid">Privacidad Extra</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Policies\Microsoft\Windows\TabletPC">HKLM:\SOFTWARE\Policies\Microsoft\Windows\TabletPC</td>
+            <td class="mono small"><strong>PreventHandwritingDataSharing</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">1</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Impide compartir datos de escritura a mano con Microsoft</td>
+            <td class="center"><span class="badge badge-diff">Valor diferente</span></td>
+        </tr>        <tr class="row-diff">
+            <td><span class="cat cat-privacid">Privacidad Extra</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Policies\Microsoft\Windows\HandwritingErrorReports">HKLM:\SOFTWARE\Policies\Microsoft\Windows\HandwritingErrorReports</td>
+            <td class="mono small"><strong>PreventHandwritingErrorReports</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">1</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Impide envio de errores de escritura a mano</td>
+            <td class="center"><span class="badge badge-diff">Valor diferente</span></td>
+        </tr>        <tr class="row-diff">
+            <td><span class="cat cat-privacid">Privacidad Extra</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\InputPersonalization">HKCU:\SOFTWARE\Microsoft\InputPersonalization</td>
+            <td class="mono small"><strong>RestrictImplicitInkCollection</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">1</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Restringe recopilacion implicita de tinta</td>
+            <td class="center"><span class="badge badge-diff">Valor diferente</span></td>
+        </tr>        <tr class="row-diff">
+            <td><span class="cat cat-privacid">Privacidad Extra</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\InputPersonalization">HKCU:\SOFTWARE\Microsoft\InputPersonalization</td>
+            <td class="mono small"><strong>RestrictImplicitTextCollection</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">1</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Restringe recopilacion implicita de texto</td>
+            <td class="center"><span class="badge badge-diff">Valor diferente</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-privacid">Privacidad Extra</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\MediaPlayer\Preferences">HKCU:\SOFTWARE\Microsoft\MediaPlayer\Preferences</td>
+            <td class="mono small"><strong>UsageTracking</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita tracking de uso en Windows Media Player</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-diff">
+            <td><span class="cat cat-windowsu">Windows Update P2P</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Config">HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Config</td>
+            <td class="mono small"><strong>DODownloadMode</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">1</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Restringe descarga P2P de actualizaciones a la red local (modo 1)</td>
+            <td class="center"><span class="badge badge-diff">Valor diferente</span></td>
+        </tr>        <tr class="row-diff">
+            <td><span class="cat cat-windowsu">Windows Update P2P</span></td>
+            <td class="mono small path" title="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization">HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization</td>
+            <td class="mono small"><strong>SystemSettingsDownloadMode</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">3</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Configura modo de descarga del sistema a red local</td>
+            <td class="center"><span class="badge badge-diff">Valor diferente</span></td>
+        </tr>        <tr class="row-diff">
+            <td><span class="cat cat-uac">UAC</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System">HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System</td>
+            <td class="mono small"><strong>ConsentPromptBehaviorAdmin</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">2</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Eleva UAC para admins (requiere confirmacion en escritorio seguro)</td>
+            <td class="center"><span class="badge badge-diff">Valor diferente</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-uac">UAC</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System">HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System</td>
+            <td class="mono small"><strong>ConsentPromptBehaviorUser</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">3</td>
+            <td class="center mono small obj">3</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Usuarios estandar deben autenticarse para elevar privilegios</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-uac">UAC</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System">HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System</td>
+            <td class="mono small"><strong>EnableInstallerDetection</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">1</td>
+            <td class="center mono small obj">1</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Detecta instaladores y eleva UAC automaticamente</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-uac">UAC</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System">HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System</td>
+            <td class="mono small"><strong>EnableLUA</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">1</td>
+            <td class="center mono small obj">1</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Fuerza ejecucion como usuario estandar (LUA activado)</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-uac">UAC</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System">HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System</td>
+            <td class="mono small"><strong>PromptOnSecureDesktop</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">1</td>
+            <td class="center mono small obj">1</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Muestra prompt UAC en escritorio seguro aislado</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-diff">
+            <td><span class="cat cat-desfragm">Desfragmentacion</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Microsoft\Dfrg\BootOptimizeFunction">HKLM:\SOFTWARE\Microsoft\Dfrg\BootOptimizeFunction</td>
+            <td class="mono small"><strong>Enable</strong></td>
+            <td class="center mono small">String</td>
+            <td class="center mono small curr"></td>
+            <td class="center mono small obj">N</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita la optimizacion de arranque del desfragmentador</td>
+            <td class="center"><span class="badge badge-diff">Valor diferente</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-desfragm">Desfragmentacion</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Microsoft\Dfrg\BootOptimizeFunction">HKLM:\SOFTWARE\Microsoft\Dfrg\BootOptimizeFunction</td>
+            <td class="mono small"><strong>OptimizeComplete</strong></td>
+            <td class="center mono small">String</td>
+            <td class="center mono small curr">No</td>
+            <td class="center mono small obj">No</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Marca la optimizacion de arranque como no completada para desactivarla</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-hibernac">Hibernacion</span></td>
+            <td class="mono small path" title="HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power">HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power</td>
+            <td class="mono small"><strong>HiberbootEnabled</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita el arranque hibrido (fast startup + hibernacion)</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-hibernac">Hibernacion</span></td>
+            <td class="mono small path" title="HKLM:\System\CurrentControlSet\Control\Session Manager\Power">HKLM:\System\CurrentControlSet\Control\Session Manager\Power</td>
+            <td class="mono small"><strong>HibernteEnabled</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita la hibernacion del sistema</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-hibernac">Hibernacion</span></td>
+            <td class="mono small path" title="HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings">HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings</td>
+            <td class="mono small"><strong>ShowHibernateOption</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Oculta la opcion Hibernar del menu de inicio/apagado</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-memoria">Memoria</span></td>
+            <td class="mono small path" title="HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management">HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management</td>
+            <td class="mono small"><strong>ClearPageFileAtShutdown</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">No limpia el archivo de paginacion al apagar (mejora velocidad)</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-memoria">Memoria</span></td>
+            <td class="mono small path" title="HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management">HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management</td>
+            <td class="mono small"><strong>LargeSystemCache</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita la cache de sistema grande (para sistemas de escritorio)</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-superfet">Superfetch</span></td>
+            <td class="mono small path" title="HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters">HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters</td>
+            <td class="mono small"><strong>EnablePrefetcher</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita el precargador de aplicaciones Prefetch</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-superfet">Superfetch</span></td>
+            <td class="mono small path" title="HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters">HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters</td>
+            <td class="mono small"><strong>EnableSuperfetch</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita SuperFetch (innecesario en SSD con RAM suficiente)</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>        <tr class="row-done">
+            <td><span class="cat cat-memoria">Memoria</span></td>
+            <td class="mono small path" title="HKLM:\\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management">HKLM:\\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management</td>
+            <td class="mono small"><strong>SwapfileControl</strong></td>
+            <td class="center mono small">DWord</td>
+            <td class="center mono small curr">0</td>
+            <td class="center mono small obj">0</td>
+            <td class="center"><span class="op op-set">SET</span></td>
+            <td class="desc small">Deshabilita el archivo de intercambio swapfile.sys (Metro apps)</td>
+            <td class="center"><span class="badge badge-done">Aplicado</span></td>
+        </tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<footer>
+  Generado por <span>HardeningSetup.ps1</span> &mdash; 4t0m5K &mdash; 17/04/2026 18:56:47
+</footer>
+
+<script>
+  function showTab(id,btn){
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById('tab-'+id).classList.add('active');
+    btn.classList.add('active');
+  }
+  var detailRows=null;
+  function getDetailRows(){if(!detailRows)detailRows=Array.from(document.querySelectorAll('#detailBody tr'));return detailRows;}
+  function filterDetail(cls,btn){
+    document.querySelectorAll('.toolbar .filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    var q=document.getElementById('detailSearch').value.toLowerCase();
+    getDetailRows().forEach(function(r){
+      var mf=cls==='all'||r.classList.contains(cls);
+      var ms=!q||r.innerText.toLowerCase().includes(q);
+      r.style.display=(mf&&ms)?'':'none';
+    });
+  }
+  function searchDetail(){
+    var q=document.getElementById('detailSearch').value.toLowerCase();
+    var active=document.querySelector('.toolbar .filter-btn.active');
+    var cls=active?active.onclick.toString().match(/'([^']+)'/)?.[1]:'all';
+    if(!cls)cls='all';
+    getDetailRows().forEach(function(r){
+      var mf=cls==='all'||r.classList.contains(cls);
+      var ms=!q||r.innerText.toLowerCase().includes(q);
+      r.style.display=(mf&&ms)?'':'none';
+    });
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,807 @@
+2023/07/12
+
+
+ANTES DE EJECUTAR ESTOS SCRIPT USA LOS PROGRAMAS TOOLS !!!! PORQUE MUCHOS DAN ERROR DESPUÉS
+HACER TODO ANTES
+
+# Borrar una clave del registro
+function removeKey {
+  Param ( [String] $path )
+  Write-Host "Borrando la clave $path"
+  Remove-Item -Path $path -Recurse -ErrorAction SilentlyContinue
+  if ((Get-ItemProperty -Path $path -Name $key -ErrorAction SilentlyContinue) -eq 0) {
+    Write-Host "La clave se ELIMINO CORRECTAMENTE" -F Green
+  } Else {
+    Write-Host "La clave NO se puedo ELIMINAR" -F Red
+  }
+}
+
+# Cambiar el valor de una clave del registro de Windows
+function setKeyValue {
+  Param ( [String] $path, [string] $key, [string] $typ, $val )
+  Write-Host "Creando o cambiando el valor de $path : [$key] con Valor: $val"
+  if (Test-Path $path) {
+    if ($typ -eq "DWord") {
+      Set-ItemProperty -Path $path -Name $key -Type DWord -Value $val | Out-Null
+    } elseif ($typ -eq "String") {
+      Set-ItemProperty -Path $path -Name $key -Type String -Value $val | Out-Null
+    } elseif ($typ -eq "Binary") {
+      Set-ItemProperty -Path $path -Name $key -Type Binary -Value $val | Out-Null
+    } else {
+      Write-Host "Tipo de valor $typ DESCONOCIDO." -F Red
+    }
+    if (Get-ItemProperty -Path $path -Name $key -ErrorAction SilentlyContinue) {
+      Write-Host "La clave se creó o modificó CORRECTAMENTE" -F Green
+    } Else {
+      Write-Host "La clave NO se puedo CREAR ni MODIFICAR" -F Red
+    }
+    return 1
+  } else {
+    Write-Host "La ruta $path NO EXISTE" -F Red
+    return 0
+  }
+}
+
+
+# Crea una nueva ruta en el registro de Windoes si está no existe
+function createKey {
+  Param ( [String] $path )
+  Write-Host "Creando la ruta $path ..."
+  if (!(Test-Path $path)) {
+    New-Item -Path $path -Force | Out-Null
+    if (Test-Path $path) { 
+        Write-Host "La ruta $path se creó CORRECTAMENTE" -F Green
+      } else {
+        Write-Host "No se pudo CREAR la ruta $path" -F Red
+      }
+  } else {
+    Write-Host "La ruta $path ya EXISTE" -F Yellow
+  }
+}
+
+
+# Desinstala una aplicación de Windows mediante power-shell
+function uninstallApp {
+  Param ( [String] $path )
+  Write-Host "Desintalando $path ..."
+  if ( (Get-AppxPackage $path).PackageFullName) {
+    Get-AppxPackage $path | Remove-AppxPackage
+    if ( (Get-AppxPackage $path).PackageFullName) {
+       Write-Host "No se puedo Desinstalar $path ..." -F Red
+    } else {
+       Write-Host "La APP se desinstaló CORRECTAMENTE $path ..." -F Green
+    }
+  } else {
+    Write-Host "No existe el paquete $path." -F Yellow
+  }
+}
+
+# Detiene y deshabilita un servicio de Windows
+function disableService {
+  Param ( [String] $path, [String] $typ )
+  Write-Host "Deteniendo o deshabilitando el servicio $name [$path] ..." 
+  if ( Get-Service $path -ErrorAction SilentlyContinue) {
+    if ( (Get-Service $path).Status -eq 'Running' ) {
+      $name = (Get-Service $path).DisplayName
+      Write-Host "Deteniendo $name [$path] ..." 
+      Stop-Service $path -Force -WarningAction SilentlyContinue
+      if ( (Get-Service $path).Status -eq 'Stopped' ) {
+        Write-Host "Servicio $name [$path] DETENIDO" -F Green
+      }
+    } else { 
+      Write-Host "El servicio $path ya está detenido." -F Yellow
+    }
+    if ($typ -eq "Disabled") {
+      Write-Host "Deshabilitando $name [$path] ..."
+      Set-Service $path -StartupType Disabled 
+      if ( (Get-Service $path).StartType -eq 'Disabled' ) {
+        Write-Host "Servicio $name [$path] DESHABILITADO" -F Green
+      }
+    } elseif ($typ -eq "Manual") {
+      Write-Host "Pasando a modo manual $name [$path] ..."
+      Set-Service $path -StartupType Manual  
+      if ( (Get-Service $path).StartType -eq 'Manual' ) {
+        Write-Host "Servicio $name [$path] EN MANUAL" -F Green
+      }
+    }
+  } else {
+    Write-Host "NO EXISTE el servicio $path." -F Red
+  }
+}
+
+# Deshabilita tareas programadas
+function disableScheduledTask {
+  Param ( [String] $path, [String] $name )
+  if ( (Get-ScheduledTask -TaskPath $path -TaskName $name).State -eq 'Running' ) {
+    Write-Host "Deteniendo la tarea $name [$path] ..." 
+    Stop-ScheduledTask -TaskPath $path -TaskName $name -ErrorAction SilentlyContinue | Out-Null
+    if ( (Get-ScheduledTask -TaskPath $path -TaskName $name).State -eq 'Ready' ) {
+      Write-Host "La tarea $name [$path] fué DETENIDA" -F Green
+    } else {
+        Write-Host "La tarea $name [$path] no se pudo detener" -F Red
+    }
+  } else {
+    Write-Host "La tarea $name [$path] ya estaba detenida" -F Yellow
+  }
+  if ( (Get-ScheduledTask -TaskPath $path -TaskName $name).State -ne 'Disabled' ) {
+    Write-Host "Deshabilitando la tarea $name [$path] ..." 
+    Disable-ScheduledTask -TaskPath $path -TaskName $name -ErrorAction SilentlyContinue | Out-Null
+    if ( (Get-ScheduledTask -TaskPath $path -TaskName $name).State -eq 'Ready' ) {
+      Write-Host "La tarea $name [$path] fué DESHABILITADA" -F Green
+    } else {
+      Write-Host "La tarea $name [$path] no se pudo deshabilitar" -F Red
+    }
+  } else {
+    Write-Host "La tarea $name [$path] ya estaba deshabilitada" -F Yellow
+  }
+}
+
+
+
+# //////////////////////////////////////////////////////////////////////////////////////////////
+get-appxpackage | Select Name, InstallLocation | Sort Name | Format-Table -AutoSize
+
+
+
+
+
+Write-Host "Desinstalando aplicaciones por defecto de Microsoft..."
+uninstallApp -path "Microsoft.MixedReality.Portal"
+uninstallApp -path "YourPhone"
+uninstallApp -path "Microsoft.3DBuilder"
+uninstallApp -path "Microsoft.AppConnector"
+uninstallApp -path "Microsoft.BingFinance"
+uninstallApp -path "Microsoft.BingNews"
+uninstallApp -path "Microsoft.BingSports"
+uninstallApp -path "Microsoft.BingWeather"
+uninstallApp -path "Microsoft.CommsPhone"
+uninstallApp -path "Microsoft.ConnectivityStore"
+uninstallApp -path "Microsoft.Getstarted"
+uninstallApp -path "Microsoft.Messaging"
+uninstallApp -path "Microsoft.Microsoft3DViewer"
+uninstallApp -path "Microsoft.MicrosoftOfficeHub"
+uninstallApp -path "Microsoft.MicrosoftPowerBIForWindows"
+uninstallApp -path "Microsoft.MicrosoftSolitaireCollection"
+uninstallApp -path "Microsoft.MicrosoftStickyNotes"
+uninstallApp -path "Microsoft.MinecraftUWP"
+uninstallApp -path "Microsoft.NetworkSpeedTest"
+uninstallApp -path "Microsoft.Office.OneNote"
+uninstallApp -path "Microsoft.Office.Sway"
+uninstallApp -path "Microsoft.OneConnect"
+uninstallApp -path "Microsoft.People"
+uninstallApp -path "Microsoft.Print3D"
+uninstallApp -path "Microsoft.RemoteDesktop"
+uninstallApp -path "Microsoft.SkypeApp"
+uninstallApp -path "Microsoft.WindowsCamera"
+uninstallApp -path "microsoft.windowscommunicationsapps"
+uninstallApp -path "Microsoft.WindowsFeedback"
+uninstallApp -path "Microsoft.WindowsFeedbackHub"
+uninstallApp -path "Microsoft.WindowsMaps"
+uninstallApp -path "Microsoft.WindowsPhone"
+#uninstallApp -path "Microsoft.WindowsSoundRecorder"
+uninstallApp -path "Microsoft.ZuneMusic"
+uninstallApp -path "Microsoft.ZuneVideo"
+uninstallApp -path "Windows.ContactSupport"
+uninstallApp -path "Windows.PurchaseDialog"
+uninstallApp -path "Microsoft.Windows.CloudExperienceHost" # No se puede
+uninstallApp -path "Microsoft.Windows.Cortana" # No se puede
+uninstallApp -path "Microsoft.Windows.HolographicFirstRun" # No se puede
+uninstallApp -path "Windows.MiracastView" # No se puede
+
+Write-Host "Desinstalar aplicaciones de terceras partes por defecto..."
+uninstallApp -path "9E2F88E3.Twitter"
+uninstallApp -path "king.com.CandyCrushSodaSaga"
+uninstallApp -path "4DF9E0F8.Netflix"
+uninstallApp -path "Drawboard.DrawboardPDF"
+uninstallApp -path "D52A8D61.FarmVille2CountryEscape"
+uninstallApp -path "GAMELOFTSA.Asphalt8Airborne"
+uninstallApp -path "flaregamesGmbH.RoyalRevolt2"
+uninstallApp -path "AdobeSystemsIncorporated.AdobePhotoshopExpress"
+uninstallApp -path "ActiproSoftwareLLC.562882FEEB491"
+uninstallApp -path "D5EA27B7.Duolingo-LearnLanguagesforFree"
+uninstallApp -path "Facebook.Facebook"
+uninstallApp -path "46928bounde.EclipseManager"
+uninstallApp -path "A278AB0D.MarchofEmpires"
+uninstallApp -path "KeeperSecurityInc.Keeper"
+uninstallApp -path "king.com.BubbleWitch3Saga"
+uninstallApp -path "89006A2E.AutodeskSketchBook"
+uninstallApp -path "CAF9E577.Plex"
+uninstallApp -path "A278AB0D.DisneyMagicKingdoms"
+uninstallApp -path "828B5831.HiddenCityMysteryofShadows"
+uninstallApp -path "WinZipComputing.WinZipUniversal"
+uninstallApp -path "SpotifyAB.SpotifyMusic"
+uninstallApp -path "PandoraMediaInc.29680B314EFC2"
+uninstallApp -path "2414FC7A.Viber"
+uninstallApp -path "64885BlueEdge.OneCalendar"
+uninstallApp -path "41038Axilesoft.ACGMediaPlayer"
+uninstallApp -path "Microsoft.XboxApp"
+uninstallApp -path "Microsoft.XboxIdentityProvider"
+uninstallApp -path "Microsoft.XboxSpeechToTextOverlay"
+uninstallApp -path "Microsoft.XboxGameOverlay"
+uninstallApp -path "Microsoft.Xbox.TCUI"
+uninstallApp -path "Microsoft.XboxGameCallableUI" # No se puede
+uninstallApp -path "Microsoft.DesktopAppInstaller"
+uninstallApp -path "Microsoft.WindowsStore"
+uninstallApp -path "Microsoft.Windows.ParentalControls" # No se puede
+uninstallApp -path "Microsoft.Windows.PeopleExperienceHost" # No se puede
+uninstallApp -path "Microsoft.XboxGamingOverlay"
+uninstallApp -path "Windows.CBSPreview" # No se puede
+uninstallApp -path "Microsoft.BioEnrollment" # No se puede
+
+
+# //////////////////////////////////////////////////////////////////////////////////////////////
+Get-ScheduledTask | sort State, taskpath | Format-Table -AutoSize
+schtasks
+
+
+
+disableScheduledTask -path "\Microsoft\Windows\Active Directory Rights Management Services Client\" -name "AD RMS Rights Policy Template Management (Manual)"
+disableScheduledTask -path "\Microsoft\Windows\AppID\" -name "SmartScreenSpecific"
+disableScheduledTask -path "\Microsoft\Windows\Application Experience\" -name "Microsoft Compatibility Appraiser"
+disableScheduledTask -path "\Microsoft\Windows\Application Experience\" -name "ProgramDataUpdater"
+disableScheduledTask -path "\Microsoft\Windows\Application Experience\" -name "StartupAppTask"
+disableScheduledTask -path "\Microsoft\Windows\Autochk\" -name "Proxy"
+disableScheduledTask -path "\Microsoft\Windows\Bluetooth\" -name "UninstallDeviceTask"
+disableScheduledTask -path "\Microsoft\Windows\Chkdsk\" -name "ProactiveScan"
+disableScheduledTask -path "\Microsoft\Windows\CloudExperienceHost\" -name "CreateObjectTask"
+disableScheduledTask -path "\Microsoft\Windows\Customer Experience Improvement Program\" -name "Consolidator"
+disableScheduledTask -path "\Microsoft\Windows\Customer Experience Improvement Program\" -name "UsbCeip"
+disableScheduledTask -path "\Microsoft\Windows\Defrag\" -name "ScheduledDefrag"
+disableScheduledTask -path "\Microsoft\Windows\DiskDiagnostic\" -name "Microsoft-Windows-DiskDiagnosticDataCollector"
+disableScheduledTask -path "\Microsoft\Windows\Feedback\Siuf\" -name "DmClient"
+disableScheduledTask -path "\Microsoft\Windows\Feedback\Siuf\" -name "DmClientOnScenarioDownload"
+disableScheduledTask -path "\Microsoft\Windows\Maps\" -name "MapsToastTask"
+disableScheduledTask -path "\Microsoft\Windows\Maps\" -name "MapsUpdateTask"
+disableScheduledTask -path "\Microsoft\Windows\Mobile Broadband Accounts\" -name "MNO Metadata Parser"
+disableScheduledTask -path "\Microsoft\Windows\NetTrace\" -name "GatherNetworkInfo"
+disableScheduledTask -path "\Microsoft\Windows\NlaSvc\" -name "WiFiTask"
+disableScheduledTask -path "\Microsoft\Windows\RemoteAssistance\" -name "RemoteAssistanceTask"
+disableScheduledTask -path "\Microsoft\Windows\Speech\" -name "SpeechModelDownloadTask"
+disableScheduledTask -path "\Microsoft\Windows\TextServicesFramework\" -name "MsCtfMonitor"
+disableScheduledTask -path "\Microsoft\Windows\Time Synchronization\" -name "ForceSynchronizeTime"
+disableScheduledTask -path "\Microsoft\Windows\Time Synchronization\" -name "SynchronizeTime"
+disableScheduledTask -path "\Microsoft\Windows\Time Zone\" -name "SynchronizeTimeZone"
+disableScheduledTask -path "\Microsoft\Windows\UpdateOrchestrator\" -name "Backup Scan"
+disableScheduledTask -path "\Microsoft\Windows\UpdateOrchestrator\" -name "MusUx_UpdateInterval"
+disableScheduledTask -path "\Microsoft\Windows\UpdateOrchestrator\" -name "Report policies"
+disableScheduledTask -path "\Microsoft\Windows\UpdateOrchestrator\" -name "Schedule Scan Static Task"
+disableScheduledTask -path "\Microsoft\Windows\UpdateOrchestrator\" -name "Schedule Scan"
+disableScheduledTask -path "\Microsoft\Windows\UpdateOrchestrator\" -name "UpdateModelTask"
+disableScheduledTask -path "\Microsoft\Windows\UpdateOrchestrator\" -name "USO_Broker_Display"
+disableScheduledTask -path "\Microsoft\Windows\UpdateOrchestrator\" -name "USO_UxBroker"
+disableScheduledTask -path "\Microsoft\Windows\WaaSMedic" -name "PerformRemediation"
+disableScheduledTask -path "\Microsoft\Windows\WaaSMedic\" -name "PerformRemediation"
+disableScheduledTask -path "\Microsoft\Windows\Windows Defender\" -name "Windows Defender Scheduled Scan"
+disableScheduledTask -path "\Microsoft\Windows\Windows Error Reporting\" -name "QueueReporting"
+disableScheduledTask -path "\Microsoft\Windows\Windows Media Sharing\" -name "UpdateLibrary"
+disableScheduledTask -path "\Microsoft\Windows\WindowsUpdate" -name "sih"
+disableScheduledTask -path "\Microsoft\Windows\WindowsUpdate\" -name "Scheduled Start"
+disableScheduledTask -path "\Microsoft\XblGameSave\" -name "XblGameSaveTask"
+disableScheduledTask -path "\Microsoft\XblGameSave\" -name "XblGameSaveTaskLogon"
+disableScheduledTask -path "\Mozilla\" -name "Firefox Default Browser Agent 308046B0AF4A39CB"
+
+
+# //////////////////////////////////////////////////////////////////////////////////////////////
+
+Get-WmiObject win32_service | Select Name, State, StartMode, DisplayName | Sort State, StartMode, Name | Format-Table -AutoSize
+
+
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\AppIDSvc" -key "Start" -typ DWord -val 3
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\Appinfo" -key "Start" -typ DWord -val 3
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\AppXSvc" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\cbdhsvc" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\cbdhsvc_22441" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\cbdhsvc_4f73d" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\CDPSvc" -key "Start" -typ DWord -val 3
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\CDPUserSvc_22441" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\ClipSVC" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\Dhcp" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\Dnscache" -key "Start" -typ DWord -val 3
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\DoSvc" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\embeddedmode" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\EntAppSvc" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\iphlpsvc" -key "Start" -typ DWord -val 3
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\MpsSvc" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\msiserver" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\NgcCtnrSvc" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\NgcSvc" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\NlaSvc" -key "Start" -typ DWord -val 3
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\OneSyncSvc" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\OneSyncSvc_22441" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\OneSyncSvc_4f73d" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\PcaSvc" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\PimIndexMaintenanceSvc_22441" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\PimIndexMaintenanceSvc_4f73d" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\RmSvc" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\Sense" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\SensorService" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\SessionEnv" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\SgrmBroker" -key "Start" -typ DWord -val 3
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\sppsvc" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\SstpSvc" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\SysMain" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\TabletInputService" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\TokenBroker" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\TrustedInstaller" -key "Start" -typ DWord -val 4 # No se puede
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\UnistoreSvc" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\UnistoreSvc_22441" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\UnistoreSvc_4f73d" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\UserDataSvc" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\UserDataSvc_22441" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\UserDataSvc_4f73d" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\UsoSvc" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\WaaSMedicSvc" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\WinHttpAutoProxySvc" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\WpnService" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\WpnUserService" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\WpnUserService_22441" -key "Start" -typ DWord -val 4
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\wscsvc" -key "Start" -typ DWord -val 3
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\wuauserv" -key "Start" -typ DWord -val 4
+
+Write-Host "Parando y poniendo en modo MANUAL Servicios ..."
+disableService -path "AJRouter" -typ "Manual"
+disableService -path "ALG" -typ "Manual"
+disableService -path "AppMgmt" -typ "Manual"
+disableService -path "AppReadiness" -typ "Manual"
+disableService -path "AxInstSV" -typ "Manual"
+disableService -path "BDESVC" -typ "Manual"
+disableService -path "bthserv" -typ "Manual"
+disableService -path "CertPropSvc" -typ "Manual"
+disableService -path "COMSysApp" -typ "Manual"
+disableService -path "CscService" -typ "Manual"
+disableService -path "defragsvc" -typ "Manual"
+disableService -path "DeviceAssociationService" -typ "Manual"
+disableService -path "DeviceInstall" -typ "Manual"
+disableService -path "DevQueryBroker" -typ "Manual"
+disableService -path "diagnosticshub.standardcollector.service" -typ "Manual"
+disableService -path "DmEnrollmentSvc" -typ "Manual"
+disableService -path "dot3svc" -typ "Manual"
+disableService -path "DPS" -typ "Manual"
+disableService -path "DsSvc" -typ "Manual"
+disableService -path "DusmSvc" -typ "Manual"
+disableService -path "EapHost" -typ "Manual"
+disableService -path "EFS" -typ "Manual"
+disableService -path "fdPHost" -typ "Manual"
+disableService -path "FDResPub" -typ "Manual"
+disableService -path "fhsvc" -typ "Manual"
+disableService -path "FrameServer" -typ "Manual"
+disableService -path "hidserv" -typ "Manual"
+disableService -path "HvHost" -typ "Manual"
+disableService -path "icssvc" -typ "Manual"
+disableService -path "KeyIso" -typ "Manual"
+disableService -path "KtmRm" -typ "Manual"
+disableService -path "lltdsvc" -typ "Manual"
+disableService -path "MSDTC" -typ "Manual"
+disableService -path "MSiSCSI" -typ "Manual"
+disableService -path "NcaSvc" -typ "Manual"
+disableService -path "NcbService" -typ "Manual"
+disableService -path "NcdAutoSetup" -typ "Manual"
+disableService -path "Netlogon" -typ "Manual"
+disableService -path "Netman" -typ "Manual"
+disableService -path "netprofm" -typ "Manual" # No funciona
+disableService -path "NetSetupSvc" -typ "Manual"
+disableService -path "p2pimsvc" -typ "Manual"
+disableService -path "p2psvc" -typ "Manual"
+disableService -path "PeerDistSvc" -typ "Manual"
+disableService -path "PerfHost" -typ "Manual"
+disableService -path "PhoneSvc" -typ "Manual"
+disableService -path "pla" -typ "Manual"
+disableService -path "PNRPAutoReg" -typ "Manual"
+disableService -path "PNRPsvc" -typ "Manual"
+disableService -path "PrintNotify" -typ "Manual"
+disableService -path "QWAVE" -typ "Manual"
+disableService -path "RasAuto" -typ "Manual"
+disableService -path "RasMan" -typ "Manual"
+disableService -path "RetailDemo" -typ "Manual"
+disableService -path "RpcLocator" -typ "Manual"
+disableService -path "ScDeviceEnum" -typ "Manual"
+disableService -path "SCPolicySvc" -typ "Manual"
+disableService -path "SDRSVC" -typ "Manual"
+disableService -path "seclogon" -typ "Manual"
+disableService -path "SharedAccess" -typ "Manual"
+disableService -path "smphost" -typ "Manual"
+disableService -path "SmsRouter" -typ "Manual"
+disableService -path "SNMPTRAP" -typ "Manual"
+disableService -path "SSDPSRV" -typ "Manual"
+disableService -path "StorSvc" -typ "Manual"
+disableService -path "swprv" -typ "Manual"
+disableService -path "TapiSrv" -typ "Manual"
+disableService -path "TieringEngineService" -typ "Manual"
+disableService -path "UmRdpService" -typ "Manual"
+disableService -path "upnphost" -typ "Manual"
+disableService -path "vds" -typ "Manual"
+disableService -path "vmicguestinterface" -typ "Manual"
+disableService -path "vmicheartbeat" -typ "Manual"
+disableService -path "vmickvpexchange" -typ "Manual"
+disableService -path "vmicrdv" -typ "Manual"
+disableService -path "vmicshutdown" -typ "Manual"
+disableService -path "vmictimesync" -typ "Manual"
+disableService -path "vmicvmsession" -typ "Manual"
+disableService -path "vmicvss" -typ "Manual"
+disableService -path "VSS" -typ "Manual"
+disableService -path "wbengine" -typ "Manual"
+disableService -path "wcncsvc" -typ "Manual"
+disableService -path "WdiServiceHost" -typ "Manual"
+disableService -path "WdiSystemHost" -typ "Manual"
+disableService -path "WebClient" -typ "Manual"
+disableService -path "Wecsvc" -typ "Manual"
+disableService -path "WEPHOSTSVC" -typ "Manual"
+disableService -path "wercplsupport" -typ "Manual"
+disableService -path "WerSvc" -typ "Manual"
+disableService -path "WiaRpc" -typ "Manual"
+disableService -path "WinRM" -typ "Manual"
+disableService -path "wlidsvc" -typ "Manual"
+disableService -path "wmiApSrv" -typ "Manual"
+disableService -path "workfolderssvc" -typ "Manual"
+disableService -path "WwanSvc" -typ "Manual"
+
+
+# Parar y poner en modo Deshabilitado
+disableService -path "AppVClient" -typ "Disabled"
+disableService -path "BthAvctpSvc" -typ "Disabled"
+disableService -path "cbdhsvc_22441" -typ "Disabled"
+disableService -path "CDPUserSvc" -typ "Disabled"
+disableService -path "CDPUserSvc_22441" -typ "Disabled"
+disableService -path "diagnosticshub.standardcollector.service"  -typ "Disabled"
+disableService -path "DiagTrack" -typ "Disabled"
+disableService -path "DisplayEnhancementService" -typ "Disabled"
+disableService -path "dmwappushservice" -typ "Disabled"
+disableService -path "DoSvc" -typ "Disabled"
+disableService -path "DsmSvc" -typ "Disabled"
+disableService -path "DsSvc" -typ "Disabled"
+disableService -path "edgeupdate" -typ "Disabled"
+disableService -path "EventLog" -typ "Disabled"
+disableService -path "FontCache" -typ "Disabled"
+disableService -path "IKEEXT" -typ "Disabled"
+disableService -path "LanmanServer" -typ "Disabled"
+disableService -path "LanmanWorkstation" -typ "Disabled"
+disableService -path "lfsvc" -typ "Disabled"
+disableService -path "lmhosts" -typ "Disabled"
+disableService -path "MapsBroker" -typ "Disabled"
+disableService -path "NetTcpPortSharing" -typ "Disabled"
+disableService -path "nsi" -typ "Disabled"
+disableService -path "OneSyncSvc_22441" -typ "Disabled"
+disableService -path "PimIndexMaintenanceSvc_22441" -typ "Disabled"
+disableService -path "RasMan" -typ "Disabled"
+disableService -path "RemoteAccess" -typ "Disabled"
+disableService -path "RemoteRegistry" -typ "Disabled"
+disableService -path "RetailDemo" -typ "Disabled"
+disableService -path "RmSvc" -typ "Disabled"
+disableService -path "SCardSvr" -typ "Disabled"
+disableService -path "SEMgrSvc" -typ "Disabled"
+disableService -path "SENS" -typ "Disabled"
+disableService -path "SensrSvc" -typ "Disabled"
+disableService -path "ShellHWDetection" -typ "Disabled"
+disableService -path "shpamsvc" -typ "Disabled"
+disableService -path "Spooler" -typ "Disabled"
+disableService -path "svsvc" -typ "Disabled"
+disableService -path "TabletInputService" -typ "Disabled"
+disableService -path "TermService" -typ "Disabled"
+disableService -path "tzautoupdate" -typ "Disabled"
+disableService -path "UevAgentService" -typ "Disabled"
+disableService -path "UnistoreSvc_22441" -typ "Disabled"
+disableService -path "UserDataSvc_22441" -typ "Disabled"
+disableService -path "VSS" -typ "Disabled"
+disableService -path "W32Time" -typ "Disabled"
+disableService -path "WalletService" -typ "Disabled"
+disableService -path "WbioSrvc" -typ "Disabled"
+disableService -path "Wcmsvc" -typ "Disabled"
+disableService -path "wisvc" -typ "Disabled"
+disableService -path "WlanSvc" -typ "Disabled"
+disableService -path "wlidsvc" -typ "Disabled"
+disableService -path "WMPNetworkSvc" -typ "Disabled"
+disableService -path "WPDBusEnum" -typ "Disabled"
+disableService -path "WpnUserService_22441" -typ "Disabled"
+disableService -path "WSearch" -typ "Disabled"
+disableService -path "wuauserv" -typ "Disabled"
+disableService -path "XblAuthManager" -typ "Disabled"
+disableService -path "XboxNetApiSvc" -typ "Disabled"
+
+
+
+
+
+
+
+
+
+
+
+# //////////////////////////////////////////////////////////////////////////////////////////////
+
+# DisableTelemetry
+Write-Host "Deshabilitando telemetría -----------------------------------"
+setKeyValue -path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" -key "AllowTelemetry" -typ DWord -val 0
+setKeyValue -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -key "AllowTelemetry" -typ DWord -val 0
+setKeyValue -path "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Policies\DataCollection" -key "AllowTelemetry" -typ DWord -val 0
+Write-Host "-------------------------------------------------------------"
+# DisableWiFiSense
+Write-Host "Deshabilitando Wi-Fi Sense (Compartir Wifi desde Windows)----"
+createKey -path "HKLM:\SOFTWARE\Microsoft\PolicyManager\default\WiFi\AllowWiFiHotSpotReporting"
+setKeyValue -path "HKLM:\SOFTWARE\Microsoft\PolicyManager\default\WiFi\AllowWiFiHotSpotReporting" -key "Value" -typ "DWord" -val 0
+setKeyValue -path "HKLM:\SOFTWARE\Microsoft\PolicyManager\default\WiFi\AllowAutoConnectToWiFiSenseHotspots" -key "Value" -typ "DWord" -val 0
+createKey -path "HKLM:\SOFTWARE\Microsoft\WcmSvc\wifinetworkmanager\config"
+setKeyValue -path "HKLM:\SOFTWARE\Microsoft\WcmSvc\wifinetworkmanager\config" -key "AutoConnectAllowedOEM" -typ "DWord" -val 0
+setKeyValue -path "HKLM:\SOFTWARE\Microsoft\WcmSvc\wifinetworkmanager\config" -key "WiFISenseAllowed" -typ "DWord" -val 0
+Write-Host "-------------------------------------------------------------"
+# DisableSmartScreen
+Write-Host "Deshabilitando SmartScreen Filter (Previene la ejecución de programas que no este en la lista blanca de Microsoft)"
+setKeyValue -path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" -key "SmartScreenEnabled" -typ "String" -val "Off"
+setKeyValue -path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost" -key "EnableWebContentEvaluation" -typ "DWord" -val 0
+$edge = (Get-AppxPackage -AllUsers "Microsoft.MicrosoftEdge").PackageFamilyName
+createKey -path "HKCU:\SOFTWARE\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppContainer\Storage\$edge\MicrosoftEdge\PhishingFilter"
+setKeyValue -path "HKCU:\SOFTWARE\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppContainer\Storage\$edge\MicrosoftEdge\PhishingFilter" -key "EnabledV9" -typ "DWord" -val 0
+setKeyValue -path "HKCU:\SOFTWARE\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppContainer\Storage\$edge\MicrosoftEdge\PhishingFilter" -key "PreventOverride" -typ "DWord" -val 0
+Write-Host "-------------------------------------------------------------"
+# DisableWebSearch
+Write-Host "Deshabilitando Bing Search in Start Menu (Buscador en Bing desde Windows)"
+setKeyValue -path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" -key "BingSearchEnabled" -typ "DWord" -val 0
+createKey -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search"
+setKeyValue -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -key "DisableWebSearch" -typ "DWord" -val 1
+Write-Host "-------------------------------------------------------------"
+# DisableBackgroundApps
+Write-Host "Deshabilitando aplicaciones en segundo plano (No permitir que aplicaciones se descargen o actualicen en segundo plano)"
+Get-ChildItem -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" -Exclude "Microsoft.Windows.Cortana*" | ForEach {
+	setKeyValue -path $_.PsPath -key "Disabled" -typ "DWord" -val 1
+	setKeyValue -path $_.PsPath -key "DisabledByUser" -typ "DWord" -val 1
+}
+# Desabilitar app en segundo plano 
+setKeyValue -path "HKCU:\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" -key "GlobalUserDisabled " -typ "Dword" -val 0
+Write-Host "-------------------------------------------------------------"
+# DisableLockScreenSpotlight
+Write-Host "Deshabilitando anuncios en la ventana de bloqueo ------------"
+setKeyValue -path "HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -key "RotatingLockScreenEnabled" -typ "DWord" -val 0
+setKeyValue -path "HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -key "RotatingLockScreenOverlayEnabled" -typ "DWord" -val 0
+setKeyValue -path "HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -key "SubscribedContent-338387Enabled" -typ "DWord" -val 0
+Write-Host "-------------------------------------------------------------"
+# DisableLocationTracking
+Write-Host "Deshabilitando seguimiento de localización ------------------"
+setKeyValue -path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Sensor\Overrides\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}" -key "SensorPermissionState" -typ "DWord" -val 0
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\lfsvc\Service\Configuration" -key "Status" -typ "DWord" -val 0
+setKeyValue -path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location" -key "Value" -typ "String" -val "Deny"
+Write-Host "-------------------------------------------------------------"
+# DisableMapUpdates {
+Write-Host "Deshabilitando actualización de mapas automático ------------"
+setKeyValue -path "HKLM:\SYSTEM\Maps" -key "AutoUpdateEnabled" -typ "DWord" -val 0
+Write-Host "-------------------------------------------------------------"
+# DisableFeedback
+Write-Host "Deshabilitando Feedback -------------------------------------"
+createKey -path "HKCU:\SOFTWARE\Microsoft\Siuf\Rules"
+setKeyValue -path "HKCU:\SOFTWARE\Microsoft\Siuf\Rules" -key "NumberOfSIUFInPeriod" -typ "DWord" -val 0
+setKeyValue -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -key "DoNotShowFeedbackNotifications" -typ "DWord" -val 1
+Write-Host "-------------------------------------------------------------"
+# DisableAdvertisingID
+Write-Host "Deshabilitando Advertising ID (ID unico para publicidad a medida)"
+createKey -path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo"
+setKeyValue -path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo" -key "Enabled" -typ "DWord" -val 0
+createKey -path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Privacy"
+setKeyValue -path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Privacy" -key "TailoredExperiencesWithDiagnosticDataEnabled" -typ "DWord" -val 0
+Write-Host "-------------------------------------------------------------"
+# DisableErrorReporting
+Write-Host "Deshabilitando reporte de errores (Mandar errores a Microsoft)"
+setKeyValue -path "HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting" -key "Disabled" -typ "DWord" -val 1
+Write-Host "-------------------------------------------------------------"
+# SetP2PUpdateLocal
+Write-Host "Restringiendo update P2P a la red local ---------------------"
+createKey -path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Config"
+setKeyValue -path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Config" -key "DODownloadMode" -typ "DWord" -val 1
+createKey -path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization"
+setKeyValue -path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization" -key "SystemSettingsDownloadMode" -typ "DWord" -val 3
+Write-Host "-------------------------------------------------------------"
+# DisableAdminShares
+Write-Host "Deshabilitando recursos implicitos compartidos --------------"
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" -key "AutoShareWks" -typ "DWord" -val 0
+Write-Host "-------------------------------------------------------------"
+# DisableFirewall
+Write-Host "Deshabilitando Firewall de Windows (!Instalar otro en su lugar¡)"
+createKey -path "HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\StandardProfile"
+setKeyValue -path "HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\StandardProfile" -key "EnableFirewall" -typ "DWord" -val 0
+Write-Host "-------------------------------------------------------------"
+# DisableDefenderCloud
+Write-Host "Deshabilitando Windows Defender Cloud -----------------------"
+createKey -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet"
+setKeyValue -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet" -key "SpynetReporting" -typ "DWord" -val 0
+setKeyValue -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet" -key "SubmitSamplesConsent" -typ "DWord" -val 2
+Write-Host "-------------------------------------------------------------"
+# DisableSharedExperiences
+Write-Host "Deshabilitando Experiencias Compartidas ---------------------"
+setKeyValue -path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\CDP" -key "RomeSdkChannelUserAuthzPolicy" -typ "DWord" -val 0
+Write-Host "-------------------------------------------------------------"
+# DisableRemoteAssistance
+Write-Host "Deshabilitando Asistencia Remota ----------------------------"
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Control\Remote Assistance" -key "fAllowToGetHelp" -typ "DWord" -val 0
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Control\Remote Assistance" -key "fAllowFullControl" -typ "DWord" -val 0
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Control\Remote Assistance" -key "fEnableChatControl" -typ "DWord" -val 0
+Write-Host "-------------------------------------------------------------"
+# DisableRemoteDesktop
+Write-Host "Deshabilitando Escritorio Remoto ----------------------------"
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server" -key "fDenyTSConnections" -typ "DWord" -val 1
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" -key "UserAuthentication" -typ "DWord" -val 1
+Write-Host "-------------------------------------------------------------"
+# DisableAutoplay
+Write-Host "Deshabilitando Autoplay -------------------------------------"
+setKeyValue -path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers" -key "DisableAutoplay" -typ "DWord" -val 1
+Write-Host "-------------------------------------------------------------"
+# DisableAutorun
+Write-Host "Deshabilitando Autorun para todos los dispositivos ----------"
+createKey -path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer"
+setKeyValue -path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" -key "NoDriveTypeAutoRun" -typ "DWord" -val 255
+Write-Host "-------------------------------------------------------------"
+# DisableStorageSense
+Write-Host "Deshabilitando Storage Sense (Listado de imagenes, videos, etc)"
+removeKey -path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\StorageSense\Parameters\StoragePolicy"
+Write-Host "-------------------------------------------------------------"
+# DisableFastStartup
+Write-Host "Deshabilitando Fast Startup (Produce más problemas que beneficios)"
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power" -key "HiberbootEnabled" -typ "DWord" -val 0
+Write-Host "-------------------------------------------------------------"
+# DisableLastlivedat
+Write-Host "Deshabilitando laslive.dat ----------------------------------"
+setKeyValue -path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Reliability" -key "TimeStampInterval" -typ "DWord" -val 0
+Write-Host "-------------------------------------------------------------"
+# EnableAllPrivacy
+Write-Host "Deshabilitando opciones de privacidad de Windows ------------"
+setKeyValue -path "HKCU:\SOFTWARE\Microsoft\InputPersonalization" -key "RestrictImplicitInkCollection" -typ "DWord" -val 1
+setKeyValue -path "HKCU:\SOFTWARE\Microsoft\InputPersonalization" -key "RestrictImplicitTextCollection" -typ "DWord" -val 1
+setKeyValue -path "HKCU:\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore" -key "HarvestContacts" -typ "DWord" -val 0
+setKeyValue -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\TabletPC" -key "PreventHandwritingDataSharing" -typ "DWord" -val 1
+setKeyValue -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\HandwritingErrorReports" -key "PreventHandwritingErrorReports" -typ "DWord" -val 1
+setKeyValue -path "HKLM\SOFTWARE\Microsoft\Input\TIPC" -key "Enabled" -typ "Dword" -val 0
+setKeyValue -path "HKCU\SOFTWARE\Microsoft\Input\TIPC" -key "Enabled" -typ "Dword" -val 0
+setKeyValue -path "HKCU\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\PushNotifications" -key "NoTileApplicationNotification" -typ "Dword" -val 1
+setKeyValue -path "HKCU\SOFTWARE\Microsoft\MediaPlayer\Preferences" -key "UsageTracking" -typ "Dword" -val 0
+Write-Host "-------------------------------------------------------------"
+# EnableFileDeleteConfirm
+Write-Host "Habilitando ventana de confirmación al borrar archivo -------"
+createKey -path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"
+setKeyValue -path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" -key "ConfirmFileDelete" -typ "DWord" -val 1
+Write-Host "-------------------------------------------------------------"
+# HideTaskbarSearchBox
+Write-Host "Ocultando barra de busqueda de Cortana ----------------------"
+setKeyValue -path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" -key "SearchboxTaskbarMode" -typ "DWord" -val 0
+Write-Host "-------------------------------------------------------------"
+# ShowKnownExtensions
+Write-Host "Mostrando extensiones de archivo ----------------------------"
+setKeyValue -path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -key "HideFileExt" -typ "DWord" -val 0
+Write-Host "-------------------------------------------------------------"
+# HideRecentShortcuts
+Write-Host "Escondiendo archivos recientes y frecuentes usados en el explorador"
+setKeyValue -path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" -key "ShowRecent" -typ "DWord" -val 0
+setKeyValue -path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" -key "ShowFrequent" -typ "DWord" -val 0
+Write-Host "-------------------------------------------------------------"
+# SetExplorerThisPC
+Write-Host "Cambiando la vista por defecto del explorador a Mi PC -------"
+setKeyValue -path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -key "LaunchTo" -typ "DWord" -val 1
+Write-Host "-------------------------------------------------------------"
+# SetVisualFXPerformance
+Write-Host "Ajustando opciones visuales para mejorar el rendimiento -----"
+setKeyValue -path "HKCU:\Control Panel\Desktop" -key "DragFullWindows" -typ "String" -val 0
+setKeyValue -path "HKCU:\Control Panel\Desktop" -key "MenuShowDelay" -typ "String" -val 0
+setKeyValue -path "HKCU:\Control Panel\Desktop\WindowMetrics" -key "MinAnimate" -typ "String" -val 0
+setKeyValue -path "HKCU:\Control Panel\Keyboard" -key "KeyboardDelay" -typ "DWord" -val 0
+setKeyValue -path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -key "ListviewAlphaSelect" -typ "DWord" -val 0
+setKeyValue -path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -key "ListviewShadow" -typ "DWord" -val 0
+setKeyValue -path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -key "TaskbarAnimations" -typ "DWord" -val 0
+setKeyValue -path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" -key "VisualFXSetting" -typ "DWord" -val 3
+setKeyValue -path "HKCU:\Software\Microsoft\Windows\DWM" -key "EnableAeroPeek" -typ "DWord" -val 0
+Write-Host "-------------------------------------------------------------"
+# DisableXboxFeatures
+Write-Host "Deshabilitando características Xbox -------------------------"
+setKeyValue -path "HKCU:\System\GameConfigStore" -key "GameDVR_Enabled" -typ "DWord" -val 0
+createKey -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\GameDVR"
+setKeyValue -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\GameDVR" -key "AllowGameDVR" -typ "DWord" -val 0
+Write-Host "-------------------------------------------------------------"
+# DisableAdobeFlash
+Write-Host "Deshabilitando instalación Adobe Flash en IE y Edge ---------"
+createKey -path "HKCU:\Software\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppContainer\Storage\microsoft.microsoftedge_8wekyb3d8bbwe\MicrosoftEdge\Addons"
+setKeyValue -path "HKCU:\Software\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppContainer\Storage\microsoft.microsoftedge_8wekyb3d8bbwe\MicrosoftEdge\Addons" -key "FlashPlayerEnabled" -typ "DWord" -val 0
+createKey -path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Ext\Settings\{D27CDB6E-AE6D-11CF-96B8-444553540000}"
+setKeyValue -path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Ext\Settings\{D27CDB6E-AE6D-11CF-96B8-444553540000}" -key "Flags" -typ "DWord" -val 1
+Write-Host "-------------------------------------------------------------"
+# DisableHibernation
+Write-Host "Deshabilitando Hibernación ----------------------------------"
+setKeyValue -path "HKLM:\System\CurrentControlSet\Control\Session Manager\Power" -key "HibernteEnabled" -typ "Dword" -val 0
+createKey -path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings"
+setKeyValue -path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings" -key "ShowHibernateOption" -typ "Dword" -val 0
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power" -key "HiberbootEnabled" -typ "DWord" -val 0
+Write-Host "-------------------------------------------------------------"
+# DisableSuperfetch
+Write-Host "Deshabilitando Superfetch -----------------------------------"
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters" -key "EnablePrefetcher" -typ "DWord" -val 0
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters" -key "EnableSuperfetch" -typ "DWord" -val 0
+Write-Host "-------------------------------------------------------------"
+# DisableDefragmentation
+Write-Host "Deshabilitando desgragmentación programada ------------------"
+setKeyValue -path "HKLM:\SOFTWARE\Microsoft\Dfrg\BootOptimizeFunction" -key "OptimizeComplete" -typ "String" -val "No"
+setKeyValue -path "HKLM:\SOFTWARE\Microsoft\Dfrg\BootOptimizeFunction" -key "Enable" -typ "String" -val "N"
+Write-Host "-------------------------------------------------------------"
+# DisableActivityHistory  
+Write-Host "Deshabilitando historial de actividad -----------------------"
+setKeyValue -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -key "EnableActivityFeed" -typ "Dword" -val 0
+setKeyValue -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -key "PublishUserActivities" -typ "Dword" -val 0
+setKeyValue -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -key "UploadUserActivities" -typ "Dword" -val 0
+Write-Host "-------------------------------------------------------------"
+# DisableTailoredExperiences
+Write-Host "Deshabilitando experiencias a medida ------------------------"
+createKey -path "HKCU:\SOFTWARE\Policies\Microsoft\Windows\CloudContent"
+setKeyValue -path "HKCU:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -key "DisableTailoredExperiencesWithDiagnosticData" -typ "Dword" -val 1
+Write-Host "-------------------------------------------------------------"
+# DisableWebLangList 
+Write-Host "Deshabilitando mostrar contenido web por lenguaje -----------"
+setKeyValue -path "HKCU:\Control Panel\International\User Profile" -key "HttpAcceptLanguageOptOut" -typ "Dword" -val 1
+Write-Host "-------------------------------------------------------------"
+# HideRecentJumplists 
+Write-Host "Ocultando archivos abiertos recientemente  ------------------"
+setKeyValue -path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -key "Start_TrackDocs" -typ "Dword" -val 0
+setKeyValue -path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -key "Start_TrackProgs" -typ "Dword" -val 0
+Write-Host "-------------------------------------------------------------"
+# DisableNCSIProbe
+Write-Host "Deshabilitando activar test NCSI ----------------------------"
+setKeyValue -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\NetworkConnectivityStatusIndicator" -key "NoActiveProbe" -typ "Dword" -val 1
+Write-Host "-------------------------------------------------------------"
+# EnableCIMemoryIntegrity 
+Write-Host "Habilitando aislamiento de nucleo e integridad de memoria ---"
+createKey -path "HKLM:\SYSTEM\CurrentControlSet\Control\DeviceGuard\Scenarios\HypervisorEnforcedCodeIntegrity"
+setKeyValue -path "HKLM:\SYSTEM\CurrentControlSet\Control\DeviceGuard\Scenarios\HypervisorEnforcedCodeIntegrity" -key "Enabled" -typ "Dword" -val 1
+Write-Host "-------------------------------------------------------------"
+# DisableScriptHost
+Write-Host "Deshabilitando Windows Script Host --------------------------"
+setKeyValue -path "HKLM:\SOFTWARE\Microsoft\Windows Script Host\Settings" -key "Enabled" -typ "Dword" -val 0
+Write-Host "-------------------------------------------------------------"
+# HideNetworkFromLockScreen
+Write-Host "Ocultando opciones de redes en la pantalla de bloqueo -------"
+setKeyValue -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -key "DontDisplayNetworkSelectionUI" -typ "Dword" -val 1
+Write-Host "-------------------------------------------------------------"
+# DisableSharingWizard
+Write-Host "Deshabilitando Sharing Wizard -------------------------------"
+setKeyValue -path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -key "SharingWizardOn" -typ "Dword" -val 0
+Write-Host "-------------------------------------------------------------"
+# Hide3DObjectsFromThisPC
+Write-Host "Hiding 3D Objects icon from This PC..."
+removeKey -path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}"
+Write-Host "-------------------------------------------------------------"
+# Hide3DObjectsFromExplorer
+Write-Host "Ocultando icono de objetos 3D en el Explorer ----------------"
+createKey -path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FolderDescriptions\{31C0DD25-9439-4F12-BF41-7FF4EDA38722}\PropertyBag"
+setKeyValue -path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FolderDescriptions\{31C0DD25-9439-4F12-BF41-7FF4EDA38722}\PropertyBag" -key "ThisPCPolicy" -typ "String" -val "Hide"
+createKey -path "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Explorer\FolderDescriptions\{31C0DD25-9439-4F12-BF41-7FF4EDA38722}\PropertyBag"
+setKeyValue -path "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Explorer\FolderDescriptions\{31C0DD25-9439-4F12-BF41-7FF4EDA38722}\PropertyBag" -key "ThisPCPolicy" -typ "String" -val "Hide"
+Write-Host "-------------------------------------------------------------"
+
+
+# DisableOneDrive
+Write-Host "Deshabilitando OneDrive -------------------------------------"
+setKeyValue -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OneDrive" -key "DisableFileSyncNGSC" -typ "DWord" -val 1
+setKeyValue -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OneDrive" -key "DisableFileSyncNGSC" -typ "DWord" -val 1
+setKeyValue -path "HKLM:\SOFTWARE\Wow6432Node\Policies\Microsoft\Windows\OneDrive" -key "DisableFileSyncNGSC" -typ "DWord" -val 1
+setKeyValue -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OneDrive" -key "DisableLibrariesDefaultSaveToOneDrive" -typ "DWord" -val 1
+setKeyValue -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OneDrive" -key "DisableMeteredNetworkFileSync" -typ "DWord" -val 1
+setKeyValue -path "HKLM:\SOFTWARE\Wow6432Node\Policies\Microsoft\Windows\Onedrive" -key "DisableLibrariesDefaultSaveToOneDrive" -typ "DWord" -val 1
+setKeyValue -path "HKLM:\SOFTWARE\Wow6432Node\Policies\Microsoft\Windows\Onedrive" -key "DisableMeteredNetworkFileSync" -typ "DWord" -val 1
+setKeyValue -path "HKCR:\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" -key "System.IsPinnedToNameSpaceTree" -typ "DWord" -val 0
+setKeyValue -path "HKCR:\Wow6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" -key "System.IsPinnedToNameSpaceTree" -typ "DWord" -val 0
+setKeyValue -path "HKCU:\Software\Classes\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" -key "System.IsPinnedToNameSpaceTree" -typ "DWord" -val 0
+setKeyValue -path "HKCU:\Software\Classes\Wow6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" -key "System.IsPinnedToNameSpaceTree" -typ "DWord" -val 0
+removeKey "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\OneDrive"
+
+
+# DisableCortana
+Write-Host "Deshabilitando Cortana --------------------------------------"
+createKey -path "HKCU:\SOFTWARE\Microsoft\Personalization\Settings"
+setKeyValue -path "HKCU:\SOFTWARE\Microsoft\Personalization\Settings" -key "AcceptedPrivacyPolicy" -typ "DWord" -val 0
+createKey -path "HKCU:\SOFTWARE\Microsoft\InputPersonalization"
+setKeyValue -path "HKCU:\SOFTWARE\Microsoft\InputPersonalization" -key "RestrictImplicitTextCollection" -typ "DWord" -val 1
+setKeyValue -path "HKCU:\SOFTWARE\Microsoft\InputPersonalization" -key "RestrictImplicitInkCollection" -typ "DWord" -val 1
+createKey -path "HKCU:\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore"
+setKeyValue -path "HKCU:\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore" -key "HarvestContacts" -typ "DWord" -val 0
+createKey -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search"
+setKeyValue -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -key "AllowCortana" -typ "DWord" -val 0
+createKey -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search"
+setKeyValue -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -key "AllowSearchToUseLocation" -typ "DWord" -val 0
+setKeyValue -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -key "DisableWebSearch" -typ "DWord" -val 1
+setKeyValue -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -key "ConnectedSearchUseWeb" -typ "DWord" -val 0
+setKeyValue -path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -key "SearchboxTaskbarMode" -typ "DWord" -val 0
+setKeyValue -path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" -key "CortanaEnabled" -typ "DWord" -val 0
+setKeyValue -path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" -key "BingSearchEnabled" -typ "DWord" -val 0
+Write-Host "-------------------------------------------------------------"
+

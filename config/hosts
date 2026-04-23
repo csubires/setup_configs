@@ -1,0 +1,38 @@
+127.0.0.1	localhost
+127.0.1.1	darkc
+192.168.18.20	servermedia.local
+192.168.18.20	npm.servermedia.local
+192.168.18.20	heimdall.servermedia.local
+192.168.18.20	nextcloud.servermedia.local
+192.168.18.20	filmoteca.servermedia.local
+192.168.18.20	filmoteca2.servermedia.local
+192.168.18.20	gitea.servermedia.local
+192.168.18.20	jellyfin.servermedia.local
+192.168.18.20	portainer.servermedia.local
+192.168.18.20	qbittorrent.servermedia.local
+192.168.18.20	firefox.servermedia.local
+192.168.18.20	jdownloader.servermedia.local
+192.168.18.20	monitor.servermedia.local
+192.168.18.20	cloudbeaver.servermedia.local
+192.168.18.20	keepassxc.servermedia.local
+192.168.18.20	auth.servermedia.local
+192.168.18.20	authelia.servermedia.local
+192.168.18.20	stremio.servermedia.local
+
+0.0.0.0		45.55.255.55
+0.0.0.0		45.55.41.223
+0.0.0.0		license.sublimehq.com
+127.0.0.1	45.55.255.55
+127.0.0.1	45.55.41.223
+127.0.0.1	license.sublimehq.com
+127.0.0.1	sublimehq.com
+127.0.0.1	sublimetext.com
+127.0.0.1	www.sublimetext.com
+
+
+# The following lines are desirable for IPv6 capable hosts
+::1     ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters

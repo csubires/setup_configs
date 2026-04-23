@@ -1,0 +1,67 @@
+[0;34m╔══════════════════════════════════════════════════════════╗[0m
+[0;34m║[1;37m   SERVICE HARDENING AUDITOR  //  2026-03-14 09:46:06   [0;34m║[0m
+[0;34m║[2m   darkc — user[0m[0;34m                                          ║[0m
+[0;34m╚══════════════════════════════════════════════════════════╝[0m
+[0;36m[*][0m CSV fuente  : [1;37mservices_hardening.csv[0m
+[0;36m[*][0m Informe HTML: [1;37mservice_report_20260314_094606.html[0m
+[0;36m[*][0m Log         : [1;37mhardening_20260314_094606.log[0m
+[2m    Solo lectura — el sistema no será modificado[0m
+
+[0;35m▐ [1;37m[1mAuditando servicios del sistema[0m
+[0;35m────────────────────────────────────────────────────────────[0m
+[2m  [–]  bluetooth  →  no instalado[0m
+[0;33m  [▲][0m [1;37mModemManager[0m  →  [0;31mACTIVE[0m  [2m(Conectividad)[0m
+[0;33m  [▲][0m [1;37mfprintd[0m  →  [0;31mENABLED_STOPPED[0m  [2m(Autenticación)[0m
+[0;34m  [?][0m [1;37mcups[0m  →  [2mestado desconocido[0m
+[0;34m  [?][0m [1;37mcups-browsed[0m  →  [2mestado desconocido[0m
+[0;34m  [?][0m [1;37mavahi-daemon[0m  →  [2mestado desconocido[0m
+[0;33m  [▲][0m [1;37mrsyslog[0m  →  [0;31mACTIVE[0m  [2m(Logs)[0m
+[0;34m  [?][0m [1;37mopenvpn[0m  →  [2mestado desconocido[0m
+[0;34m  [?][0m [1;37mufw[0m  →  [2mestado desconocido[0m
+[2m  [–]  smb  →  no instalado[0m
+[2m  [–]  rpcbind  →  no instalado[0m
+[0;34m  [?][0m [1;37mpostfix[0m  →  [2mestado desconocido[0m
+[0;34m  [?][0m [1;37mwpa_supplicant[0m  →  [2mestado desconocido[0m
+[0;34m  [?][0m [1;37mspeech-dispatcher[0m  →  [2mestado desconocido[0m
+[0;33m  [▲][0m [1;37mgeoclue[0m  →  [0;31mENABLED_STOPPED[0m  [2m(Privacidad)[0m
+[2m  [–]  geoclue2  →  no instalado[0m
+[2m  [–]  brltty  →  no instalado[0m
+[2m  [–]  cockpit  →  no instalado[0m
+[2m  [–]  podman  →  no instalado[0m
+[2m  [–]  podman-auto-update  →  no instalado[0m
+[2m  [–]  iscsid  →  no instalado[0m
+[2m  [–]  rasdaemon  →  no instalado[0m
+[2m  [–]  mcelog  →  no instalado[0m
+[0;33m  [▲][0m [1;37mpackagekit[0m  →  [0;31mENABLED_STOPPED[0m  [2m(Paquetes)[0m
+[2m  [–]  realmd  →  no instalado[0m
+[2m  [–]  pcscd  →  no instalado[0m
+[2m  [–]  low-memory-monitor  →  no instalado[0m
+[0;33m  [▲][0m [1;37mswitcheroo-control[0m  →  [0;31mACTIVE[0m  [2m(Hardware)[0m
+[2m  [–]  sssd-ssh  →  no instalado[0m
+[2m  [–]  sssd-sudo  →  no instalado[0m
+[2m  [–]  setroubleshootd  →  no instalado[0m
+[2m  [–]  nis-domainname  →  no instalado[0m
+[2m  [–]  unbound-anchor  →  no instalado[0m
+[2m  [–]  kpatch  →  no instalado[0m
+[2m  [–]  ledmon  →  no instalado[0m
+[2m  [–]  hypervvssd  →  no instalado[0m
+[2m  [–]  hypervkvpd  →  no instalado[0m
+[2m  [–]  hypervfcopyd  →  no instalado[0m
+[2m  [–]  canberra-system-bootup  →  no instalado[0m
+[2m  [–]  canberra-system-shutdown  →  no instalado[0m
+
+[0;35m▐ [1;37m[1mResumen[0m
+[0;35m────────────────────────────────────────────────────────────[0m
+  [1;37mTotal evaluados    :[0m [0;36m40[0m
+  [1;37mCandidatos a desh. :[0m [0;33m6[0m
+  [1;37mYa deshabilitados  :[0m [0;32m0[0m
+  [1;37mNo instalados      :[0m [2m26[0m
+  [1;37mEstado desconocido :[0m [2m8[0m
+
+[0;35m▐ [1;37m[1mGenerando informe HTML[0m
+[0;35m────────────────────────────────────────────────────────────[0m
+[0;32m[✔][0m Informe → [1;37mservice_report_20260314_094606.html[0m
+[0;32m[✔][0m Log     → [1;37mhardening_20260314_094606.log[0m
+[0;34m╔══════════════════════════════════════════════════════════╗[0m
+[0;34m║  [0;32mAUDITORÍA COMPLETADA[0m[0;34m                                     ║[0m
+[0;34m╚══════════════════════════════════════════════════════════╝[0m

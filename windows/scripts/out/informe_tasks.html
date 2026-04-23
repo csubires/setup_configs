@@ -1,0 +1,2016 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Informe Tareas Programadas - DESKTOP-NOTUPOG</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@300;400;600;700;900&display=swap');
+  :root {
+    --bg:#0a0c10;--surface:#0f1318;--border:#1e2530;
+    --accent:#f4a261;--accent2:#00b4d8;--green:#2dc653;
+    --off:#4a5568;--ghost:#3a3f4b;--text:#c9d1d9;--text-dim:#8b949e;
+    --mono:'Share Tech Mono',monospace;--sans:'Barlow',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;}
+
+  header{background:linear-gradient(135deg,#0d1117 0%,#161b22 55%,#1a1200 100%);border-bottom:2px solid var(--accent);padding:40px 48px 32px;position:relative;overflow:hidden;}
+  header::before{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(244,162,97,.13) 0%,transparent 70%);pointer-events:none;}
+  header .label{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:8px;}
+  header h1{font-size:34px;font-weight:900;letter-spacing:-1px;color:#fff;}
+  header h1 span{color:var(--accent);}
+  header .meta{margin-top:12px;font-family:var(--mono);font-size:12px;color:var(--text-dim);display:flex;gap:32px;flex-wrap:wrap;}
+  header .meta b{color:var(--accent2);}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;padding:28px 48px;background:var(--surface);border-bottom:1px solid var(--border);}
+  .stat-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:18px 22px;position:relative;overflow:hidden;}
+  .stat-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;}
+  .stat-card.danger::after{background:var(--accent);}
+  .stat-card.safe::after{background:var(--green);}
+  .stat-card.off::after{background:var(--off);}
+  .stat-card.ghost::after{background:var(--ghost);}
+  .stat-card.total::after{background:var(--accent2);}
+  .stat-num{font-size:38px;font-weight:900;line-height:1;margin-bottom:4px;}
+  .stat-card.danger .stat-num{color:var(--accent);}
+  .stat-card.safe .stat-num{color:var(--green);}
+  .stat-card.off .stat-num{color:var(--off);}
+  .stat-card.ghost .stat-num{color:var(--ghost);}
+  .stat-card.total .stat-num{color:var(--accent2);}
+  .stat-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);}
+
+  .toolbar{padding:18px 48px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--border);background:var(--surface);}
+  .toolbar label{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-right:4px;}
+  .filter-btn{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:5px 13px;border-radius:4px;cursor:pointer;font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.5px;transition:all .15s;}
+  .filter-btn:hover,.filter-btn.active{border-color:var(--accent2);color:var(--accent2);}
+  .filter-btn.active{background:rgba(0,180,216,.1);}
+  input#searchBox{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:5px 13px;border-radius:4px;font-family:var(--mono);font-size:12px;width:260px;outline:none;}
+  input#searchBox:focus{border-color:var(--accent2);}
+
+  .table-wrap{padding:24px 48px 48px;overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  thead th{background:#0d1117;border-bottom:2px solid var(--border);padding:11px 13px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);white-space:nowrap;}
+  tbody tr{border-bottom:1px solid var(--border);transition:background .1s;}
+  tbody tr:hover{background:rgba(255,255,255,.03);}
+  tbody td{padding:9px 13px;vertical-align:middle;}
+  .row-danger{background:rgba(244,162,97,.04);}
+  .row-safe{background:rgba(45,198,83,.03);}
+  .row-off{background:rgba(74,85,104,.06);}
+  .row-ghost{opacity:.4;}
+
+  .badge{display:inline-block;padding:3px 9px;border-radius:3px;font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;font-family:var(--mono);}
+  .badge-danger{background:rgba(244,162,97,.2);color:#f4a261;border:1px solid rgba(244,162,97,.4);}
+  .badge-safe{background:rgba(45,198,83,.15);color:#5dde7c;border:1px solid rgba(45,198,83,.3);}
+  .badge-off{background:rgba(74,85,104,.3);color:#718096;border:1px solid #4a5568;}
+  .badge-ghost{background:rgba(100,110,130,.2);color:#8b949e;border:1px solid #3a3f4b;}
+
+  .state{display:inline-block;padding:2px 7px;border-radius:2px;font-size:10px;font-weight:700;font-family:var(--mono);}
+  .state-run{background:#0d2e12;color:#3fb950;}
+  .state-ready{background:#1a2a3a;color:#58a6ff;}
+  .state-dis{background:#1e2530;color:#8b949e;}
+
+  .cat{display:inline-block;padding:2px 7px;border-radius:2px;font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;white-space:nowrap;}
+  .cat-tel{background:#1a0a2e;color:#c084fc;}
+  .cat-feed{background:#2e1a1a;color:#fca5a5;}
+  .cat-xbox{background:#0d2e12;color:#3fb950;}
+  .cat-wu{background:#1a2a3a;color:#60a5fa;}
+  .cat-def{background:#1a2e1a;color:#4ade80;}
+  .cat-disk{background:#2e2a1a;color:#fbbf24;}
+  .cat-loc{background:#1a2e2a;color:#34d399;}
+  .cat-time{background:#2a1a2e;color:#a78bfa;}
+  .cat-rem{background:#2e1a2a;color:#f472b6;}
+  .cat-ss{background:#2e2a1a;color:#fb923c;}
+  .cat-cloud{background:#1a2030;color:#7dd3fc;}
+  .cat-media{background:#2e1a28;color:#e879f9;}
+  .cat-net{background:#1a2828;color:#2dd4bf;}
+  .cat-text{background:#282020;color:#d8b4fe;}
+  .cat-third{background:#2e1a00;color:#f0883e;}
+  .cat-sys{background:#1e2530;color:#8b949e;}
+
+  .mono{font-family:var(--mono);}
+  .small{font-size:11px;}
+  .dim{color:var(--text-dim);}
+  .center{text-align:center;}
+  .desc{font-size:12px;color:var(--text-dim);max-width:280px;}
+
+  footer{text-align:center;padding:22px;font-family:var(--mono);font-size:11px;color:var(--text-dim);border-top:1px solid var(--border);}
+  footer span{color:var(--accent);}
+  ::-webkit-scrollbar{width:6px;height:6px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="label">// Windows 10 Hardening // Tareas Programadas</div>
+  <h1>Informe de <span>Tareas Programadas</span></h1>
+  <div class="meta">
+    <div><b>Host</b> DESKTOP-NOTUPOG</div>
+    <div><b>Usuario</b> user</div>
+    <div><b>Fecha</b> 17/04/2026 18:50:19</div>
+    <div><b>CSV</b> C:\Users\user\Desktop\tasks\scheduled_tasks_list.csv</div>
+  </div>
+</header>
+
+<div class="stats">
+  <div class="stat-card total"><div class="stat-num">261</div><div class="stat-label">Tareas totales</div></div>
+  <div class="stat-card danger"><div class="stat-num">23</div><div class="stat-label">A deshabilitar</div></div>
+  <div class="stat-card off"><div class="stat-num">2</div><div class="stat-label">Ya deshabilitadas</div></div>
+  <div class="stat-card safe"><div class="stat-num">223</div><div class="stat-label">Se mantienen</div></div>
+  <div class="stat-card ghost"><div class="stat-num">13</div><div class="stat-label">No existen</div></div>
+</div>
+
+<div class="toolbar">
+  <label>Filtro:</label>
+  <button class="filter-btn active" onclick="filterTable('all',this)">Todas</button>
+  <button class="filter-btn" onclick="filterTable('danger',this)">A deshabilitar</button>
+  <button class="filter-btn" onclick="filterTable('off',this)">Ya OFF</button>
+  <button class="filter-btn" onclick="filterTable('safe',this)">Mantener</button>
+  <button class="filter-btn" onclick="filterTable('ghost',this)">No existen</button>
+  &nbsp;
+  <input type="text" id="searchBox" placeholder="Buscar tarea..." oninput="searchTable()" />
+</div>
+
+<div class="table-wrap">
+  <table id="mainTable">
+    <thead>
+      <tr>
+        <th>Categoria</th>
+        <th>Tarea / Ruta</th>
+        <th>Descripcion</th>
+        <th>Estado actual</th>
+        <th>Ultima ejecucion</th>
+        <th>Accion</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+              <tr class="row-danger">
+            <td><span class='cat cat-rem'>Asistencia Remota</span></td>
+            <td><strong>RemoteAssistanceTask</strong><br><small class="mono dim">\Microsoft\Windows\RemoteAssistance\</small></td>
+            <td class="desc">Monitoriza solicitudes de asistencia remota</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-danger">DESHABILITAR</span></td>
+        </tr>        <tr class="row-danger">
+            <td><span class='cat cat-sys'>Bluetooth</span></td>
+            <td><strong>UninstallDeviceTask</strong><br><small class="mono dim">\Microsoft\Windows\Bluetooth\</small></td>
+            <td class="desc">Desinstala dispositivos Bluetooth en segundo plano</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-danger">DESHABILITAR</span></td>
+        </tr>        <tr class="row-danger">
+            <td><span class='cat cat-def'>Defender</span></td>
+            <td><strong>Windows Defender Scheduled Scan</strong><br><small class="mono dim">\Microsoft\Windows\Windows Defender\</small></td>
+            <td class="desc">Analisis programado de Windows Defender</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:29</td>
+            <td class="center"><span class="badge badge-danger">DESHABILITAR</span></td>
+        </tr>        <tr class="row-danger">
+            <td><span class='cat cat-disk'>Disco</span></td>
+            <td><strong>ProactiveScan</strong><br><small class="mono dim">\Microsoft\Windows\Chkdsk\</small></td>
+            <td class="desc">Escaneo proactivo del disco en busca de errores</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:22</td>
+            <td class="center"><span class="badge badge-danger">DESHABILITAR</span></td>
+        </tr>        <tr class="row-danger">
+            <td><span class='cat cat-feed'>Feedback</span></td>
+            <td><strong>DmClient</strong><br><small class="mono dim">\Microsoft\Windows\Feedback\Siuf\</small></td>
+            <td class="desc">Envia peticiones de feedback al usuario</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:22</td>
+            <td class="center"><span class="badge badge-danger">DESHABILITAR</span></td>
+        </tr>        <tr class="row-danger">
+            <td><span class='cat cat-feed'>Feedback</span></td>
+            <td><strong>DmClientOnScenarioDownload</strong><br><small class="mono dim">\Microsoft\Windows\Feedback\Siuf\</small></td>
+            <td class="desc">Descarga escenarios de feedback de Microsoft</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 13:55</td>
+            <td class="center"><span class="badge badge-danger">DESHABILITAR</span></td>
+        </tr>        <tr class="row-danger">
+            <td><span class='cat cat-feed'>Feedback</span></td>
+            <td><strong>QueueReporting</strong><br><small class="mono dim">\Microsoft\Windows\Windows Error Reporting\</small></td>
+            <td class="desc">Envia informes de errores a Microsoft</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-danger">DESHABILITAR</span></td>
+        </tr>        <tr class="row-danger">
+            <td><span class='cat cat-media'>Multimedia</span></td>
+            <td><strong>SpeechModelDownloadTask</strong><br><small class="mono dim">\Microsoft\Windows\Speech\</small></td>
+            <td class="desc">Descarga modelos de reconocimiento de voz</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:22</td>
+            <td class="center"><span class="badge badge-danger">DESHABILITAR</span></td>
+        </tr>        <tr class="row-danger">
+            <td><span class='cat cat-media'>Multimedia</span></td>
+            <td><strong>UpdateLibrary</strong><br><small class="mono dim">\Microsoft\Windows\Windows Media Sharing\</small></td>
+            <td class="desc">Actualiza la biblioteca de Windows Media Player</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-danger">DESHABILITAR</span></td>
+        </tr>        <tr class="row-danger">
+            <td><span class='cat cat-cloud'>Nube</span></td>
+            <td><strong>CreateObjectTask</strong><br><small class="mono dim">\Microsoft\Windows\CloudExperienceHost\</small></td>
+            <td class="desc">Tareas de la experiencia en la nube de Microsoft</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">08/07/2025 16:49</td>
+            <td class="center"><span class="badge badge-danger">DESHABILITAR</span></td>
+        </tr>        <tr class="row-danger">
+            <td><span class='cat cat-time'>Sincronizacion Hora</span></td>
+            <td><strong>ForceSynchronizeTime</strong><br><small class="mono dim">\Microsoft\Windows\Time Synchronization\</small></td>
+            <td class="desc">Fuerza sincronizacion horaria con servidor MS</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 13:50</td>
+            <td class="center"><span class="badge badge-danger">DESHABILITAR</span></td>
+        </tr>        <tr class="row-danger">
+            <td><span class='cat cat-time'>Sincronizacion Hora</span></td>
+            <td><strong>SynchronizeTime</strong><br><small class="mono dim">\Microsoft\Windows\Time Synchronization\</small></td>
+            <td class="desc">Sincronizacion periodica de hora con internet</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:22</td>
+            <td class="center"><span class="badge badge-danger">DESHABILITAR</span></td>
+        </tr>        <tr class="row-danger">
+            <td><span class='cat cat-tel'>Telemetria</span></td>
+            <td><strong>Consolidator</strong><br><small class="mono dim">\Microsoft\Windows\Customer Experience Improvement Program\</small></td>
+            <td class="desc">Consolida datos del programa CEIP de Microsoft</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-danger">DESHABILITAR</span></td>
+        </tr>        <tr class="row-danger">
+            <td><span class='cat cat-tel'>Telemetria</span></td>
+            <td><strong>Microsoft-Windows-DiskDiagnosticDataCollector</strong><br><small class="mono dim">\Microsoft\Windows\DiskDiagnostic\</small></td>
+            <td class="desc">Envia datos de diagnostico del disco a Microsoft</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">13/04/2026 09:10</td>
+            <td class="center"><span class="badge badge-danger">DESHABILITAR</span></td>
+        </tr>        <tr class="row-danger">
+            <td><span class='cat cat-tel'>Telemetria</span></td>
+            <td><strong>Proxy</strong><br><small class="mono dim">\Microsoft\Windows\Autochk\</small></td>
+            <td class="desc">Proxy de telemetria de chkdsk</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:22</td>
+            <td class="center"><span class="badge badge-danger">DESHABILITAR</span></td>
+        </tr>        <tr class="row-danger">
+            <td><span class='cat cat-tel'>Telemetria</span></td>
+            <td><strong>StartupAppTask</strong><br><small class="mono dim">\Microsoft\Windows\Application Experience\</small></td>
+            <td class="desc">Monitoriza apps al inicio para telemetria</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:22</td>
+            <td class="center"><span class="badge badge-danger">DESHABILITAR</span></td>
+        </tr>        <tr class="row-danger">
+            <td><span class='cat cat-tel'>Telemetria</span></td>
+            <td><strong>UsbCeip</strong><br><small class="mono dim">\Microsoft\Windows\Customer Experience Improvement Program\</small></td>
+            <td class="desc">Datos de uso de USB para CEIP</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">13/04/2026 09:10</td>
+            <td class="center"><span class="badge badge-danger">DESHABILITAR</span></td>
+        </tr>        <tr class="row-danger">
+            <td><span class='cat cat-text'>Texto e Input</span></td>
+            <td><strong>MsCtfMonitor</strong><br><small class="mono dim">\Microsoft\Windows\TextServicesFramework\</small></td>
+            <td class="desc">Monitor del framework de servicios de texto</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 13:51</td>
+            <td class="center"><span class="badge badge-danger">DESHABILITAR</span></td>
+        </tr>        <tr class="row-danger">
+            <td><span class='cat cat-loc'>Ubicacion y Mapas</span></td>
+            <td><strong>MapsToastTask</strong><br><small class="mono dim">\Microsoft\Windows\Maps\</small></td>
+            <td class="desc">Notificaciones de actualizacion de mapas</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-danger">DESHABILITAR</span></td>
+        </tr>        <tr class="row-danger">
+            <td><span class='cat cat-loc'>Ubicacion y Mapas</span></td>
+            <td><strong>SynchronizeTimeZone</strong><br><small class="mono dim">\Microsoft\Windows\Time Zone\</small></td>
+            <td class="desc">Sincroniza la zona horaria automaticamente</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:23</td>
+            <td class="center"><span class="badge badge-danger">DESHABILITAR</span></td>
+        </tr>        <tr class="row-danger">
+            <td><span class='cat cat-loc'>Ubicacion y Mapas</span></td>
+            <td><strong>WiFiTask</strong><br><small class="mono dim">\Microsoft\Windows\NlaSvc\</small></td>
+            <td class="desc">Detecta redes WiFi en segundo plano</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-danger">DESHABILITAR</span></td>
+        </tr>        <tr class="row-danger">
+            <td><span class='cat cat-wu'>Windows Update</span></td>
+            <td><strong>Scheduled Start</strong><br><small class="mono dim">\Microsoft\Windows\WindowsUpdate\</small></td>
+            <td class="desc">Inicio programado de Windows Update</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-danger">DESHABILITAR</span></td>
+        </tr>        <tr class="row-danger">
+            <td><span class='cat cat-xbox'>Xbox y Gaming</span></td>
+            <td><strong>XblGameSaveTask</strong><br><small class="mono dim">\Microsoft\XblGameSave\</small></td>
+            <td class="desc">Sincroniza guardados de Xbox en la nube</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-danger">DESHABILITAR</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>.NET Framework NGEN v4.0.30319</strong><br><small class="mono dim">\Microsoft\Windows\.NET Framework\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:23</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>.NET Framework NGEN v4.0.30319 64</strong><br><small class="mono dim">\Microsoft\Windows\.NET Framework\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:23</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>.NET Framework NGEN v4.0.30319 64 Critical</strong><br><small class="mono dim">\Microsoft\Windows\.NET Framework\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">17/04/2026 13:50</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>.NET Framework NGEN v4.0.30319 Critical</strong><br><small class="mono dim">\Microsoft\Windows\.NET Framework\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">17/04/2026 13:50</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Account Cleanup</strong><br><small class="mono dim">\Microsoft\Windows\SharedPC\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>AD RMS Rights Policy Template Management (Automated)</strong><br><small class="mono dim">\Microsoft\Windows\Active Directory Rights Management Services Client\</small></td>
+            <td class="desc">Actualiza las plantillas de directivas de derechos AD RMS del usuario. Este trabajo no indica un aviso de credenciales si hay un error de la autenticación del servicio web de distribución de plantillas en el servidor. En este caso, el error se produce en modo silencioso.</td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>AD RMS Rights Policy Template Management (Manual)</strong><br><small class="mono dim">\Microsoft\Windows\Active Directory Rights Management Services Client\</small></td>
+            <td class="desc">Actualiza las plantillas de directivas de derechos AD RMS del usuario. Este trabajo indica un aviso de credenciales si hay un error de la autenticación del servicio web de distribución de plantillas en el servidor.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>AikCertEnrollTask</strong><br><small class="mono dim">\Microsoft\Windows\CertificateServicesClient\</small></td>
+            <td class="desc">Esta tarea inscribe un certificado para la clave de identidad de la atestación.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 13:51</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>AnalyzeSystem</strong><br><small class="mono dim">\Microsoft\Windows\Power Efficiency Diagnostics\</small></td>
+            <td class="desc">Esta tarea analiza el sistema en busca de condiciones que puedan causar un uso energético elevado.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:29</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>appuriverifierdaily</strong><br><small class="mono dim">\Microsoft\Windows\ApplicationData\</small></td>
+            <td class="desc">Comprueba los registros de host de AppUriHandler.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:22</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>appuriverifierinstall</strong><br><small class="mono dim">\Microsoft\Windows\ApplicationData\</small></td>
+            <td class="desc">Comprueba los registros de host de AppUriHandler.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 08:54</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Automatic-Device-Join</strong><br><small class="mono dim">\Microsoft\Windows\Workplace Join\</small></td>
+            <td class="desc">Registra este equipo si ya está unido a un dominio de Active Directory.</td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>AutomaticOfflineMemoryDiagnostic</strong><br><small class="mono dim">\Microsoft\Windows\MemoryDiagnostic\</small></td>
+            <td class="desc">Programa un diagnóstico de memoria sin conexión en respuesta a los eventos del sistema.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 13:51</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Background Synchronization</strong><br><small class="mono dim">\Microsoft\Windows\Offline Files\</small></td>
+            <td class="desc">Esta tarea controla la sincronización periódica en segundo plano de archivos sin conexión cuando el usuario trabaja en un modo sin conexión.</td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Backup</strong><br><small class="mono dim">\Microsoft\Windows\AppListBackup\</small></td>
+            <td class="desc">$(@%SystemRoot%\system32\AppListBackupLauncher.dll,-602)</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:22</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Backup</strong><br><small class="mono dim">\Microsoft\Windows\CloudRestore\</small></td>
+            <td class="desc">Controla la restauración de la configuración desde la nube</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">13/04/2026 06:37</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>BackupNonMaintenance</strong><br><small class="mono dim">\Microsoft\Windows\AppListBackup\</small></td>
+            <td class="desc">$(@%SystemRoot%\system32\AppListBackupLauncher.dll,-602)</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">13/04/2026 06:37</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>BfeOnServiceStartTypeChange</strong><br><small class="mono dim">\Microsoft\Windows\Windows Filtering Platform\</small></td>
+            <td class="desc">Esta tarea ajusta el tipo de inicio de los servicios desencadenados por un firewall cuando se deshabilita el tipo de inicio del Motor de filtrado de base (BFE).</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>BgTaskRegistrationMaintenanceTask</strong><br><small class="mono dim">\Microsoft\Windows\BrokerInfrastructure\</small></td>
+            <td class="desc">Mantiene registros de las tareas en segundo plano de las aplicaciones de la Plataforma universal de Windows.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">13/04/2026 09:09</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>BitLocker Encrypt All Drives</strong><br><small class="mono dim">\Microsoft\Windows\BitLocker\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>BitLocker MDM policy Refresh</strong><br><small class="mono dim">\Microsoft\Windows\BitLocker\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>BootstrapUsageDataReporting</strong><br><small class="mono dim">\Microsoft\Windows\Flighting\FeatureConfig\</small></td>
+            <td class="desc">Tarea que registra periódicamente informes de uso de características</td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">08/07/2025 19:06</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>CacheTask</strong><br><small class="mono dim">\Microsoft\Windows\Wininet\</small></td>
+            <td class="desc">Tarea de caché WinINet</td>
+            <td class="center"><span class="state state-run">Running</span></td>
+            <td class="center mono small">17/04/2026 13:51</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Calibration Loader</strong><br><small class="mono dim">\Microsoft\Windows\WindowsColorSystem\</small></td>
+            <td class="desc">Esta tarea aplica la configuración de calibración de color.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 13:51</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>CDSSync</strong><br><small class="mono dim">\Microsoft\Windows\WlanSvc\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 13:52</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Cellular</strong><br><small class="mono dim">\Microsoft\Windows\Management\Provisioning\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>CleanupTemporaryState</strong><br><small class="mono dim">\Microsoft\Windows\ApplicationData\</small></td>
+            <td class="desc">Cleans up each package&#39;s unused temporary files.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">13/04/2026 09:10</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>CmCleanup</strong><br><small class="mono dim">\Microsoft\Windows\Containers\</small></td>
+            <td class="desc">Realiza la limpieza de componentes de contenedor cuando corresponde</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">13/04/2026 09:10</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>CreateObjectTask</strong><br><small class="mono dim">\Microsoft\Windows\Shell\</small></td>
+            <td class="desc">Proporciona compatibilidad con los componentes shell que acceden a los datos del sistema</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">13/04/2026 06:29</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>CryptoPolicyTask</strong><br><small class="mono dim">\Microsoft\Windows\CertificateServicesClient\</small></td>
+            <td class="desc">Esta tarea sincroniza la directiva de cifrado.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Data Integrity Check And Scan</strong><br><small class="mono dim">\Microsoft\Windows\Data Integrity Scan\</small></td>
+            <td class="desc">Examina daños latentes en volúmenes con tolerancia a errores</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Data Integrity Scan</strong><br><small class="mono dim">\Microsoft\Windows\Data Integrity Scan\</small></td>
+            <td class="desc">Examina daños latentes en volúmenes con tolerancia a errores</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Data Integrity Scan for Crash Recovery</strong><br><small class="mono dim">\Microsoft\Windows\Data Integrity Scan\</small></td>
+            <td class="desc">Examina recuperación rápida tras bloqueo en volúmenes con tolerancia a errores</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>DeferredWork</strong><br><small class="mono dim">\Microsoft\Windows\WaaSMedic\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">31/12/2025 12:20</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>DetectHardwareChange</strong><br><small class="mono dim">\Microsoft\Windows\Management\Autopilot\</small></td>
+            <td class="desc">$(@%SystemRoot%\system32\Autopilot.dll,-602)</td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Device</strong><br><small class="mono dim">\Microsoft\Windows\Device Information\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Device Install Group Policy</strong><br><small class="mono dim">\Microsoft\Windows\Plug and Play\</small></td>
+            <td class="desc">Controlador de cambio de directiva de grupo de instalación de dispositivos</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Device Install Reboot Required</strong><br><small class="mono dim">\Microsoft\Windows\Plug and Play\</small></td>
+            <td class="desc">Notifica al usuario que se debe reiniciar para finalizar la configuración de un dispositivo de Windows.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 13:51</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Device User</strong><br><small class="mono dim">\Microsoft\Windows\Device Information\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">13/04/2026 09:43</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Device-Sync</strong><br><small class="mono dim">\Microsoft\Windows\Workplace Join\</small></td>
+            <td class="desc">Sincronice los atributos del dispositivo con Microsoft Entra ID.</td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Diagnostics</strong><br><small class="mono dim">\Microsoft\Windows\DiskFootprint\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:22</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>DirectXDatabaseUpdater</strong><br><small class="mono dim">\Microsoft\Windows\DirectX\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:36</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Driver Recovery on Reboot</strong><br><small class="mono dim">\Microsoft\Windows\Device Setup\</small></td>
+            <td class="desc">$(@%SystemRoot%\system32\DeviceSetupManagerAPI.dll,-602)</td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>DsSvcCleanup</strong><br><small class="mono dim">\Microsoft\Windows\ApplicationData\</small></td>
+            <td class="desc">Realiza el mantenimiento del servicio de uso compartido de datos.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:22</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>dusmtask</strong><br><small class="mono dim">\Microsoft\Windows\DUSM\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>DXGIAdapterCache</strong><br><small class="mono dim">\Microsoft\Windows\DirectX\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 13:51</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>EDP App Launch Task</strong><br><small class="mono dim">\Microsoft\Windows\EDP\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>EDP Auth Task</strong><br><small class="mono dim">\Microsoft\Windows\EDP\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>EDP Inaccessible Credentials Task</strong><br><small class="mono dim">\Microsoft\Windows\EDP\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>EDP Policy Manager</strong><br><small class="mono dim">\Microsoft\Windows\AppID\</small></td>
+            <td class="desc">Esta tarea permite realizar los pasos necesarios para configurar Windows Information Protection.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>EduPrintProv</strong><br><small class="mono dim">\Microsoft\Windows\Printing\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>EnableLicenseAcquisition</strong><br><small class="mono dim">\Microsoft\Windows\Subscription\</small></td>
+            <td class="desc">Enable susbscription license acquisition</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 13:50</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>ExploitGuard MDM policy Refresh</strong><br><small class="mono dim">\Microsoft\Windows\ExploitGuard\</small></td>
+            <td class="desc">Tarea para aplicar cambios en la configuración de Protección contra vulnerabilidades del equipo.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 13:50</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>FamilySafetyMonitor</strong><br><small class="mono dim">\Microsoft\Windows\Shell\</small></td>
+            <td class="desc">Inicializa la supervisión y cumplimiento de la Protección infantil.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>FamilySafetyRefreshTask</strong><br><small class="mono dim">\Microsoft\Windows\Shell\</small></td>
+            <td class="desc">Sincroniza la configuración más reciente con el servicio de características de la familia de Microsoft.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>File History (maintenance mode)</strong><br><small class="mono dim">\Microsoft\Windows\FileHistory\</small></td>
+            <td class="desc">Protege los archivos de usuario frente a pérdidas accidentales copiándolos en una ubicación de copia de seguridad cuando el sistema está desatendido</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">13/04/2026 09:10</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Firefox Background Update S-1-5-21-1306727280-3045863218-242321344-1001 308046B0AF4A39CB</strong><br><small class="mono dim">\Mozilla\</small></td>
+            <td class="desc">The Background Update task checks for updates to Firefox when Firefox is not running. This task is installed automatically by Firefox, and is reinstalled when Firefox runs. To disable this task, update the browser settings or the Firefox enterprise policy setting “BackgroundAppUpdate”.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Firefox Default Browser Agent 308046B0AF4A39CB</strong><br><small class="mono dim">\Mozilla\</small></td>
+            <td class="desc">The Default Browser Agent task checks when the default changes from Firefox to another browser. If the change happens under suspicious circumstances, it will prompt users to change back to Firefox no more than two times. This task is installed automatically by Firefox, and is reinstalled when Firefox updates. To disable this task, update the “default-browser-agent.enabled” preference on the about:config page or the Firefox enterprise policy setting “DisableDefaultBrowserAgent”.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>GovernedFeatureUsageProcessing</strong><br><small class="mono dim">\Microsoft\Windows\Flighting\FeatureConfig\</small></td>
+            <td class="desc">Tarea de conciliar periódicamente configuraciones de características</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:37</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>HandleCommand</strong><br><small class="mono dim">\Microsoft\Windows\DeviceDirectoryClient\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>HandleWnsCommand</strong><br><small class="mono dim">\Microsoft\Windows\DeviceDirectoryClient\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>HiveUploadTask</strong><br><small class="mono dim">\Microsoft\Windows\User Profile Service\</small></td>
+            <td class="desc">Esta tarea cargará automáticamente un subárbol del Registro de un perfil de usuario móvil en su ubicación de red.</td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>HybridDriveCachePrepopulate</strong><br><small class="mono dim">\Microsoft\Windows\Sysmain\</small></td>
+            <td class="desc">Tarea de rellenado previo de caché de unidad híbrida</td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>HybridDriveCacheRebalance</strong><br><small class="mono dim">\Microsoft\Windows\Sysmain\</small></td>
+            <td class="desc">Tarea de mantenimiento de equilibrio de caché de unidad híbrida</td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>IndexerAutomaticMaintenance</strong><br><small class="mono dim">\Microsoft\Windows\Shell\</small></td>
+            <td class="desc">Mantiene el índice de búsqueda actualizado</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:22</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>InitialConfiguration</strong><br><small class="mono dim">\Microsoft\Windows\WindowsAI\Recall\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">31/12/2025 21:11</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>InitialConfiguration</strong><br><small class="mono dim">\Microsoft\Windows\WindowsAI\Settings\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Initialization</strong><br><small class="mono dim">\Microsoft\Windows\ReFsDedupSvc\</small></td>
+            <td class="desc">Inicializa el servicio de desduplicación REFS cuando se detecta el primer volumen habilitado para desduplicación en el sistema. No quite ni modifique esta tarea.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>InputSettingsRestoreDataAvailable</strong><br><small class="mono dim">\Microsoft\Windows\input\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Installation</strong><br><small class="mono dim">\Microsoft\Windows\LanguageComponentsInstaller\</small></td>
+            <td class="desc">Instala componentes de idioma que coincidan con la lista de idiomas del usuario.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>IntegrityCheck</strong><br><small class="mono dim">\Microsoft\Windows\DeviceDirectoryClient\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">13/04/2026 09:09</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Interactive</strong><br><small class="mono dim">\Microsoft\Windows\Task Manager\</small></td>
+            <td class="desc">Ejecuta una tarea como el usuario interactivo.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>KeyPreGenTask</strong><br><small class="mono dim">\Microsoft\Windows\CertificateServicesClient\</small></td>
+            <td class="desc">Esta tarea genera previamente una clave de identidad de la atestación (AIK) y una clave de almacenamiento (SK) basadas en TPM.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 13:50</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>La57Cleanup</strong><br><small class="mono dim">\Microsoft\Windows\Kernel\</small></td>
+            <td class="desc">Esta tarea limpia archivos binarios de paginación de 5 niveles en sistemas que no admiten la paginación de 5 niveles.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">13/04/2026 09:42</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>License Validation</strong><br><small class="mono dim">\Microsoft\Windows\Clip\</small></td>
+            <td class="desc">Windows Store legacy license migration task</td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>LicenseAcquisition</strong><br><small class="mono dim">\Microsoft\Windows\Subscription\</small></td>
+            <td class="desc">Susbscription license acquisition</td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>LicenseImdsIntegration</strong><br><small class="mono dim">\Microsoft\Windows\Clip\</small></td>
+            <td class="desc">FClip</td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>LocalUserSyncDataAvailable</strong><br><small class="mono dim">\Microsoft\Windows\input\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">21/07/2025 08:27</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>LocateCommandUserSession</strong><br><small class="mono dim">\Microsoft\Windows\DeviceDirectoryClient\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>LoginCheck</strong><br><small class="mono dim">\Microsoft\Windows\PushToInstall\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Logon</strong><br><small class="mono dim">\Microsoft\Windows\Management\Provisioning\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">13/04/2026 09:41</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Logon Synchronization</strong><br><small class="mono dim">\Microsoft\Windows\Offline Files\</small></td>
+            <td class="desc">Esta tarea inicia la sincronización de los archivos sin conexión cuando el usuario inicia sesión en el sistema.</td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>LPRemove</strong><br><small class="mono dim">\Microsoft\Windows\MUI\</small></td>
+            <td class="desc">Iniciar herramienta de limpieza de idioma</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">13/04/2026 09:42</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>MaintenanceTasks</strong><br><small class="mono dim">\Microsoft\Windows\StateRepository\</small></td>
+            <td class="desc">$(@%SystemRoot%\system32\Windows.StateRepositoryClient.dll,-602)</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:22</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>maintenancetasks</strong><br><small class="mono dim">\Microsoft\Windows\capabilityaccessmanager\</small></td>
+            <td class="desc">Tareas de mantenimiento del administrador de acceso de capacidad</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:22</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>MareBackup</strong><br><small class="mono dim">\Microsoft\Windows\Application Experience\</small></td>
+            <td class="desc">Recopila datos de aplicaciones Win32 para el escenario Copia de seguridad de aplicaciones</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>MdmDiagnosticsCleanup</strong><br><small class="mono dim">\Microsoft\Windows\Management\Provisioning\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">08/07/2025 14:22</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Metadata Refresh</strong><br><small class="mono dim">\Microsoft\Windows\Device Setup\</small></td>
+            <td class="desc">Realiza una actualización periódica de los metadatos del dispositivo</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">13/04/2026 09:10</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Microsoft Compatibility Appraiser Exp</strong><br><small class="mono dim">\Microsoft\Windows\Application Experience\</small></td>
+            <td class="desc">Recopila información de telemetría de los programas si participa en el Programa para la mejora de la experiencia del usuario de Microsoft.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>MicrosoftEdgeUpdateTaskMachineCore{921C39F7-55C7-4911-B6B2-3A75080202AF}</strong><br><small class="mono dim">\</small></td>
+            <td class="desc">Mantiene tu software de Microsoft actualizado. Si esta tarea se deshabilita o se detiene, el software de Microsoft no se mantendrá actualizado, lo que significa que no se podrán solucionar las vulnerabilidades de seguridad que puedan surgir y las características podrían no funcionar. Esta tarea se desinstalará automáticamente cuando no la esté usando ningún software de Microsoft.</td>
+            <td class="center"><span class="state state-run">Running</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>MicrosoftEdgeUpdateTaskMachineUA{EF64DBD0-C884-4ECC-83C1-A7E441676C6C}</strong><br><small class="mono dim">\</small></td>
+            <td class="desc">Mantiene tu software de Microsoft actualizado. Si esta tarea se deshabilita o se detiene, el software de Microsoft no se mantendrá actualizado, lo que significa que no se podrán solucionar las vulnerabilidades de seguridad que puedan surgir y las características podrían no funcionar. Esta tarea se desinstalará automáticamente cuando no la esté usando ningún software de Microsoft.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:36</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Microsoft-Windows-DiskDiagnosticResolver</strong><br><small class="mono dim">\Microsoft\Windows\DiskDiagnostic\</small></td>
+            <td class="desc">Microsoft-Windows-DiskDiagnosticResolver advierte a los usuarios acerca de los errores notificados por los discos duros que admiten el estándar de la tecnología de supervisión automática, análisis y generación de informes (SMART). El Servicio de directivas de diagnóstico activa automáticamente esta tarea cuando se detecta un error de SMART.</td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>MobilityManager</strong><br><small class="mono dim">\Microsoft\Windows\Ras\</small></td>
+            <td class="desc">Proporciona compatibilidad para el cambio de una conexión VPN con movilidad habilitada a otra si se desactiva la interfaz subyacente de la conexión.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Monitoring</strong><br><small class="mono dim">\Microsoft\Windows\Hotpatch\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:22</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>MoProfileManagement</strong><br><small class="mono dim">\Microsoft\Windows\WlanSvc\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>MouseSyncDataAvailable</strong><br><small class="mono dim">\Microsoft\Windows\input\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>NcsiIdentifyUserProxies</strong><br><small class="mono dim">\Microsoft\Windows\Network Connectivity Status Indicator\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 13:51</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>NotificationTask</strong><br><small class="mono dim">\Microsoft\Windows\WwanSvc\</small></td>
+            <td class="desc">Tarea en segundo plano para realizar interacciones web y por usuario</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>OneDrive Reporting Task-S-1-5-21-1306727280-3045863218-242321344-1001</strong><br><small class="mono dim">\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>OneDrive Standalone Update Task-S-1-5-21-1306727280-3045863218-242321344-1001</strong><br><small class="mono dim">\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>OneDrive Startup Task-S-1-5-21-1306727280-3045863218-242321344-1001</strong><br><small class="mono dim">\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>OobeDiscovery</strong><br><small class="mono dim">\Microsoft\Windows\WwanSvc\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 13:50</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>OOBEFodSetup</strong><br><small class="mono dim">\Microsoft\Windows\Servicing\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">08/07/2025 16:54</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>PcaPatchDbTask</strong><br><small class="mono dim">\Microsoft\Windows\Application Experience\</small></td>
+            <td class="desc">Updates compatibility database</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>PCR Prediction Framework Firmware Update Task</strong><br><small class="mono dim">\Microsoft\Windows\PCRPF\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>PenSyncDataAvailable</strong><br><small class="mono dim">\Microsoft\Windows\input\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>PerformRemediation</strong><br><small class="mono dim">\Microsoft\Windows\WaaSMedic\</small></td>
+            <td class="desc">$(@%systemroot%\system32\WaasMedicSvcImpl.dll,-104)</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">13/04/2026 06:37</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>PITRTask</strong><br><small class="mono dim">\Microsoft\Windows\Setup\</small></td>
+            <td class="desc">Crea instantáneas para restauración a un momento específico.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:22</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Pluton-Ksp-Provisioning</strong><br><small class="mono dim">\Microsoft\Windows\Pluton\</small></td>
+            <td class="desc">Controlador de tareas de PlutonTasks</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>PolicyConfiguration</strong><br><small class="mono dim">\Microsoft\Windows\WindowsAI\Recall\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 13:51</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>PolicyConverter</strong><br><small class="mono dim">\Microsoft\Windows\AppID\</small></td>
+            <td class="desc">Convierte la directiva de directivas de restricción de software de formato XML a formato binario.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">06/11/2025 18:25</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>PowerGridForecastTask</strong><br><small class="mono dim">\Microsoft\Windows\Sustainability\</small></td>
+            <td class="desc">PowerGridForecastTask tiene un controlador de tareas COM</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Pre-staged app cleanup</strong><br><small class="mono dim">\Microsoft\Windows\AppxDeploymentClient\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">12/08/2025 07:29</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>PrinterCleanupTask</strong><br><small class="mono dim">\Microsoft\Windows\Printing\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">13/04/2026 06:37</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>PrintJobCleanupTask</strong><br><small class="mono dim">\Microsoft\Windows\Printing\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">06/11/2025 20:13</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>ProcessMemoryDiagnosticEvents</strong><br><small class="mono dim">\Microsoft\Windows\MemoryDiagnostic\</small></td>
+            <td class="desc">Programa un diagnóstico de memoria en respuesta a los eventos del sistema.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:22</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Property Definition Sync</strong><br><small class="mono dim">\Microsoft\Windows\File Classification Infrastructure\</small></td>
+            <td class="desc">Sincroniza la taxonomía de la infraestructura de clasificación de archivos en el equipo con las definiciones de propiedades de recursos almacenadas en Servicios de dominio de Active Directory.</td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>RecommendedTroubleshootingScanner</strong><br><small class="mono dim">\Microsoft\Windows\Diagnosis\</small></td>
+            <td class="desc">Comprobar la resolución de problemas recomendada de Microsoft</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">08/07/2025 15:17</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>ReconcileConfigs</strong><br><small class="mono dim">\Microsoft\Windows\Flighting\FeatureConfig\</small></td>
+            <td class="desc">Tarea de conciliar periódicamente configuraciones de características</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">08/07/2025 18:43</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>ReconcileFeatures</strong><br><small class="mono dim">\Microsoft\Windows\Flighting\FeatureConfig\</small></td>
+            <td class="desc">Tarea de conciliar periódicamente configuraciones de características</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:48</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>ReconcileLanguageResources</strong><br><small class="mono dim">\Microsoft\Windows\LanguageComponentsInstaller\</small></td>
+            <td class="desc">Instala componentes de idioma que coincidan con la lista de idiomas del usuario.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>RecoverabilityToastTask</strong><br><small class="mono dim">\Microsoft\Windows\AccountHealth\</small></td>
+            <td class="desc">El controlador de tareas AccountHealth evalúa el estado de una cuenta de Microsoft y toma las acciones de reparación necesarias</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">21/07/2025 12:01</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Recovery-Check</strong><br><small class="mono dim">\Microsoft\Windows\Workplace Join\</small></td>
+            <td class="desc">Realiza una comprobación de recuperación.</td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Refresh Group Policy Cache</strong><br><small class="mono dim">\Microsoft\Windows\WindowsUpdate\</small></td>
+            <td class="desc">Esta tarea se usa para actualizar la memoria caché de la directiva de grupo en Windows Update</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>RefreshCache</strong><br><small class="mono dim">\Microsoft\Windows\Flighting\OneSettings\</small></td>
+            <td class="desc">Tarea que actualiza periódicamente datos para clientes de OneSettings.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:40</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>RegIdleBackup</strong><br><small class="mono dim">\Microsoft\Windows\Registry\</small></td>
+            <td class="desc">Tarea de copia de seguridad de inactividad de Registro</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">13/04/2026 09:10</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>RegisterDeviceAccountChange</strong><br><small class="mono dim">\Microsoft\Windows\DeviceDirectoryClient\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>RegisterDeviceLocationRightsChange</strong><br><small class="mono dim">\Microsoft\Windows\DeviceDirectoryClient\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>RegisterDevicePeriodic24</strong><br><small class="mono dim">\Microsoft\Windows\DeviceDirectoryClient\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>RegisterDevicePolicyChange</strong><br><small class="mono dim">\Microsoft\Windows\DeviceDirectoryClient\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>RegisterDeviceProtectionStateChanged</strong><br><small class="mono dim">\Microsoft\Windows\DeviceDirectoryClient\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">13/04/2026 09:19</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>RegisterDeviceSettingChange</strong><br><small class="mono dim">\Microsoft\Windows\DeviceDirectoryClient\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 13:51</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>RegisterUserDevice</strong><br><small class="mono dim">\Microsoft\Windows\DeviceDirectoryClient\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Registration</strong><br><small class="mono dim">\Microsoft\Windows\PushToInstall\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>RemediateHardwareChange</strong><br><small class="mono dim">\Microsoft\Windows\Management\Autopilot\</small></td>
+            <td class="desc">$(@%SystemRoot%\system32\Autopilot.dll,-603)</td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>RemoteMouseSyncDataAvailable</strong><br><small class="mono dim">\Microsoft\Windows\input\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>RemotePenSyncDataAvailable</strong><br><small class="mono dim">\Microsoft\Windows\input\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>RemoteTouchpadSyncDataAvailable</strong><br><small class="mono dim">\Microsoft\Windows\input\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Report policies</strong><br><small class="mono dim">\Microsoft\Windows\UpdateOrchestrator\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">13/04/2026 09:10</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>RequestTrace</strong><br><small class="mono dim">\Microsoft\Windows\PerformanceTrace\</small></td>
+            <td class="desc">Controla la tecla de acceso rápido Win+Shift+Control+T para realizar un seguimiento de rendimiento del Shell</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>ResolutionHost</strong><br><small class="mono dim">\Microsoft\Windows\WDI\</small></td>
+            <td class="desc">El host de resolución de Infraestructura de diagnóstico de Windows habilita las resoluciones interactivas de problemas del sistema detectados por el Servicio de directivas de diagnóstico. Este servicio lo activa cuando resulta necesario en la sesión de usuario adecuada. Si el Servicio de directivas de diagnóstico no se está ejecutando, la tarea no se ejecutará.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">13/04/2026 09:54</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>ResPriStaticDbSync</strong><br><small class="mono dim">\Microsoft\Windows\Sysmain\</small></td>
+            <td class="desc">Tarea de mantenimiento de sincronización de base de datos estática de prioridad reservada</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:29</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Restore</strong><br><small class="mono dim">\Microsoft\Windows\CloudRestore\</small></td>
+            <td class="desc">Controla la restauración de la configuración desde la nube</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>RestoreDevice</strong><br><small class="mono dim">\Microsoft\Windows\InstallService\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Retry</strong><br><small class="mono dim">\Microsoft\Windows\Management\Provisioning\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>RunFullMemoryDiagnostic</strong><br><small class="mono dim">\Microsoft\Windows\MemoryDiagnostic\</small></td>
+            <td class="desc">Detecta y mitiga problemas en la memoria física (RAM).</td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>RunOnReboot</strong><br><small class="mono dim">\Microsoft\Windows\Management\Provisioning\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>ScanForUpdates</strong><br><small class="mono dim">\Microsoft\Windows\InstallService\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>ScanForUpdatesAsUser</strong><br><small class="mono dim">\Microsoft\Windows\InstallService\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:22</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Schedule Maintenance Work</strong><br><small class="mono dim">\Microsoft\Windows\UpdateOrchestrator\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Schedule Scan</strong><br><small class="mono dim">\Microsoft\Windows\UpdateOrchestrator\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Schedule Scan Static Task</strong><br><small class="mono dim">\Microsoft\Windows\UpdateOrchestrator\</small></td>
+            <td class="desc">Esta tarea realiza un análisis programado de Windows Update.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Schedule Wake To Work</strong><br><small class="mono dim">\Microsoft\Windows\UpdateOrchestrator\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Schedule Work</strong><br><small class="mono dim">\Microsoft\Windows\UpdateOrchestrator\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:40</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Scheduled</strong><br><small class="mono dim">\Microsoft\Windows\Diagnosis\</small></td>
+            <td class="desc">La Tarea de mantenimiento programada de Windows realiza un mantenimiento periódico del sistema del equipo mediante la corrección automática de problemas o su notificación a través de Seguridad y mantenimiento.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">13/04/2026 09:10</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>SdbinstMergeDbTask</strong><br><small class="mono dim">\Microsoft\Windows\Application Experience\</small></td>
+            <td class="desc">Combina las bases de datos shim que están pendientes de combinación.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Secure-Boot-Update</strong><br><small class="mono dim">\Microsoft\Windows\PI\</small></td>
+            <td class="desc">Esta tarea actualiza las variables de arranque seguro.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>SetupRecoveryDataTask</strong><br><small class="mono dim">\Microsoft\Windows\Setup\</small></td>
+            <td class="desc">Tarea de datos de resistencia de recuperación e instalación de Windows.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>SilentCleanup</strong><br><small class="mono dim">\Microsoft\Windows\DiskCleanup\</small></td>
+            <td class="desc">Tarea de mantenimiento usada por el sistema para iniciar una limpieza silenciosa automática del disco cuando el espacio en disco es insuficiente.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:22</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>SmartRetry</strong><br><small class="mono dim">\Microsoft\Windows\InstallService\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>SoftLandingCreativeManagementTask</strong><br><small class="mono dim">\SoftLanding\S-1-5-21-1306727280-3045863218-242321344-1001\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>SpaceAgentTask</strong><br><small class="mono dim">\Microsoft\Windows\SpacePort\</small></td>
+            <td class="desc">Configuración de Espacios de almacenamiento</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>SpaceManagerTask</strong><br><small class="mono dim">\Microsoft\Windows\SpacePort\</small></td>
+            <td class="desc">$(@%SystemRoot%\system32\spaceman.exe,-3)</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Sqm-Tasks</strong><br><small class="mono dim">\Microsoft\Windows\PI\</small></td>
+            <td class="desc">Esta tarea reúne información acerca del Módulo de plataforma segura (TPM), arranque seguro y arranque medido.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">13/04/2026 09:10</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>SR</strong><br><small class="mono dim">\Microsoft\Windows\SystemRestore\</small></td>
+            <td class="desc">Esta tarea crea puntos de protección del sistema a intervalos regulares.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:29</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Start Oobe Expedite Work</strong><br><small class="mono dim">\Microsoft\Windows\UpdateOrchestrator\</small></td>
+            <td class="desc">Esta tarea realiza un análisis programado de Windows Update.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>StartComponentCleanup</strong><br><small class="mono dim">\Microsoft\Windows\Servicing\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">13/04/2026 09:10</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>StartOobeAppsScan_LicenseAccepted</strong><br><small class="mono dim">\Microsoft\Windows\UpdateOrchestrator\</small></td>
+            <td class="desc">Esta tarea realiza un análisis programado de Windows Update.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>StartOobeAppsScanAfterUpdate</strong><br><small class="mono dim">\Microsoft\Windows\UpdateOrchestrator\</small></td>
+            <td class="desc">Esta tarea realiza un análisis programado de Windows Update.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Storage Tiers Management Initialization</strong><br><small class="mono dim">\Microsoft\Windows\Storage Tiers Management\</small></td>
+            <td class="desc">Inicializa el servicio de administración de capas de almacenamiento cuando se detecta en el sistema el primer espacio de almacenamiento en capas. No quite o modifique esta tarea.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Storage Tiers Optimization</strong><br><small class="mono dim">\Microsoft\Windows\Storage Tiers Management\</small></td>
+            <td class="desc">Optimiza la colocación de los datos en capas de almacenamiento en todos los espacios de almacenamiento en capas del sistema.</td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>StorageCardEncryption Task</strong><br><small class="mono dim">\Microsoft\Windows\EDP\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>StorageSense</strong><br><small class="mono dim">\Microsoft\Windows\DiskFootprint\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:22</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>SustainabilityTelemetry</strong><br><small class="mono dim">\Microsoft\Windows\Sustainability\</small></td>
+            <td class="desc">Eventos de telemetría para la sostenibilidad</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">13/04/2026 09:10</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>SvcRestartTask</strong><br><small class="mono dim">\Microsoft\Windows\SoftwareProtectionPlatform\</small></td>
+            <td class="desc">Esta tarea reinicia el Servicio de plataforma de protección de software en el momento especificado</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>SvcRestartTaskLogon</strong><br><small class="mono dim">\Microsoft\Windows\SoftwareProtectionPlatform\</small></td>
+            <td class="desc">Esta tarea reinicia el servicio de plataforma de protección de software cuando se produce el inicio de sesión de usuario</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">08/07/2025 16:55</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>SvcRestartTaskNetwork</strong><br><small class="mono dim">\Microsoft\Windows\SoftwareProtectionPlatform\</small></td>
+            <td class="desc">Esta tarea reinicia el servicio de plataforma de protección de software cuando se detecta una nueva red</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">08/07/2025 17:05</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Synchronize Language Settings</strong><br><small class="mono dim">\Microsoft\Windows\International\</small></td>
+            <td class="desc">Synchronize User Language Settings from other devices.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 13:51</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>syncpensettings</strong><br><small class="mono dim">\Microsoft\Windows\input\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>SyspartRepair</strong><br><small class="mono dim">\Microsoft\Windows\Chkdsk\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Sysprep Generalize Drivers</strong><br><small class="mono dim">\Microsoft\Windows\Plug and Play\</small></td>
+            <td class="desc">Generalice el estado del controlador para preparar el sistema para que sea reiniciable en cualquier configuración de hardware.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>SystemSoundsService</strong><br><small class="mono dim">\Microsoft\Windows\Multimedia\</small></td>
+            <td class="desc">Agente de modo usuario de sonidos del sistema</td>
+            <td class="center"><span class="state state-run">Running</span></td>
+            <td class="center mono small">17/04/2026 13:51</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>SystemTask</strong><br><small class="mono dim">\Microsoft\Windows\CertificateServicesClient\</small></td>
+            <td class="desc">El cliente de Servicios de servidor de certificados administra automáticamente identidades digitales, como certificados, claves y credenciales para los usuarios y el equipo, lo que habilita la inscripción, movilidad (itinerancia) y otros servicios.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 13:50</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>TempSignedLicenseExchange</strong><br><small class="mono dim">\Microsoft\Windows\License Manager\</small></td>
+            <td class="desc">Exchanges temporary preinstalled licenses for Microsoft Store licenses.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:22</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>ThemeAssetTask_SyncFODState</strong><br><small class="mono dim">\Microsoft\Windows\Shell\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>ThemesSyncedImageDownload</strong><br><small class="mono dim">\Microsoft\Windows\Shell\</small></td>
+            <td class="desc">Descarga una copia de seguridad de las imágenes del tema sincronizado</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:22</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>TouchpadSyncDataAvailable</strong><br><small class="mono dim">\Microsoft\Windows\input\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Tpm-HASCertRetr</strong><br><small class="mono dim">\Microsoft\Windows\TPM\</small></td>
+            <td class="desc">Esta tarea solicita un certificado de atestación de estado.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Tpm-Maintenance</strong><br><small class="mono dim">\Microsoft\Windows\TPM\</small></td>
+            <td class="desc">Esta tarea realiza acciones en segundo plano en nombre del sistema operativo para ser compatible con el Módulo de plataforma segura (TPM).</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 13:50</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Tpm-PreAttestationHealthCheck</strong><br><small class="mono dim">\Microsoft\Windows\TPM\</small></td>
+            <td class="desc">Esta tarea realiza acciones en segundo plano en nombre del sistema operativo para ser compatible con el Módulo de plataforma segura (TPM).</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 13:50</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>UCPD velocity</strong><br><small class="mono dim">\Microsoft\Windows\AppxDeploymentClient\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:22</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>UIEOrchestrator</strong><br><small class="mono dim">\Microsoft\Windows\UpdateOrchestrator\</small></td>
+            <td class="desc">Esta tarea envía información de latido para datos de características de Windows Update</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>UnexpectedCodepath</strong><br><small class="mono dim">\Microsoft\Windows\Diagnosis\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:37</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>UnifiedConsentSyncTask</strong><br><small class="mono dim">\Microsoft\Windows\ConsentUX\UnifiedConsent\</small></td>
+            <td class="desc">$(@%systemRoot%\system32\unifiedconsent.dll,-101)</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Uninstallation</strong><br><small class="mono dim">\Microsoft\Windows\LanguageComponentsInstaller\</small></td>
+            <td class="desc">Desinstala componentes de idioma que no están en ninguna lista de idiomas del usuario.</td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">12/08/2025 07:29</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>UpdateUserPictureTask</strong><br><small class="mono dim">\Microsoft\Windows\Shell\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>UpdateUserPictureTaskContained</strong><br><small class="mono dim">\Microsoft\Windows\Shell\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>UPnPHostConfig</strong><br><small class="mono dim">\Microsoft\Windows\UPnP\</small></td>
+            <td class="desc">Establecer el servicio UPnPHost en inicio automático</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>UsageAndQualityInsights-MaintenanceTask</strong><br><small class="mono dim">\Microsoft\Windows\UsageAndQualityInsights\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>UsageDataFlushing</strong><br><small class="mono dim">\Microsoft\Windows\Flighting\FeatureConfig\</small></td>
+            <td class="desc">Tareas que conservan datos de uso de características en el disco</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:40</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>UsageDataReceiver</strong><br><small class="mono dim">\Microsoft\Windows\Flighting\FeatureConfig\</small></td>
+            <td class="desc">Tareas que conservan datos de uso de características en el disco</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:47</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>UsageDataReporting</strong><br><small class="mono dim">\Microsoft\Windows\Flighting\FeatureConfig\</small></td>
+            <td class="desc">Tarea que registra periódicamente informes de uso de características</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 13:50</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Usb-Notifications</strong><br><small class="mono dim">\Microsoft\Windows\USB\</small></td>
+            <td class="desc">Tarea de notificación de error de USB</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>UserTask</strong><br><small class="mono dim">\Microsoft\Windows\CertificateServicesClient\</small></td>
+            <td class="desc">El cliente de Servicios de servidor de certificados administra automáticamente identidades digitales, como certificados, claves y credenciales para los usuarios y el equipo, lo que habilita la inscripción, movilidad (itinerancia) y otros servicios.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 13:51</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>UserTask-Roam</strong><br><small class="mono dim">\Microsoft\Windows\CertificateServicesClient\</small></td>
+            <td class="desc">El cliente de Servicios de servidor de certificados administra automáticamente identidades digitales, como certificados, claves y credenciales para los usuarios y el equipo, lo que habilita la inscripción, movilidad (itinerancia) y otros servicios.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">21/07/2025 12:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>USO_UxBroker</strong><br><small class="mono dim">\Microsoft\Windows\UpdateOrchestrator\</small></td>
+            <td class="desc">Esta tarea desencadena un reinicio del sistema tras la instalación de la actualización.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:47</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>UUS Failover Task</strong><br><small class="mono dim">\Microsoft\Windows\UpdateOrchestrator\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>VerifiedPublisherCertStoreCheck</strong><br><small class="mono dim">\Microsoft\Windows\AppID\</small></td>
+            <td class="desc">Busca certificados no válidos o revocados en la memoria caché de certificados de AppID.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:22</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>VerifyWinRE</strong><br><small class="mono dim">\Microsoft\Windows\RecoveryEnvironment\</small></td>
+            <td class="desc">Valida el Entorno de recuperación de Windows.</td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">12/08/2025 07:29</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>WakeUpAndContinueUpdates</strong><br><small class="mono dim">\Microsoft\Windows\InstallService\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>WakeUpAndScanForUpdates</strong><br><small class="mono dim">\Microsoft\Windows\InstallService\</small></td>
+            <td class="desc"></td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>WhesvcToast</strong><br><small class="mono dim">\Microsoft\Windows\PerformanceTrace\</small></td>
+            <td class="desc">Controla la visualización de la experiencia de usuario cuando se captura el seguimiento de la tecla de acceso rápido</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>WiFiTask</strong><br><small class="mono dim">\Microsoft\Windows\WCM\</small></td>
+            <td class="desc">Tarea en segundo plano para realizar interacciones web y por usuario</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>WIM-Hash-Management</strong><br><small class="mono dim">\Microsoft\Windows\WOF\</small></td>
+            <td class="desc">Esta tarea permite el arranque de WIM realizando acciones en segundo plano en nombre del sistema operativo.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>WIM-Hash-Validation</strong><br><small class="mono dim">\Microsoft\Windows\WOF\</small></td>
+            <td class="desc">Esta tarea permite el arranque de WIM realizando acciones en segundo plano en nombre del sistema operativo.</td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">12/08/2025 07:29</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Windows Defender Cache Maintenance</strong><br><small class="mono dim">\Microsoft\Windows\Windows Defender\</small></td>
+            <td class="desc">Tarea de mantenimiento periódica.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:29</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Windows Defender Cleanup</strong><br><small class="mono dim">\Microsoft\Windows\Windows Defender\</small></td>
+            <td class="desc">Tarea de limpieza periódica.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:22</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Windows Defender Verification</strong><br><small class="mono dim">\Microsoft\Windows\Windows Defender\</small></td>
+            <td class="desc">Tarea de comprobación periódica.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 13:50</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>WindowsActionDialog</strong><br><small class="mono dim">\Microsoft\Windows\Location\</small></td>
+            <td class="desc">Notificación de ubicación</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>WinSAT</strong><br><small class="mono dim">\Microsoft\Windows\Maintenance\</small></td>
+            <td class="desc">Mide el rendimiento y las capacidades de un sistema</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:29</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Work Folders Logon Synchronization</strong><br><small class="mono dim">\Microsoft\Windows\Work Folders\</small></td>
+            <td class="desc">Esta tarea inicia la sincronización de los perfiles de las carpetas de trabajo cuando un usuario inicia sesión en el sistema.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">17/04/2026 18:35</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>Work Folders Maintenance Work</strong><br><small class="mono dim">\Microsoft\Windows\Work Folders\</small></td>
+            <td class="desc">Esta tarea inicia el trabajo de mantenimiento requerido para el buen rendimiento constante de la sincronización de datos de los perfiles de las carpetas de trabajo.</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:22</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-safe">
+            <td><span class='cat cat-sys'>Sistema</span></td>
+            <td><strong>WsSwapAssessmentTask</strong><br><small class="mono dim">\Microsoft\Windows\Sysmain\</small></td>
+            <td class="desc">Tarea de mantenimiento de evaluación de intercambio de espacio de trabajo</td>
+            <td class="center"><span class="state state-ready">Ready</span></td>
+            <td class="center mono small">14/04/2026 09:29</td>
+            <td class="center"><span class="badge badge-safe">Mantener</span></td>
+        </tr>        <tr class="row-ghost">
+            <td><span class='cat cat-net'>Red Movil</span></td>
+            <td><strong>MNO Metadata Parser</strong><br><small class="mono dim">\Microsoft\Windows\Mobile Broadband Accounts\</small></td>
+            <td class="desc">Parsea metadatos de operadores de red movil</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center mono small">-</td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>        <tr class="row-ghost">
+            <td><span class='cat cat-ss'>Seguridad SmartScreen</span></td>
+            <td><strong>SmartScreenSpecific</strong><br><small class="mono dim">\Microsoft\Windows\AppID\</small></td>
+            <td class="desc">Analisis SmartScreen de aplicaciones especificas</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center mono small">-</td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>        <tr class="row-ghost">
+            <td><span class='cat cat-tel'>Telemetria</span></td>
+            <td><strong>GatherNetworkInfo</strong><br><small class="mono dim">\Microsoft\Windows\NetTrace\</small></td>
+            <td class="desc">Recopila informacion de red para telemetria</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center mono small">-</td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>        <tr class="row-ghost">
+            <td><span class='cat cat-tel'>Telemetria</span></td>
+            <td><strong>KernelCeipTask</strong><br><small class="mono dim">\Microsoft\Windows\Customer Experience Improvement Program\</small></td>
+            <td class="desc">Recopila datos del kernel para CEIP</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center mono small">-</td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>        <tr class="row-ghost">
+            <td><span class='cat cat-tel'>Telemetria</span></td>
+            <td><strong>Microsoft Compatibility Appraiser</strong><br><small class="mono dim">\Microsoft\Windows\Application Experience\</small></td>
+            <td class="desc">Recopila datos de compatibilidad de apps para Microsoft</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center mono small">-</td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>        <tr class="row-ghost">
+            <td><span class='cat cat-tel'>Telemetria</span></td>
+            <td><strong>ProgramDataUpdater</strong><br><small class="mono dim">\Microsoft\Windows\Application Experience\</small></td>
+            <td class="desc">Envia datos de uso de programas a Microsoft</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center mono small">-</td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>        <tr class="row-ghost">
+            <td><span class='cat cat-tel'>Telemetria</span></td>
+            <td><strong>Uploader</strong><br><small class="mono dim">\Microsoft\Windows\Customer Experience Improvement Program\</small></td>
+            <td class="desc">Sube datos CEIP a Microsoft</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center mono small">-</td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>        <tr class="row-ghost">
+            <td><span class='cat cat-third'>Terceros</span></td>
+            <td><strong>CCleanerSkipUAC</strong><br><small class="mono dim">\</small></td>
+            <td class="desc">CCleaner saltandose el UAC (riesgo de seguridad)</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center mono small">-</td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>        <tr class="row-ghost">
+            <td><span class='cat cat-third'>Terceros</span></td>
+            <td><strong>OneDrive Standalone Update Task v2</strong><br><small class="mono dim">\</small></td>
+            <td class="desc">Actualizacion autonoma de OneDrive</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center mono small">-</td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>        <tr class="row-ghost">
+            <td><span class='cat cat-wu'>Windows Update</span></td>
+            <td><strong>Automatic App Update</strong><br><small class="mono dim">\Microsoft\Windows\WindowsUpdate\</small></td>
+            <td class="desc">Actualizacion automatica de apps de la Store</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center mono small">-</td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>        <tr class="row-ghost">
+            <td><span class='cat cat-wu'>Windows Update</span></td>
+            <td><strong>sih</strong><br><small class="mono dim">\Microsoft\Windows\WindowsUpdate\</small></td>
+            <td class="desc">Server Initiated Healing - reparacion remota</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center mono small">-</td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>        <tr class="row-ghost">
+            <td><span class='cat cat-wu'>Windows Update</span></td>
+            <td><strong>sihboot</strong><br><small class="mono dim">\Microsoft\Windows\WindowsUpdate\</small></td>
+            <td class="desc">Server Initiated Healing en el arranque</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center mono small">-</td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>        <tr class="row-ghost">
+            <td><span class='cat cat-xbox'>Xbox y Gaming</span></td>
+            <td><strong>XblGameSaveTaskLogon</strong><br><small class="mono dim">\Microsoft\XblGameSave\</small></td>
+            <td class="desc">Sincroniza guardados Xbox al iniciar sesion</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center mono small">-</td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>        <tr class="row-off">
+            <td><span class='cat cat-disk'>Desfragmentacion</span></td>
+            <td><strong>ScheduledDefrag</strong><br><small class="mono dim">\Microsoft\Windows\Defrag\</small></td>
+            <td class="desc">Desfragmentacion programada del disco (innecesaria en SSD)</td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-off">Ya OFF</span></td>
+        </tr>        <tr class="row-off">
+            <td><span class='cat cat-loc'>Ubicacion y Mapas</span></td>
+            <td><strong>MapsUpdateTask</strong><br><small class="mono dim">\Microsoft\Windows\Maps\</small></td>
+            <td class="desc">Descarga actualizaciones de mapas offline</td>
+            <td class="center"><span class="state state-dis">Disabled</span></td>
+            <td class="center mono small">30/11/1999 00:00</td>
+            <td class="center"><span class="badge badge-off">Ya OFF</span></td>
+        </tr>
+    </tbody>
+  </table>
+</div>
+
+<footer>
+  Generado por <span>TaskDebloater.ps1</span> &mdash; 4t0m5K &mdash; 17/04/2026 18:50:19
+</footer>
+
+<script>
+  var allRows=null;
+  function getRows(){if(!allRows)allRows=Array.from(document.querySelectorAll('#tableBody tr'));return allRows;}
+  function filterTable(type,btn){
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    var q=document.getElementById('searchBox').value.toLowerCase();
+    getRows().forEach(function(row){
+      var m=type==='all'||row.classList.contains('row-'+type);
+      var s=!q||row.innerText.toLowerCase().includes(q);
+      row.style.display=(m&&s)?'':'none';
+    });
+  }
+  function searchTable(){
+    var q=document.getElementById('searchBox').value.toLowerCase();
+    var active=document.querySelector('.filter-btn.active');
+    var type='all';
+    if(active){
+      var t=active.textContent.trim();
+      if(t==='A deshabilitar')type='danger';
+      else if(t==='Ya OFF')type='off';
+      else if(t==='Mantener')type='safe';
+      else if(t==='No existen')type='ghost';
+    }
+    getRows().forEach(function(row){
+      var m=type==='all'||row.classList.contains('row-'+type);
+      var s=!q||row.innerText.toLowerCase().includes(q);
+      row.style.display=(m&&s)?'':'none';
+    });
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+service,description,category,reason
+bluetooth,Soporte para dispositivos Bluetooth,Conectividad,Vector de ataque inalámbrico innecesario en servidores
+ModemManager,Gestión de modems 3G/4G,Conectividad,Innecesario sin modem físico
+fprintd,Servicio de autenticación biométrica,Autenticación,Superficie de ataque biométrica
+cups,Servidor de impresión CUPS,Impresión,Puerto 631 expuesto - innecesario sin impresoras
+cups-browsed,Descubrimiento de impresoras CUPS,Impresión,CVEs conocidos - cerrar junto a cups
+avahi-daemon,Descubrimiento mDNS/Bonjour,Red,Puerto 5353 expuesto - enumeración de red local
+rsyslog,Sistema de logs remoto,Logs,Reducir superficie si no se usan logs centralizados
+openvpn,Servidor/cliente OpenVPN,VPN,Deshabilitar si no se usa VPN activamente
+ufw,Firewall UFW,Firewall,Solo si se gestiona con nftables/iptables directamente
+smb,Compartición de archivos Samba,Red,Puerto 445 - vector de ataque crítico (EternalBlue)
+rpcbind,RPCBind para NFS,Red,Puerto 111 - innecesario sin NFS
+postfix,Servidor de correo saliente,Correo,Puerto 25 - innecesario si no se envía correo local
+wpa_supplicant,Conexión a redes Wi-Fi,Conectividad,Innecesario en servidores con Ethernet
+speech-dispatcher,Síntesis de voz,Accesibilidad,Sin uso en entornos servidor/headless
+geoclue,Detección de ubicación geográfica,Privacidad,Fuga de datos de ubicación
+geoclue2,Detección de ubicación geográfica v2,Privacidad,Fuga de datos de ubicación
+brltty,Soporte para pantallas Braille,Accesibilidad,Innecesario en servidores
+cockpit,Interfaz web de gestión,Administración,Puerto HTTP/HTTPS expuesto - solo si no se usa
+podman,Contenedores rootless Podman,Contenedores,Deshabilitar si no se usan contenedores
+podman-auto-update,Actualización automática de contenedores,Contenedores,Control manual preferible
+iscsid,Gestión de conexiones iSCSI,Almacenamiento,Innecesario sin almacenamiento iSCSI
+rasdaemon,Informes de errores hardware RAS,Hardware,Overhead innecesario en VMs
+mcelog,Registro de errores de CPU MCE,Hardware,Obsoleto - reemplazado por rasdaemon
+packagekit,Gestor automático de paquetes GUI,Paquetes,Actualizaciones automáticas no controladas
+realmd,Unión a dominios de red,Directorio,Innecesario sin Active Directory/LDAP
+pcscd,Lector de tarjetas inteligentes PC/SC,Hardware,Innecesario sin smartcard
+low-memory-monitor,Monitor de memoria baja,Sistema,Overhead de monitorización redundante
+switcheroo-control,Gestión de GPU híbrida,Hardware,Solo relevante con GPU dual (NVIDIA Optimus)
+sssd-ssh,Integración SSSD para SSH,Autenticación,Solo si no se usa SSSD para autenticación SSH
+sssd-sudo,Integración SSSD para Sudo,Autenticación,Solo si no se usa SSSD para sudo
+setroubleshootd,Análisis de errores SELinux,SELinux,Overhead innecesario en producción
+nis-domainname,Soporte para dominio NIS,Red,NIS es obsoleto e inseguro
+unbound-anchor,Verificación DNSSEC Unbound,DNS,Solo si no se usa Unbound como resolver
+kpatch,Actualizaciones del kernel en vivo,Sistema,Solo si no se usan live patches
+ledmon,Monitorización de LEDs para RAID,Hardware,Solo en hardware físico con LEDs RAID
+hypervvssd,Integración Hyper-V shadow copy,Virtualización,Solo en VMs Hyper-V
+hypervkvpd,Integración Hyper-V gestión claves,Virtualización,Solo en VMs Hyper-V
+hypervfcopyd,Integración Hyper-V copiar archivos,Virtualización,Solo en VMs Hyper-V
+canberra-system-bootup,Sonido de inicio Canberra,Audio,Innecesario en entornos headless/servidor
+canberra-system-shutdown,Sonido de apagado Canberra,Audio,Innecesario en entornos headless/servidor

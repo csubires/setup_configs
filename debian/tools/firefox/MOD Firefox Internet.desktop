@@ -1,0 +1,14 @@
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Version=1.0
+Exec=/home/user/Documentos/MyScripts/runFirefox.sh
+Name=Firefox Internet
+Icon=firefox.png
+GenericName=Firefox Internet Group
+Comment=Acceso de Firefox a Internet a través de las reglas iptables
+Encoding=UTF-8
+Terminal=false
+Type=Application
+Categories=Application;Network;
+Name[es_ES]=MOD Firefox Internet

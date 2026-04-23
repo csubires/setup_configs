@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hardening — Servicios — darkc</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@300;400;600;700;900&display=swap');
+  :root{--bg:#0a0c10;--surface:#0f1318;--border:#1e2530;--accent:#f4a261;--accent2:#00b4d8;
+    --green:#2dc653;--off:#4a5568;--ghost:#3a3f4b;--text:#c9d1d9;--text-dim:#8b949e;
+    --mono:'Share Tech Mono',monospace;--sans:'Barlow',sans-serif;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;}
+  header{background:linear-gradient(135deg,#0d1117 0%,#161b22 55%,#0a1200 100%);
+    border-bottom:2px solid var(--accent);padding:40px 48px 32px;position:relative;overflow:hidden;}
+  header::before{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;
+    border-radius:50%;background:radial-gradient(circle,rgba(244,162,97,.13) 0%,transparent 70%);pointer-events:none;}
+  header .label{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:8px;}
+  header h1{font-size:34px;font-weight:900;letter-spacing:-1px;color:#fff;}
+  header h1 span{color:var(--accent);}
+  header .meta{margin-top:12px;font-family:var(--mono);font-size:12px;color:var(--text-dim);display:flex;gap:32px;flex-wrap:wrap;}
+  header .meta b{color:var(--accent2);}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:16px;
+    padding:28px 48px;background:var(--surface);border-bottom:1px solid var(--border);}
+  .stat-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;
+    padding:18px 22px;position:relative;overflow:hidden;}
+  .stat-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;}
+  .stat-card.danger::after{background:var(--accent);}
+  .stat-card.off::after{background:var(--off);}
+  .stat-card.ghost::after{background:var(--ghost);}
+  .stat-card.total::after{background:var(--accent2);}
+  .stat-num{font-size:38px;font-weight:900;line-height:1;margin-bottom:4px;}
+  .stat-card.danger .stat-num{color:var(--accent);}
+  .stat-card.off .stat-num{color:var(--off);}
+  .stat-card.ghost .stat-num{color:var(--ghost);}
+  .stat-card.total .stat-num{color:var(--accent2);}
+  .stat-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);}
+  .toolbar{padding:18px 48px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+    border-bottom:1px solid var(--border);background:var(--surface);}
+  .toolbar label{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-right:4px;}
+  .filter-btn{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:5px 13px;
+    border-radius:4px;cursor:pointer;font-family:var(--sans);font-size:12px;font-weight:600;
+    letter-spacing:.5px;transition:all .15s;}
+  .filter-btn:hover,.filter-btn.active{border-color:var(--accent2);color:var(--accent2);}
+  .filter-btn.active{background:rgba(0,180,216,.1);}
+  input#searchBox{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:5px 13px;
+    border-radius:4px;font-family:var(--mono);font-size:12px;width:260px;outline:none;}
+  input#searchBox:focus{border-color:var(--accent2);}
+  .table-wrap{padding:24px 48px 48px;overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  thead th{background:#0d1117;border-bottom:2px solid var(--border);padding:11px 13px;text-align:left;
+    font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);white-space:nowrap;}
+  tbody tr{border-bottom:1px solid var(--border);transition:background .1s;}
+  tbody tr:hover{background:rgba(255,255,255,.03);}
+  tbody td{padding:9px 13px;vertical-align:middle;}
+  .row-danger{background:rgba(244,162,97,.04);}
+  .row-off{background:rgba(74,85,104,.06);}
+  .row-ghost{opacity:.4;}
+  .badge{display:inline-block;padding:3px 9px;border-radius:3px;font-size:11px;font-weight:700;
+    letter-spacing:.7px;text-transform:uppercase;font-family:var(--mono);}
+  .badge-danger{background:rgba(244,162,97,.2);color:#f4a261;border:1px solid rgba(244,162,97,.4);}
+  .badge-off{background:rgba(74,85,104,.3);color:#718096;border:1px solid #4a5568;}
+  .badge-ghost{background:rgba(100,110,130,.2);color:#8b949e;border:1px solid #3a3f4b;}
+  .state{display:inline-block;padding:2px 8px;border-radius:2px;font-size:10px;font-weight:700;font-family:var(--mono);}
+  .state-run{background:#2e0d0d;color:#e05555;}
+  .state-ready{background:#1a2a3a;color:#58a6ff;}
+  .state-dis{background:#1e2530;color:#8b949e;}
+  .cat{display:inline-block;padding:2px 7px;border-radius:2px;font-size:10px;font-weight:700;
+    letter-spacing:.4px;text-transform:uppercase;white-space:nowrap;}
+  .cat-net{background:#1a2828;color:#2dd4bf;}.cat-feed{background:#2e1a1a;color:#fca5a5;}
+  .cat-xbox{background:#0d2e12;color:#3fb950;}.cat-wu{background:#1a2a3a;color:#60a5fa;}
+  .cat-def{background:#1a2e1a;color:#4ade80;}.cat-disk{background:#2e2a1a;color:#fbbf24;}
+  .cat-loc{background:#1a2e2a;color:#34d399;}.cat-rem{background:#2e1a2a;color:#f472b6;}
+  .cat-cloud{background:#1a2030;color:#7dd3fc;}.cat-media{background:#2e1a28;color:#e879f9;}
+  .cat-text{background:#282020;color:#d8b4fe;}.cat-sys{background:#1e2530;color:#8b949e;}
+  .mono{font-family:var(--mono);}.dim{color:var(--text-dim);}.center{text-align:center;}
+  .desc{font-size:12px;color:var(--text-dim);max-width:260px;}
+  .audit-banner{background:rgba(0,180,216,.06);border:1px solid rgba(0,180,216,.25);border-radius:6px;
+    padding:11px 24px;margin:20px 48px;font-family:var(--mono);font-size:12px;color:var(--accent2);}
+  footer{text-align:center;padding:22px;font-family:var(--mono);font-size:11px;
+    color:var(--text-dim);border-top:1px solid var(--border);}
+  footer span{color:var(--accent);}
+  ::-webkit-scrollbar{width:6px;height:6px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+</style>
+</head>
+<body>
+<header>
+  <div class="label">// Linux Hardening // Auditoría de Servicios</div>
+  <h1>Informe de <span>Hardening</span> — Servicios</h1>
+  <div class="meta">
+    <div><b>Host</b> darkc</div>
+    <div><b>Usuario</b> user</div>
+    <div><b>Fecha</b> 14/03/2026 09:49:51</div>
+    <div><b>CSV</b> /home/user/Documents/Scripts/hardening/services_hardening.csv</div>
+  </div>
+</header>
+<div class="stats">
+  <div class="stat-card total"><div class="stat-num">40</div><div class="stat-label">Evaluados</div></div>
+  <div class="stat-card danger"><div class="stat-num">6</div><div class="stat-label">Candidatos</div></div>
+  <div class="stat-card off"><div class="stat-num">0</div><div class="stat-label">Ya deshabilitados</div></div>
+  <div class="stat-card ghost"><div class="stat-num">26</div><div class="stat-label">No instalados</div></div>
+</div>
+<div class="audit-banner">ℹ️ &nbsp;MODO AUDITORÍA — Solo lectura. Ningún servicio ha sido modificado.</div>
+<div class="toolbar">
+  <label>Filtro:</label>
+  <button class="filter-btn active" onclick="filterTable('all',this)">Todos</button>
+  <button class="filter-btn" onclick="filterTable('danger',this)">Candidatos</button>
+  <button class="filter-btn" onclick="filterTable('off',this)">Ya OFF</button>
+  <button class="filter-btn" onclick="filterTable('ghost',this)">No instalados</button>
+  <input type="text" id="searchBox" placeholder="Buscar servicio..." oninput="searchTable()">
+</div>
+<div class="table-wrap">
+  <table>
+    <thead><tr>
+      <th>Categoría</th><th>Servicio</th><th>Descripción</th>
+      <th>Razón de deshabilitar</th><th class="center">Estado actual</th><th class="center">Resultado</th>
+    </tr></thead>
+    <tbody id="tableBody">
+        <tr class="row-ghost">
+            <td><span class="cat cat-net">Conectividad</span></td>
+            <td><strong>bluetooth</strong><br><small class="mono dim">bluetooth.service</small></td>
+            <td class="desc">Soporte para dispositivos Bluetooth</td>
+            <td class="desc dim">Vector de ataque inalámbrico innecesario en servidores</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>
+        <tr class="row-danger">
+            <td><span class="cat cat-net">Conectividad</span></td>
+            <td><strong>ModemManager</strong><br><small class="mono dim">ModemManager.service</small></td>
+            <td class="desc">Gestión de modems 3G/4G</td>
+            <td class="desc dim">Innecesario sin modem físico</td>
+            <td class="center"><span class="state state-run">running</span></td>
+            <td class="center"><span class="badge badge-danger">Candidato</span></td>
+        </tr>
+        <tr class="row-danger">
+            <td><span class="cat cat-rem">Autenticación</span></td>
+            <td><strong>fprintd</strong><br><small class="mono dim">fprintd.service</small></td>
+            <td class="desc">Servicio de autenticación biométrica</td>
+            <td class="desc dim">Superficie de ataque biométrica</td>
+            <td class="center"><span class="state state-ready">stopped</span></td>
+            <td class="center"><span class="badge badge-danger">Candidato</span></td>
+        </tr>
+        <tr class="row-safe">
+            <td><span class="cat cat-feed">Impresión</span></td>
+            <td><strong>cups</strong><br><small class="mono dim">cups.service</small></td>
+            <td class="desc">Servidor de impresión CUPS</td>
+            <td class="desc dim">Puerto 631 expuesto - innecesario sin impresoras</td>
+            <td class="center"><span class="state state-dis">?</span></td>
+            <td class="center"><span class="badge badge-ghost">Desconocido</span></td>
+        </tr>
+        <tr class="row-safe">
+            <td><span class="cat cat-feed">Impresión</span></td>
+            <td><strong>cups-browsed</strong><br><small class="mono dim">cups-browsed.service</small></td>
+            <td class="desc">Descubrimiento de impresoras CUPS</td>
+            <td class="desc dim">CVEs conocidos - cerrar junto a cups</td>
+            <td class="center"><span class="state state-dis">?</span></td>
+            <td class="center"><span class="badge badge-ghost">Desconocido</span></td>
+        </tr>
+        <tr class="row-safe">
+            <td><span class="cat cat-net">Red</span></td>
+            <td><strong>avahi-daemon</strong><br><small class="mono dim">avahi-daemon.service</small></td>
+            <td class="desc">Descubrimiento mDNS/Bonjour</td>
+            <td class="desc dim">Puerto 5353 expuesto - enumeración de red local</td>
+            <td class="center"><span class="state state-dis">?</span></td>
+            <td class="center"><span class="badge badge-ghost">Desconocido</span></td>
+        </tr>
+        <tr class="row-danger">
+            <td><span class="cat cat-sys">Logs</span></td>
+            <td><strong>rsyslog</strong><br><small class="mono dim">rsyslog.service</small></td>
+            <td class="desc">Sistema de logs remoto</td>
+            <td class="desc dim">Reducir superficie si no se usan logs centralizados</td>
+            <td class="center"><span class="state state-run">running</span></td>
+            <td class="center"><span class="badge badge-danger">Candidato</span></td>
+        </tr>
+        <tr class="row-safe">
+            <td><span class="cat cat-cloud">VPN</span></td>
+            <td><strong>openvpn</strong><br><small class="mono dim">openvpn.service</small></td>
+            <td class="desc">Servidor/cliente OpenVPN</td>
+            <td class="desc dim">Deshabilitar si no se usa VPN activamente</td>
+            <td class="center"><span class="state state-dis">?</span></td>
+            <td class="center"><span class="badge badge-ghost">Desconocido</span></td>
+        </tr>
+        <tr class="row-safe">
+            <td><span class="cat cat-def">Firewall</span></td>
+            <td><strong>ufw</strong><br><small class="mono dim">ufw.service</small></td>
+            <td class="desc">Firewall UFW</td>
+            <td class="desc dim">Solo si se gestiona con nftables/iptables directamente</td>
+            <td class="center"><span class="state state-dis">?</span></td>
+            <td class="center"><span class="badge badge-ghost">Desconocido</span></td>
+        </tr>
+        <tr class="row-ghost">
+            <td><span class="cat cat-net">Red</span></td>
+            <td><strong>smb</strong><br><small class="mono dim">smb.service</small></td>
+            <td class="desc">Compartición de archivos Samba</td>
+            <td class="desc dim">Puerto 445 - vector de ataque crítico (EternalBlue)</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>
+        <tr class="row-ghost">
+            <td><span class="cat cat-net">Red</span></td>
+            <td><strong>rpcbind</strong><br><small class="mono dim">rpcbind.service</small></td>
+            <td class="desc">RPCBind para NFS</td>
+            <td class="desc dim">Puerto 111 - innecesario sin NFS</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>
+        <tr class="row-safe">
+            <td><span class="cat cat-feed">Correo</span></td>
+            <td><strong>postfix</strong><br><small class="mono dim">postfix.service</small></td>
+            <td class="desc">Servidor de correo saliente</td>
+            <td class="desc dim">Puerto 25 - innecesario si no se envía correo local</td>
+            <td class="center"><span class="state state-dis">?</span></td>
+            <td class="center"><span class="badge badge-ghost">Desconocido</span></td>
+        </tr>
+        <tr class="row-safe">
+            <td><span class="cat cat-net">Conectividad</span></td>
+            <td><strong>wpa_supplicant</strong><br><small class="mono dim">wpa_supplicant.service</small></td>
+            <td class="desc">Conexión a redes Wi-Fi</td>
+            <td class="desc dim">Innecesario en servidores con Ethernet</td>
+            <td class="center"><span class="state state-dis">?</span></td>
+            <td class="center"><span class="badge badge-ghost">Desconocido</span></td>
+        </tr>
+        <tr class="row-safe">
+            <td><span class="cat cat-text">Accesibilidad</span></td>
+            <td><strong>speech-dispatcher</strong><br><small class="mono dim">speech-dispatcher.service</small></td>
+            <td class="desc">Síntesis de voz</td>
+            <td class="desc dim">Sin uso en entornos servidor/headless</td>
+            <td class="center"><span class="state state-dis">?</span></td>
+            <td class="center"><span class="badge badge-ghost">Desconocido</span></td>
+        </tr>
+        <tr class="row-danger">
+            <td><span class="cat cat-loc">Privacidad</span></td>
+            <td><strong>geoclue</strong><br><small class="mono dim">geoclue.service</small></td>
+            <td class="desc">Detección de ubicación geográfica</td>
+            <td class="desc dim">Fuga de datos de ubicación</td>
+            <td class="center"><span class="state state-ready">stopped</span></td>
+            <td class="center"><span class="badge badge-danger">Candidato</span></td>
+        </tr>
+        <tr class="row-ghost">
+            <td><span class="cat cat-loc">Privacidad</span></td>
+            <td><strong>geoclue2</strong><br><small class="mono dim">geoclue2.service</small></td>
+            <td class="desc">Detección de ubicación geográfica v2</td>
+            <td class="desc dim">Fuga de datos de ubicación</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>
+        <tr class="row-ghost">
+            <td><span class="cat cat-text">Accesibilidad</span></td>
+            <td><strong>brltty</strong><br><small class="mono dim">brltty.service</small></td>
+            <td class="desc">Soporte para pantallas Braille</td>
+            <td class="desc dim">Innecesario en servidores</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>
+        <tr class="row-ghost">
+            <td><span class="cat cat-wu">Administración</span></td>
+            <td><strong>cockpit</strong><br><small class="mono dim">cockpit.service</small></td>
+            <td class="desc">Interfaz web de gestión</td>
+            <td class="desc dim">Puerto HTTP/HTTPS expuesto - solo si no se usa</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>
+        <tr class="row-ghost">
+            <td><span class="cat cat-xbox">Contenedores</span></td>
+            <td><strong>podman</strong><br><small class="mono dim">podman.service</small></td>
+            <td class="desc">Contenedores rootless Podman</td>
+            <td class="desc dim">Deshabilitar si no se usan contenedores</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>
+        <tr class="row-ghost">
+            <td><span class="cat cat-xbox">Contenedores</span></td>
+            <td><strong>podman-auto-update</strong><br><small class="mono dim">podman-auto-update.service</small></td>
+            <td class="desc">Actualización automática de contenedores</td>
+            <td class="desc dim">Control manual preferible</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>
+        <tr class="row-ghost">
+            <td><span class="cat cat-disk">Almacenamiento</span></td>
+            <td><strong>iscsid</strong><br><small class="mono dim">iscsid.service</small></td>
+            <td class="desc">Gestión de conexiones iSCSI</td>
+            <td class="desc dim">Innecesario sin almacenamiento iSCSI</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>
+        <tr class="row-ghost">
+            <td><span class="cat cat-disk">Hardware</span></td>
+            <td><strong>rasdaemon</strong><br><small class="mono dim">rasdaemon.service</small></td>
+            <td class="desc">Informes de errores hardware RAS</td>
+            <td class="desc dim">Overhead innecesario en VMs</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>
+        <tr class="row-ghost">
+            <td><span class="cat cat-disk">Hardware</span></td>
+            <td><strong>mcelog</strong><br><small class="mono dim">mcelog.service</small></td>
+            <td class="desc">Registro de errores de CPU MCE</td>
+            <td class="desc dim">Obsoleto - reemplazado por rasdaemon</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>
+        <tr class="row-danger">
+            <td><span class="cat cat-wu">Paquetes</span></td>
+            <td><strong>packagekit</strong><br><small class="mono dim">packagekit.service</small></td>
+            <td class="desc">Gestor automático de paquetes GUI</td>
+            <td class="desc dim">Actualizaciones automáticas no controladas</td>
+            <td class="center"><span class="state state-ready">stopped</span></td>
+            <td class="center"><span class="badge badge-danger">Candidato</span></td>
+        </tr>
+        <tr class="row-ghost">
+            <td><span class="cat cat-rem">Directorio</span></td>
+            <td><strong>realmd</strong><br><small class="mono dim">realmd.service</small></td>
+            <td class="desc">Unión a dominios de red</td>
+            <td class="desc dim">Innecesario sin Active Directory/LDAP</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>
+        <tr class="row-ghost">
+            <td><span class="cat cat-disk">Hardware</span></td>
+            <td><strong>pcscd</strong><br><small class="mono dim">pcscd.service</small></td>
+            <td class="desc">Lector de tarjetas inteligentes PC/SC</td>
+            <td class="desc dim">Innecesario sin smartcard</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>
+        <tr class="row-ghost">
+            <td><span class="cat cat-sys">Sistema</span></td>
+            <td><strong>low-memory-monitor</strong><br><small class="mono dim">low-memory-monitor.service</small></td>
+            <td class="desc">Monitor de memoria baja</td>
+            <td class="desc dim">Overhead de monitorización redundante</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>
+        <tr class="row-danger">
+            <td><span class="cat cat-disk">Hardware</span></td>
+            <td><strong>switcheroo-control</strong><br><small class="mono dim">switcheroo-control.service</small></td>
+            <td class="desc">Gestión de GPU híbrida</td>
+            <td class="desc dim">Solo relevante con GPU dual (NVIDIA Optimus)</td>
+            <td class="center"><span class="state state-run">running</span></td>
+            <td class="center"><span class="badge badge-danger">Candidato</span></td>
+        </tr>
+        <tr class="row-ghost">
+            <td><span class="cat cat-rem">Autenticación</span></td>
+            <td><strong>sssd-ssh</strong><br><small class="mono dim">sssd-ssh.service</small></td>
+            <td class="desc">Integración SSSD para SSH</td>
+            <td class="desc dim">Solo si no se usa SSSD para autenticación SSH</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>
+        <tr class="row-ghost">
+            <td><span class="cat cat-rem">Autenticación</span></td>
+            <td><strong>sssd-sudo</strong><br><small class="mono dim">sssd-sudo.service</small></td>
+            <td class="desc">Integración SSSD para Sudo</td>
+            <td class="desc dim">Solo si no se usa SSSD para sudo</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>
+        <tr class="row-ghost">
+            <td><span class="cat cat-def">SELinux</span></td>
+            <td><strong>setroubleshootd</strong><br><small class="mono dim">setroubleshootd.service</small></td>
+            <td class="desc">Análisis de errores SELinux</td>
+            <td class="desc dim">Overhead innecesario en producción</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>
+        <tr class="row-ghost">
+            <td><span class="cat cat-net">Red</span></td>
+            <td><strong>nis-domainname</strong><br><small class="mono dim">nis-domainname.service</small></td>
+            <td class="desc">Soporte para dominio NIS</td>
+            <td class="desc dim">NIS es obsoleto e inseguro</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>
+        <tr class="row-ghost">
+            <td><span class="cat cat-net">DNS</span></td>
+            <td><strong>unbound-anchor</strong><br><small class="mono dim">unbound-anchor.service</small></td>
+            <td class="desc">Verificación DNSSEC Unbound</td>
+            <td class="desc dim">Solo si no se usa Unbound como resolver</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>
+        <tr class="row-ghost">
+            <td><span class="cat cat-sys">Sistema</span></td>
+            <td><strong>kpatch</strong><br><small class="mono dim">kpatch.service</small></td>
+            <td class="desc">Actualizaciones del kernel en vivo</td>
+            <td class="desc dim">Solo si no se usan live patches</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>
+        <tr class="row-ghost">
+            <td><span class="cat cat-disk">Hardware</span></td>
+            <td><strong>ledmon</strong><br><small class="mono dim">ledmon.service</small></td>
+            <td class="desc">Monitorización de LEDs para RAID</td>
+            <td class="desc dim">Solo en hardware físico con LEDs RAID</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>
+        <tr class="row-ghost">
+            <td><span class="cat cat-cloud">Virtualización</span></td>
+            <td><strong>hypervvssd</strong><br><small class="mono dim">hypervvssd.service</small></td>
+            <td class="desc">Integración Hyper-V shadow copy</td>
+            <td class="desc dim">Solo en VMs Hyper-V</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>
+        <tr class="row-ghost">
+            <td><span class="cat cat-cloud">Virtualización</span></td>
+            <td><strong>hypervkvpd</strong><br><small class="mono dim">hypervkvpd.service</small></td>
+            <td class="desc">Integración Hyper-V gestión claves</td>
+            <td class="desc dim">Solo en VMs Hyper-V</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>
+        <tr class="row-ghost">
+            <td><span class="cat cat-cloud">Virtualización</span></td>
+            <td><strong>hypervfcopyd</strong><br><small class="mono dim">hypervfcopyd.service</small></td>
+            <td class="desc">Integración Hyper-V copiar archivos</td>
+            <td class="desc dim">Solo en VMs Hyper-V</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>
+        <tr class="row-ghost">
+            <td><span class="cat cat-media">Audio</span></td>
+            <td><strong>canberra-system-bootup</strong><br><small class="mono dim">canberra-system-bootup.service</small></td>
+            <td class="desc">Sonido de inicio Canberra</td>
+            <td class="desc dim">Innecesario en entornos headless/servidor</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>
+        <tr class="row-ghost">
+            <td><span class="cat cat-media">Audio</span></td>
+            <td><strong>canberra-system-shutdown</strong><br><small class="mono dim">canberra-system-shutdown.service</small></td>
+            <td class="desc">Sonido de apagado Canberra</td>
+            <td class="desc dim">Innecesario en entornos headless/servidor</td>
+            <td class="center"><span class="state state-dis">-</span></td>
+            <td class="center"><span class="badge badge-ghost">No existe</span></td>
+        </tr>
+    </tbody>
+  </table>
+</div>
+<footer>Generado por <span>service_hardening.sh</span> &mdash; 4t0m5K</footer>
+<script>
+  var allRows=null;
+  function getRows(){if(!allRows)allRows=Array.from(document.querySelectorAll('#tableBody tr'));return allRows;}
+  function filterTable(type,btn){
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    var q=document.getElementById('searchBox').value.toLowerCase();
+    getRows().forEach(function(r){
+      var m=type==='all'||r.classList.contains('row-'+type);
+      var s=!q||r.innerText.toLowerCase().includes(q);
+      r.style.display=(m&&s)?'':'none';
+    });
+  }
+  function searchTable(){
+    var q=document.getElementById('searchBox').value.toLowerCase();
+    var act=document.querySelector('.filter-btn.active'),type='all';
+    if(act){var t=act.textContent.trim();
+      if(t==='Candidatos')type='danger';
+      else if(t==='Ya OFF')type='off';
+      else if(t==='No instalados')type='ghost';}
+    getRows().forEach(function(r){
+      var m=type==='all'||r.classList.contains('row-'+type);
+      var s=!q||r.innerText.toLowerCase().includes(q);
+      r.style.display=(m&&s)?'':'none';
+    });
+  }
+</script>
+</body></html>

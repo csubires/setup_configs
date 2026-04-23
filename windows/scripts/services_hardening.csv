@@ -1,0 +1,338 @@
+﻿ServiceName,ServiceKey,CurrentState,RecommendedStartup,Category,Notes
+Acceso a datos de usuarios_5f434,UserDataSvc_5f434,,Disabled,CONFIRM_DISABLED,User data access por sesion - deshabilitar
+Actualizador de zona horaria automática,tzautoupdate,Stopped,Disabled,CONFIRM_DISABLED,Time zone auto update
+Adaptador de rendimiento de WMI,WmiApSrv,,Disabled,CONFIRM_DISABLED,WMI performance adapter - innecesario
+Administracion de aplicaciones,AppMgmt,,Disabled,CONFIRM_DISABLED,Application Management GPO - innecesario fuera de dominio AD
+Administracion de capas de almacenamiento,StorageManagement,,Disabled,CONFIRM_DISABLED,Storage tiering - innecesario workstation
+Administración de autenticación de Xbox Live,XblAuthManager,Stopped,Disabled,DISABLE_GAMING,Xbox - innecesario
+Administración remota de Windows (WS-Management),WinRM,Stopped,Disabled,DISABLE_CRITICAL,CRÍTICO: WinRM superficie remota
+Administrador de conexiones automáticas de acceso remoto,RasAuto,Stopped,Disabled,CONFIRM_DISABLED,RAS auto
+Administrador de conexiones de acceso remoto,RasMan,Stopped,Disabled,CONFIRM_DISABLED,VPN/dial-up
+Administrador de conexiones de Windows,Wcmsvc,,Disabled,CONFIRM_DISABLED,Windows Connection Manager - innecesario en PC fijo con Ethernet
+Administrador de configuración de dispositivos,DsmSvc,Stopped,Disabled,CONFIRM_DISABLED,Device config mgr
+Administrador de credenciales,VaultSvc,,Manual,SYSTEM_CRITICAL,Gestor de credenciales Windows
+Administrador de cuentas de seguridad,SamSs,Running,Automatic,SYSTEM_CRITICAL,SAM crítico para auth local
+Administrador de cuentas web,AccountProvSvc,Stopped,Disabled,CONFIRM_DISABLED,Web Account Manager
+Administrador de identidad de redes de mismo nivel,p2pimsvc,Stopped,Disabled,DISABLE_NETWORK,P2P identity
+Administrador de mapas descargados,MapsBroker,Stopped,Disabled,CONFIRM_DISABLED,Mapas offline
+Administrador de pagos y NFC/SE,SEMgrSvc,Stopped,Disabled,CONFIRM_DISABLED,NFC/pagos
+Administrador de sesión local,LSM,Running,Automatic,SYSTEM_CRITICAL,Gestión sesiones locales
+Administrador de usuarios,UserManager,Running,Automatic,SYSTEM_CRITICAL,Gestión cuentas usuario
+Adquisición de imágenes de Windows (WIA),stisvc,Running,Disabled,DISABLE_IF_UNUSED,WIA escáner - deshabilitar si no hay escáner
+Agent Activation Runtime_5f434,AarSvc_5f434,,Disabled,CONFIRM_DISABLED,Agent activation por sesion - deshabilitar
+Agente de conexión de red,NcbService,Running,Disabled,DISABLE_NETWORK,Notificaciones red UWP
+Agente de deteccion en segundo plano de DevQuery,DevQueryBroker,,Disabled,CONFIRM_DISABLED,DevQuery background - innecesario
+Agente de directiva IPsec,PolicyAgent,Running,Manual,SECURITY_KEEP,IPSec policy agent
+Agente de eventos de tiempo,TimeBrokerSvc,Running,Manual,SYSTEM_CRITICAL,Timer broker UWP
+Agente de eventos del sistema,SystemEventsBroker,Running,Automatic,SYSTEM_CRITICAL,Broker eventos sistema
+Agrupación de red del mismo nivel,p2psvc,Stopped,Disabled,DISABLE_NETWORK,P2P grouping
+Aislamiento de claves CNG,KeyIso,Running,Automatic,SYSTEM_CRITICAL,Aislamiento claves crypto LSA
+Almacenamiento de datos de usuarios_5f434,UnistoreDataSvc_5f434,,Disabled,CONFIRM_DISABLED,User data store por sesion - deshabilitar
+AMD External Events Utility,AmdExternalEvents,Stopped,Disabled,CONFIRM_DISABLED,AMD driver events
+Aplicacion auxiliar IP,iphlpsvc,,Disabled,CONFIRM_DISABLED,IP Helper - innecesario si no se usa IPv6 ni tunelizacion
+Aplicacion del sistema COM+,COMSysApp,,Manual,CONFIRM_DISABLED,"COM+ System Application - Manual OK, solo activa si hay apps COM+"
+Aplicación auxiliar de NetBIOS sobre TCP/IP,lmhosts,Stopped,Disabled,CONFIRM_DISABLED,NetBIOS
+Archivos sin conexion,CscService,,Disabled,CONFIRM_DISABLED,Offline files - innecesario
+Asignador de detección de topologías de nivel de vínculo,lltdsvc,Stopped,Disabled,DISABLE_NETWORK,Mapa red topología
+Asignador de extremos de RPC,RpcEptMapper,Running,Automatic,SYSTEM_CRITICAL,RPC endpoint mapper
+Asistente para la conectividad de red,NcaSi,,Disabled,DISABLE_NETWORK,DirectAccess/NCA - innecesario
+Audio de Windows,AudioSrv,Running,Automatic,KEEP_AUDIO,Audio - mantener
+Autenticacion natural,NaturalAuthentication,,Disabled,DISABLE_NETWORK,Signal aggregator unlock - deshabilitar
+Ayudante para el inicio de sesión de cuenta Microsoft,wlidsvc,Stopped,Disabled,CONFIRM_DISABLED,MSA login
+BranchCache,PeerDistSvc,Stopped,Disabled,DISABLE_NETWORK,BranchCache innecesario
+Captura de SNMP,SNMPTRAP,,Disabled,DISABLE_NETWORK,SNMP trap - superficie ataque
+CaptureService_5f434,CaptureService_5f434,,Disabled,CONFIRM_DISABLED,Screen capture por sesion - deshabilitar
+Carpetas de trabajo,workfolderssvc,,Disabled,CONFIRM_DISABLED,Work Folders - innecesario
+Centro de seguridad,wscsvc,Stopped,Manual,WARNING,ADVERTENCIA: Security Center deshabilitado
+Cliente de directiva de grupo,gpsvc,,Manual,CONFIRM_DISABLED,Group Policy Client - sin dominio AD basta con Manual
+Cliente de seguimiento de vínculos distribuidos,TrkWks,Running,Disabled,DISABLE_NETWORK,DFS link tracking innecesario
+Cliente DHCP,Dhcp,,Automatic,SYSTEM_CRITICAL,DHCP necesario para red - mantener Automatic
+Cliente DNS,Dnscache,,Automatic,SYSTEM_CRITICAL,Cache DNS del sistema
+Cliente web,WebClient,,Disabled,DISABLE_NETWORK,WebDAV client - superficie ataque
+Cola de impresión,Spooler,Stopped,Disabled,CONFIRM_DISABLED,PrintNightmare - correcto
+COMODO Internet Security Helper Service,CmdAgent,Running,Automatic,SECURITY_KEEP,Firewall COMODO
+COMODO Internet Security Protected Helper Service,CmdVirth,Running,Automatic,SECURITY_KEEP,COMODO virtualización
+COMODO Virtual Service Manager,CmdVirth,,Manual,SECURITY_KEEP,COMODO virt - dejar en Manual
+Compilador de extremo de audio de Windows,AudioEndpointBuilder,Running,Automatic,KEEP_AUDIO,Audio endpoint
+Comprobador puntual,ChkdskSvc,,Disabled,DISABLE_MISC,Spot Verifier - innecesario
+Conexiones de red,Netman,,Manual,SYSTEM_CRITICAL,Network Connections UI - Manual OK
+Conexión compartida a Internet (ICS),SharedAccess,Running,Disabled,DISABLE_NETWORK,ICS - no compartir conexión
+Configuracion automatica de dispositivos conectados a la red,NcdAutoSetup,,Disabled,DISABLE_NETWORK,UPnP auto config - deshabilitar
+Configuracion automatica de redes cableadas,dot3svc,,Disabled,DISABLE_NETWORK,802.1X wired - innecesario sin 802.1X
+Configuracion automatica de WWAN,WwanSvc,,Disabled,DISABLE_NETWORK,Mobile broadband - innecesario
+Configuración automática de WLAN,WlanSvc,Stopped,Disabled,CONFIRM_DISABLED,WiFi - correcto si solo cable
+Configuración de Escritorio remoto,SessionEnv,Stopped,Disabled,CONFIRM_DISABLED,RDP config
+ConsentUX_5f434,ConsentUxUserSvc_5f434,,Disabled,CONFIRM_DISABLED,ConsentUX por sesion - deshabilitar
+Contenedor de Microsoft Passport,NgcCtnrSvc,Stopped,Disabled,CONFIRM_DISABLED,Windows Hello container
+Control parental,WpcMonSvc,,Disabled,CONFIRM_DISABLED,Parental controls - innecesario
+Coordinador de transacciones distribuidas,MSDTC,,Disabled,CONFIRM_DISABLED,MS DTC - solo necesario con SQL Server o apps COM+ distribuidas
+Copias de seguridad de Windows,SDRSVC,,Disabled,CONFIRM_DISABLED,Windows Backup - deshabilitar si se usa solucion de backup propia
+CoreMessaging,CoreMessagingRegistrar,Running,Automatic,SYSTEM_CRITICAL,Mensajería interna sistema
+CredentialEnrollmentManagerUserSvc_5f434,CredentialEnrollmentManagerUserSvc_5f434,,Disabled,CONFIRM_DISABLED,Credential enrollment por sesion
+Datos de contactos_5f434,PimIndexMaintenanceSvc_5f434,,Disabled,CONFIRM_DISABLED,Contacts index por sesion - deshabilitar
+Declared Configuration(DC) service,dcsvc,,Disabled,CONFIRM_DISABLED,Declared config MDM - innecesario
+Deteccion de hardware shell,ShellHWDetection,,Disabled,DISABLE_NETWORK,AutoPlay - vector USB attack
+Detección SSDP,SSDPSRV,Running,Disabled,DISABLE_NETWORK,UPnP discovery - vector ataque LAN
+DeviceAssociationBroker_5f434,DeviceAssociationBroker_5f434,,Disabled,CONFIRM_DISABLED,Device assoc broker por sesion - deshabilitar
+DevicePicker_5f434,DevicePickerUserSvc_5f434,,Disabled,CONFIRM_DISABLED,Device picker por sesion - deshabilitar
+DevicesFlow_5f434,DevicesFlowUserSvc_5f434,,Disabled,CONFIRM_DISABLED,Devices flow por sesion - deshabilitar
+Diagnostic Execution Service,diagsvc,,Disabled,DISABLE_TELEMETRY,Diagnostic execution - deshabilitar
+DialogBlockingService,DialogBlockingService,,Disabled,CONFIRM_DISABLED,Dialog blocking kiosk - innecesario
+Directiva de extraccion de tarjetas inteligentes,ScPolicySvc,,Disabled,CONFIRM_DISABLED,Smart card removal policy - innecesario
+Disco virtual,vds,,Disabled,CONFIRM_DISABLED,Virtual Disk Service - innecesario si no se gestionan discos dinamicos
+Dispositivo host de UPnP,upnphost,Stopped,Disabled,DISABLE_NETWORK,UPnP host
+DLL de host del Contador de rendimiento,PerfHost,,Disabled,CONFIRM_DISABLED,Perf counter host 32bit - innecesario
+Energía,Power,Running,Automatic,SYSTEM_CRITICAL,Gestión energía
+Enrutamiento y acceso remoto,RemoteAccess,Stopped,Disabled,CONFIRM_DISABLED,RRAS - correcto
+Estación de trabajo,LanmanWorkstation,Stopped,Disabled,CONFIRM_DISABLED,SMB client - correcto
+Examinador de equipos,Browser,,Disabled,DISABLE_NETWORK,Computer Browser SMB - deshabilitar
+Experiencia de calidad de audio y video de Windows (qWave),QWAVE,,Disabled,CONFIRM_DISABLED,QoS multimedia - innecesario
+Experiencia de calidad de audio y vídeo (qWave),QWAVE,Stopped,Disabled,DISABLE_MISC,QoS multimedia innecesario
+Experiencias del usuario y telemetría asociadas,DiagTrack,Stopped,Disabled,DISABLE_TELEMETRY,Telemetría Microsoft
+Extensiones y notificaciones de impresora,PrintNotify,Stopped,Disabled,CONFIRM_DISABLED,Print notify
+Fax,Fax,Stopped,Disabled,CONFIRM_DISABLED,Fax innecesario
+Filtro de teclado de Microsoft,MsKeyboardFilter,,Disabled,CONFIRM_DISABLED,Kiosk keyboard filter - innecesario
+Firewall de Windows Defender,MpsSvc,Stopped,Disabled,WARNING,ADVERTENCIA: Deshabilitado. COMODO activo pero revisar
+Foxit PDF Reader Update Service,FoxitReaderUpdateService,Stopped,Disabled,CONFIRM_DISABLED,3rd party updater
+GameInput Service,GameInputSvc,,Disabled,DISABLE_GAMING,Game Input - innecesario
+GraphicsPerfSvc,GraphicsPerfSvc,,Disabled,DISABLE_TELEMETRY,GPU performance telemetria
+Hora de la red de telefonia movil,autotimesvc,,Disabled,CONFIRM_DISABLED,Mobile time sync - innecesario
+Hora de Windows,W32Time,Stopped,Disabled,CONFIRM_DISABLED,ADVERTENCIA: Sin sincronización horaria - logs y eventos incorrectos
+Host de proveedor de detección de función,fdPHost,Stopped,Disabled,DISABLE_NETWORK,SSDP/WSD discovery
+Host de sistema de diagnostico,WdiSystemHost,,Manual,DISABLE_MISC,Diagnostic system host - innecesario en uso diario
+Host del servicio de diagnostico,WdiServiceHost,,Manual,DISABLE_MISC,Diagnostic service host - innecesario en uso diario
+Identidad de aplicacion,AppIDSvc,,Manual,SECURITY_KEEP,AppLocker identity - mantener Manual
+Identity Manager de redes de mismo nivel,p2pimsvc,,Disabled,CONFIRM_DISABLED,P2P identity - innecesario
+Informacion de la aplicacion,Appinfo,,Manual,SYSTEM_CRITICAL,UAC elevation info - Manual OK
+Iniciador de procesos de servidor DCOM,DcomLaunch,Running,Automatic,SYSTEM_CRITICAL,DCOM/COM launch
+Inicio de sesión secundario,seclogon,Stopped,Disabled,DISABLE_CRITICAL,CRÍTICO: runas - escalada privilegios
+Instalador de ActiveX (AxInstSV),AxInstSV,,Disabled,CONFIRM_DISABLED,ActiveX installer - deshabilitar
+Instalador de módulos de Windows,TrustedInstaller,Stopped,Disabled,UPDATES,Instala actualizaciones
+Instantaneas de volumen,VSS,,Manual,CONFIRM_DISABLED,"Volume Shadow Copy - Manual OK, se activa solo cuando se necesita"
+Instrumental de administración de Windows,Winmgmt,Running,Automatic,SYSTEM_CRITICAL,WMI - gestión sistema
+Interfaz de servicio invitado de Hyper-V,vmicguestinterface,,Disabled,DISABLE_MISC,Hyper-V guest interface - innecesario
+KTMRM para DTC (Coordinador de transacciones distribuidas),KtmRm,,Disabled,CONFIRM_DISABLED,KTM/DTC - innecesario workstation
+Llamada a procedimiento remoto (RPC),RpcSs,Running,Automatic,SYSTEM_CRITICAL,RPC base del SO
+McpManagementService,McpManagementService,,Disabled,CONFIRM_DISABLED,MCP management - revisar/deshabilitar
+MessagingService_5f434,MessagingService_5f434,,Disabled,CONFIRM_DISABLED,Messaging por sesion - deshabilitar
+Microsoft App-V Client,AppVClient,,Disabled,CONFIRM_DISABLED,App-V virtualization - innecesario
+Microsoft Edge Elevation Service (MicrosoftEdgeElevationService),MicrosoftEdgeElevationService,,Disabled,CONFIRM_DISABLED,Edge elevation - innecesario
+Microsoft Edge Elevation Service,MicrosoftEdgeElevationService,Stopped,Disabled,DISABLE_MISC,Edge elevation - innecesario si no se usa Edge
+Microsoft Edge Update Service (edgeupdatem),edgeupdatem,Stopped,Disabled,CONFIRM_DISABLED,Edge update
+Microsoft Passport,NgcSvc,Stopped,Disabled,CONFIRM_DISABLED,Windows Hello
+Microsoft Update Health Service,uhssvc,Stopped,Disabled,DISABLE_TELEMETRY,Update health telemetría
+Modo incrustado,embeddedmode,Stopped,Disabled,CONFIRM_DISABLED,Embedded mode
+Modo insertado,embeddedmode,,Disabled,CONFIRM_DISABLED,Embedded mode - correcto
+Mostrar el servicio de directivas,DisplayEnhancementService,Running,Disabled,CONFIRM_DISABLED,Display Enhancement Service - innecesario con drivers propios
+Motor de filtrado de base,BFE,Running,Automatic,SYSTEM_CRITICAL,Base firewall/IPSec - NUNCA deshabilitar
+Módulos de creación de claves de IPsec para IKE y AuthIP,IKEEXT,Running,Automatic,SECURITY_KEEP,IPSec key exchange
+Net Logon,Netlogon,,Disabled,DISABLE_NETWORK,Netlogon - solo necesario en dominio
+OpenSSH Authentication Agent,ssh-agent,,Disabled,DISABLE_CRITICAL,"SSH agent - superficie remota, deshabilitar"
+Optimización de distribución,DoSvc,Stopped,Disabled,DISABLE_TELEMETRY,P2P updates + telemetría
+Optimizar unidades,defragsvc,,Disabled,CONFIRM_DISABLED,Defrag - innecesario en SSD/manual
+Partida guardada en Xbox Live,XblGameSave,Stopped,Disabled,DISABLE_GAMING,Xbox - innecesario
+Plug and Play,PlugPlay,Running,Manual,SYSTEM_CRITICAL,Detección hardware
+Preparacion de aplicaciones,AppReadiness,,Disabled,CONFIRM_DISABLED,App Readiness - innecesario
+PrintWorkflow_5f434,PrintWorkflowUserSvc_5f434,,Disabled,CONFIRM_DISABLED,Print workflow por sesion - deshabilitar
+Programador de tareas,Schedule,Running,Automatic,SYSTEM_CRITICAL,Task Scheduler
+Propagacion de certificados,CertPropSvc,,Manual,SECURITY_KEEP,Certificate propagation
+Proteccion de software,sppsvc,,Automatic,SYSTEM_CRITICAL,Software Protection - licencias Windows
+Protocolo de autenticacion extensible,EapHost,,Disabled,CONFIRM_DISABLED,EAP - solo necesario con 802.1X o VPN EAP
+Protocolo de resolución de nombres de mismo nivel,PNRPsvc,Stopped,Disabled,DISABLE_NETWORK,PNRP P2P
+Proveedor de instantaneas de software de Microsoft,swprv,,Manual,CONFIRM_DISABLED,VSS Software Provider - Manual OK
+Publicación de recurso de detección de función,FDResPub,Stopped,Disabled,DISABLE_NETWORK,Publica equipo en red
+Reconoc. ubicacion de red,NlaSvc,,Automatic,SYSTEM_CRITICAL,Network Location Awareness
+Recopilador de eventos de Windows,Wecsvc,,Disabled,DISABLE_CRITICAL,WEF - innecesario workstation
+Recopilador de eventos de Windows,Wecsvc,Stopped,Disabled,DISABLE_NETWORK,WEF innecesario workstation
+Redirector puerto modo usuario RDP,UmRdpService,Stopped,Disabled,CONFIRM_DISABLED,RDP port redirect
+Registrador de configuracion de Windows Connect Now,wcncsvc,,Disabled,DISABLE_NETWORK,WPS config - deshabilitar
+Registro de eventos de Windows,EventLog,,Automatic,SYSTEM_CRITICAL,Log de eventos critico para auditoria
+Registro remoto,RemoteRegistry,Stopped,Disabled,DISABLE_CRITICAL,CRÍTICO: Acceso remoto al registro
+Registros y alertas de rendimiento,SysmonLog,,Disabled,CONFIRM_DISABLED,PerfMon logs - innecesario
+Sense,Sense,,Disabled,DISABLE_TELEMETRY,Windows Defender ATP Sense - telemetria
+Servicio Administrador de funcionalidad de acceso,ConsentUxUserSvc,,Disabled,CONFIRM_DISABLED,Access functionality mgr - innecesario
+Servicio Antivirus de Microsoft Defender,WinDefend,Running,Manual,SECURITY_KEEP,AV principal - MANTENER
+Servicio Asistente para la compatibilidad de programas,PcaSvc,,Disabled,DISABLE_TELEMETRY,Program Compatibility Assistant - envia telemetria de compat. a MS
+Servicio AssignedAccessManager,AssignedAccessManagerSvc,,Disabled,CONFIRM_DISABLED,Kiosk assigned access - innecesario
+Servicio AVCTP,BTHAVCTPSVC,Stopped,Disabled,CONFIRM_DISABLED,BT A/V control
+Servicio biométrico de Windows,WbioSrvc,Stopped,Disabled,CONFIRM_DISABLED,Biometría
+Servicio Cifrado de unidad BitLocker,BDESVC,Stopped,Disabled,CONFIRM_DISABLED,BitLocker - mantener disponible
+Servicio de Actualizacion de Microsoft Edge (edgeupdate),edgeupdate,,Disabled,DISABLE_TELEMETRY,Edge updater automatico - deshabilitar
+Servicio de Actualizacion de Microsoft Edge (edgeupdatem),edgeupdatem2,,Disabled,DISABLE_TELEMETRY,Edge updater scheduled - deshabilitar
+Servicio de administracion de Windows,dmwcs,,Disabled,DISABLE_NETWORK,MDM device management - deshabilitar
+Servicio de administración de aplicaciones de empresa,EntAppSvc,Stopped,Disabled,CONFIRM_DISABLED,Enterprise app mgmt
+Servicio de administración de radio,RmSvc,Stopped,Disabled,CONFIRM_DISABLED,Radio/Airplane mode
+Servicio de administrador de conexiones con servicios Wi-Fi Direct,WFDSConMgrSvc,,Disabled,DISABLE_NETWORK,WiFi Direct - deshabilitar
+Servicio de almacenamiento,StorSvc,,Automatic,SYSTEM_CRITICAL,Storage service
+Servicio de asistente para perfil local,lfsvc2,,Disabled,CONFIRM_DISABLED,SIM profile assistant - innecesario
+Servicio de asociacion de dispositivos,DeviceAssociationService,,Manual,SYSTEM_CRITICAL,Device pairing - Manual OK
+Servicio de cierre de invitado de Hyper-V,vmicshutdown,,Disabled,DISABLE_MISC,Hyper-V shutdown - innecesario
+Servicio de compatibilidad con Bluetooth,bthserv,Stopped,Disabled,DISABLE_BT,Bluetooth - deshabilitar si no se usa
+Servicio de configuracion de red,NetSetupSvc,,Manual,SYSTEM_CRITICAL,Network setup - Manual OK
+Servicio de configuracion de traslacion de IP,IpxlatCfgSvc,,Disabled,CONFIRM_DISABLED,IP translation config - innecesario
+Servicio de datos del sensor,SensorDataService,,Disabled,CONFIRM_DISABLED,Sensor data - innecesario
+Servicio de datos espacial,SharedRealitySvc,,Disabled,CONFIRM_DISABLED,Spatial data Mixed Reality - innecesario
+Servicio de deteccion automatica de proxy web WinHTTP,WinHttpAutoProxySvc,,Disabled,DISABLE_TELEMETRY,"WPAD - vector MITM, deshabilitar"
+Servicio de directivas de diagnostico,DPS,,Disabled,DISABLE_MISC,Diagnostics Policy Service - innecesario si no se usan diagnósticos del sistema
+Servicio de dispositivo de interfaz humana,hidserv,,Manual,SYSTEM_CRITICAL,HID service - mantener para teclado/raton
+Servicio de enrutador de AllJoyn,AJRouter,Stopped,Disabled,CONFIRM_DISABLED,AllJoyn IoT
+Servicio de enrutamiento de mensajes de insercion del Protocolo de aplicacion inalambrica (WAP) de administracion de dispositivos,dmwappushservice,,Disabled,DISABLE_NETWORK,WAP push MDM - deshabilitar
+Servicio de enumeracion de dispositivos de tarjeta inteligente,ScDeviceEnum,,Disabled,CONFIRM_DISABLED,Smart card enum - innecesario
+Servicio de experiencia de idioma,LicenseManager,,Disabled,CONFIRM_DISABLED,Language Experience Service - innecesario con idioma fijo instalado
+Servicio de geolocalización,lfsvc,Stopped,Disabled,CONFIRM_DISABLED,Geolocalización
+Servicio de historial de archivos,fhsvc,,Disabled,DISABLE_MISC,File History - si no se usa
+Servicio de host HV,HvHost,,Disabled,DISABLE_MISC,Hyper-V host perf counters - innecesario
+Servicio de identidad en la nube de Microsoft,cloudidsvc,,Disabled,CONFIRM_DISABLED,Microsoft Cloud Identity - innecesario
+Servicio de implementación de AppX (AppXSVC),AppXSvc,Stopped,Disabled,CONFIRM_DISABLED,Store app deploy
+Servicio de infraestructura de tareas en segundo plano,BrokerInfrastructure,Running,Automatic,SYSTEM_CRITICAL,Broker tareas BG
+Servicio de inscripcion de administracion de dispositivos,DmEnrollmentSvc,,Disabled,DISABLE_NETWORK,MDM enrollment - deshabilitar
+Servicio de inspección de red de Antivirus de Microsoft Defender,WdNisSvc,Running,Manual,SECURITY_KEEP,IDS red Defender
+Servicio de instalacion de dispositivos,DeviceInstall,,Manual,SYSTEM_CRITICAL,Device install - Manual OK
+Servicio de instalación de Microsoft Store,InstallService,Stopped,Disabled,CONFIRM_DISABLED,Store installs
+Servicio de intercambio de datos de Hyper-V,vmickvpexchange,,Disabled,DISABLE_MISC,Hyper-V data exchange - innecesario
+Servicio de latido de Hyper-V,vmicheartbeat,,Disabled,DISABLE_MISC,Hyper-V heartbeat - innecesario
+Servicio de licencia de cliente (ClipSVC),ClipSVC,Stopped,Disabled,CONFIRM_DISABLED,Store license
+Servicio de lista de redes,netprofm,,Manual,SYSTEM_CRITICAL,Network profile manager
+Servicio de mejora de visualizacion,DisplayEnhancementService,Running,Disabled,CONFIRM_DISABLED,Display Enhancement Service - innecesario con drivers propios
+Servicio de notificación de eventos de sistema,SENS,Stopped,Manual,CONFIRM_DISABLED,System Event Notification - Manual es suficiente
+Servicio de Panel de escritura a mano y teclado tactil,TabletInputService,,Disabled,CONFIRM_DISABLED,Tablet input - innecesario
+Servicio de Panel escritura a mano y teclado táctil,TabletInputService,Stopped,Disabled,CONFIRM_DISABLED,Tablet input
+Servicio de percepcion de Windows,Perceptionsimulation,,Disabled,DISABLE_MISC,Mixed Reality perception - innecesario
+Servicio de perfil de usuario,ProfSvc,Running,Automatic,SYSTEM_CRITICAL,Carga perfiles usuario
+Servicio de plataforma de dispositivos conectados,CDPSvc,,Disabled,CONFIRM_DISABLED,CDP - innecesario
+Servicio de proceso de invitado de Hyper-V,vmicrdv,,Disabled,DISABLE_MISC,Hyper-V guest process - innecesario
+Servicio de protocolo de tunel de sockets seguros,SstpSvc,,Manual,SECURITY_KEEP,SSTP VPN support - Manual OK
+Servicio de prueba comercial,RetailDemo,Stopped,Disabled,CONFIRM_DISABLED,Retail demo
+Servicio de publicación de nombres de equipo PNRP,PNRPAutoReg,Stopped,Disabled,DISABLE_NETWORK,PNRP auto registro
+Servicio de puerta de enlace de audio de Bluetooth,BTAGService,Stopped,Disabled,DISABLE_BT,BT Audio gateway
+Servicio de puerta de enlace de nivel de aplicacion,ALG,,Disabled,CONFIRM_DISABLED,ALG gateway - innecesario
+Servicio de red de Xbox Live,XboxNetApiSvc,Stopped,Disabled,DISABLE_GAMING,Xbox - innecesario
+Servicio de repositorio de estado,StateRepository,,Manual,SYSTEM_CRITICAL,App model state repo
+Servicio de sensores,SensorService,Stopped,Disabled,CONFIRM_DISABLED,Sensores hardware
+Servicio de simulacion de percepcion de Windows,perceptionsimulation,,Disabled,CONFIRM_DISABLED,MR simulation - innecesario
+Servicio de sincronizacion de hora de Hyper-V,vmictimesync,,Disabled,DISABLE_MISC,Hyper-V time sync - innecesario
+Servicio de soluccion de problemas recomendado,TroubleshootingSvc,,Disabled,DISABLE_TELEMETRY,Troubleshooting telemetria MS
+Servicio de soporte tecnico de usuario de Bluetooth_5f434,BluetoothUserService_5f434,,Disabled,DISABLE_BT,Bluetooth por sesion - deshabilitar
+Servicio de soporte técnico de usuario de Bluetooth_4dd77,BluetoothUserService_4dd77,Stopped,Disabled,DISABLE_BT,BT user service
+Servicio de soporte técnico de usuario de Bluetooth_582c3e,BluetoothUserService_582c3e,Stopped,Disabled,DISABLE_BT,BT user service
+Servicio de supervisión de sensores,SensrSvc,Stopped,Disabled,CONFIRM_DISABLED,Sensor monitor
+Servicio de transferencia inteligente en segundo plano (BITS),BITS,Stopped,Disabled,UPDATES,BITS para actualizaciones
+Servicio de uso compartido de datos,DsSvc,Stopped,Disabled,CONFIRM_DISABLED,Data sharing UWP
+Servicio de uso compartido de puertos Net.Tcp,NetTcpPortSharing,Stopped,Disabled,CONFIRM_DISABLED,Net.Tcp sharing
+Servicio de uso compartido de red del Reproductor de Windows Media,WMPNetworkSvc,Stopped,Disabled,CONFIRM_DISABLED,WMP DLNA
+Servicio de uso compartido de red WMP,WMPNetworkSvc,Stopped,Disabled,CONFIRM_DISABLED,WMP network
+Servicio de usuario de difusion y GameDVR_5f434,BcastDVRUserService_5f434,,Disabled,DISABLE_GAMING,GameDVR por sesion
+Servicio de usuario de difusión y GameDVR_4dd77,BcastDVRUserService_4dd77,Stopped,Disabled,DISABLE_GAMING,GameDVR
+Servicio de usuario de difusión y GameDVR_582c3e,BcastDVRUserService_582c3e,Stopped,Disabled,DISABLE_GAMING,GameDVR
+Servicio de usuario de notificaciones de insercion de Windows_5f434,WpnUserService_5f434,,Disabled,CONFIRM_DISABLED,WNS push por sesion - deshabilitar
+Servicio de usuario de notificaciones de inserción de Windows_4dd77,WpnUserService_4dd77,Stopped,Disabled,CONFIRM_DISABLED,WNS push user
+Servicio de usuario de notificaciones de inserción de Windows_582c3e,WpnUserService_582c3e,Stopped,Disabled,CONFIRM_DISABLED,WNS push user
+Servicio de usuario de plataforma de dispositivos conectados_5f434,CDPUserSvc_5f434,,Disabled,CONFIRM_DISABLED,CDP por sesion - deshabilitar
+Servicio de usuario de Udk_5f434,UdkUserSvc_5f434,,Disabled,CONFIRM_DISABLED,UDK shell por sesion - deshabilitar
+Servicio de usuario del portapapeles_5f434,cbdhsvc_5f434,,Disabled,CONFIRM_DISABLED,Clipboard por sesion - deshabilitar
+Servicio de virtualizacion de la experiencia de usuario,UevAgentService,,Disabled,CONFIRM_DISABLED,UE-V roaming - innecesario
+Servicio de virtualización de Escritorio remoto de Hyper-V,vmrdvcore,,Disabled,DISABLE_MISC,Hyper-V RDP virt - innecesario con VMware
+Servicio de Windows Insider,wisvc,Stopped,Disabled,CONFIRM_DISABLED,Insider program
+Servicio de Windows Update Medic,WaaSMedicSvc,Stopped,Disabled,UPDATES,Protege servicio WU
+Servicio de zona con cobertura inalambrica movil de Windows,icssvc,,Disabled,DISABLE_NETWORK,Mobile hotspot - deshabilitar
+Servicio del iniciador iSCSI de Microsoft,MSiSCSI,,Disabled,CONFIRM_DISABLED,iSCSI - innecesario workstation
+Servicio del sistema de notificaciones de inserción de Windows,WpnService,Stopped,Disabled,CONFIRM_DISABLED,WNS push notifications
+Servicio enrutador de SMS de Microsoft Windows.,SmsRouter,,Disabled,DISABLE_NETWORK,SMS router - innecesario
+Servicio enumerador de dispositivos portátiles,WPDBusEnum,Stopped,Disabled,CONFIRM_DISABLED,MTP/WPD devices
+Servicio host de proveedor de cifrado de Windows,EFS,,Manual,SECURITY_KEEP,Crypto provider host - Manual OK
+Servicio Informe de errores de Windows,WerSvc,Stopped,Disabled,DISABLE_TELEMETRY,Envía crashes a MS
+Servicio Orquestador de actualizaciones,UsoSvc,,Disabled,UPDATES,Windows Update gestor
+Servicio PowerShell Direct de Hyper-V,vmicvmsession,,Disabled,DISABLE_MISC,Hyper-V PS Direct - innecesario
+Servicio principal de Microsoft Defender,MDCoreSvc,Running,Manual,SECURITY_KEEP,Core Defender
+Servicio PushToInstall de Windows,PushToInstall,,Disabled,CONFIRM_DISABLED,Store push install - innecesario
+Servicio Recopilador concentrador de diagnósticos (R),diagnosticshub.standardcollector.service,Stopped,Disabled,DISABLE_TELEMETRY,Diagnósticos telemetría
+Servicio Recopilador estandar del concentrador de diagnosticos de Microsoft (R),diagnosticshub.standardcollector.service,,Disabled,DISABLE_TELEMETRY,DiagHub telemetria
+Servicio Seguridad de Windows,SecurityHealthService,,Manual,SYSTEM_CRITICAL,Windows Security health dashboard
+Servicio telefónico,PhoneSvc,,Disabled,CONFIRM_DISABLED,Phone service VoIP - innecesario
+Servicio Volumetric Audio Compositor,VacSvc,,Disabled,CONFIRM_DISABLED,Mixed Reality audio - innecesario
+Servicios de cifrado,CryptSvc,Running,Automatic,SYSTEM_CRITICAL,PKI y certificados
+Servicios de Escritorio remoto,TermService,Stopped,Disabled,CONFIRM_DISABLED,RDP - correcto deshabilitado
+Servidor,LanmanServer,Stopped,Disabled,CONFIRM_DISABLED,SMB server - correcto
+Shared PC Account Manager,shpamsvc,Stopped,Disabled,CONFIRM_DISABLED,SharedPC
+Sincronizar host_5f434,OneSyncSvc_5f434,,Disabled,CONFIRM_DISABLED,Sync host por sesion - deshabilitar
+Sistema de cifrado de archivos (EFS),EFS,,Manual,SECURITY_KEEP,EFS - mantener disponible
+Sistema de eventos COM+,EventSystem,Running,Automatic,SYSTEM_CRITICAL,COM+ eventos
+SMP de Espacios de almacenamiento de Microsoft,smphost,,Disabled,CONFIRM_DISABLED,Storage Spaces Management - innecesario sin Storage Spaces configurados
+Solicitante de instantaneas de volumen de Hyper-V,vmicvss,,Disabled,DISABLE_MISC,Hyper-V VSS - innecesario
+Soporte técnico informes de problemas,wercplsupport,Stopped,Disabled,DISABLE_TELEMETRY,WER UI
+SysMain,SysMain,Stopped,Disabled,CONFIRM_DISABLED,Superfetch
+Tarjeta inteligente,SCardSvr,Stopped,Disabled,CONFIRM_DISABLED,Smart card
+Telefonía,TapiSrv,,Disabled,CONFIRM_DISABLED,Telephony TAPI - innecesario
+Temas,Themes,Stopped,Disabled,CONFIRM_DISABLED,Temas UI
+Ubicador de llamada a procedimiento remoto (RPC),RpcLocator,,Disabled,DISABLE_CRITICAL,"RPC Locator - legacy, deshabilitar"
+Uso de datos,DusmSvc,,Disabled,DISABLE_TELEMETRY,Data Usage Monitor - monitoriza y reporta uso de red (telemetria)
+VeraCrypt System Favorites,VeraCrypt System Favorites,Running,Automatic,SECURITY_KEEP,Cifrado disco VeraCrypt
+VMware Alias Manager and Ticket Service,VMwareAliasManager,,Automatic,VMWARE,VMware alias/ticket auth
+VMware Authorization Service,VMAuthdService,Running,Automatic,VMWARE,Auth VMware - necesario
+VMware Autostart Service,VMwareHostd,Stopped,Manual,VMWARE,Autostart VMs
+VMware DHCP Service,VMnetDHCP,Running,Automatic,VMWARE,DHCP redes virtuales
+VMware NAT Service,VMware NAT Service,Running,Automatic,VMWARE,NAT redes virtuales
+VMware Snapshot Provider,vmvss,,Manual,VMWARE,VSS provider para snapshots VMware
+VMware Tools,VMTools,,Automatic,VMWARE,VMware Tools - necesario en VM
+VMware USB Arbitration Service,VMUSBArbService,Running,Automatic,VMWARE,USB VMware
+WalletService,WalletService,Stopped,Disabled,CONFIRM_DISABLED,Wallet
+WarpJITSvc,WarpJITSvc,,Disabled,CONFIRM_DISABLED,WARP JIT out-of-process - innecesario
+Windows Installer,msiserver,,Manual,SYSTEM_CRITICAL,MSI installer - Manual OK
+Windows Mixed Reality OpenXR Service,MixedRealityOpenXRSvc,,Disabled,CONFIRM_DISABLED,Mixed Reality OpenXR - innecesario
+Windows Search,WSearch,Stopped,Disabled,CONFIRM_DISABLED,Indexación
+Windows Update,wuauserv,Stopped,Disabled,UPDATES,Windows Update
+Xbox Accessory Management Service,XboxGipSvc,Stopped,Disabled,DISABLE_GAMING,Xbox accesorios
+Servicio de usuario de notificaciones de inserción de Windows_aa3c0,WpnUserService_aa3c0,,Disabled,CONFIRM_DISABLED,WNS push user - per-session instance
+Servicio de usuario de defensa contra amenazas web_aa3c0,WebThreatDefUserSvc_aa3c0,,Disabled,CONFIRM_DISABLED,Web Threat Defense user svc - per-session
+Servicio de usuario de plataforma de dispositivos conectados_aa3c0,CDPUserSvc_aa3c0,,Disabled,CONFIRM_DISABLED,CDP user svc - per-session instance
+Sincronizar host_aa3c0,OneSyncSvc_aa3c0,,Disabled,CONFIRM_DISABLED,Sync host per-session - deshabilitar
+Servicio de usuario del portapapeles_aa3c0,cbdhsvc_aa3c0,,Disabled,CONFIRM_DISABLED,Clipboard per-session - deshabilitar
+Servicio de usuario de difusión y GameDVR_aa3c0,BcastDVRUserService_aa3c0,,Disabled,DISABLE_GAMING,GameDVR per-session instance
+Servicio de soporte técnico de usuario de Bluetooth_aa3c0,BluetoothUserService_aa3c0,,Disabled,DISABLE_BT,BT user svc per-session instance
+Acceso a datos de usuarios_aa3c0,UserDataAccessSvc_aa3c0,,Disabled,CONFIRM_DISABLED,User data access per-session - deshabilitar
+Almacenamiento de datos de usuarios_aa3c0,UserDataSvc_aa3c0,,Disabled,CONFIRM_DISABLED,User data store per-session - deshabilitar
+Servicio de usuario de Udk_aa3c0,UdkUserSvc_aa3c0,,Disabled,CONFIRM_DISABLED,UDK shell per-session - deshabilitar
+Datos de contactos_aa3c0,PimIndexMaintenanceSvc_aa3c0,,Disabled,CONFIRM_DISABLED,Contacts index per-session - deshabilitar
+Reproducción del Servicio administrador de sesiones_aa3c0,MPSSvc_aa3c0,,Disabled,CONFIRM_DISABLED,Media session mgr per-session - deshabilitar
+DevicesFlow_aa3c0,DevicesFlowUserSvc_aa3c0,,Disabled,CONFIRM_DISABLED,Devices flow per-session - deshabilitar
+DevicePicker_aa3c0,DevicePickerUserSvc_aa3c0,,Disabled,CONFIRM_DISABLED,Device picker per-session - deshabilitar
+DeviceAssociationBroker_aa3c0,DeviceAssociationBroker_aa3c0,,Disabled,CONFIRM_DISABLED,Device assoc broker per-session - deshabilitar
+CredentialEnrollmentManagerUserSvc_aa3c0,CredentialEnrollmentManagerUserSvc_aa3c0,,Disabled,CONFIRM_DISABLED,Credential enrollment per-session - deshabilitar
+Servicio de usuario ConsentUX_aa3c0,ConsentUxUserSvc_aa3c0,,Disabled,CONFIRM_DISABLED,ConsentUX per-session - deshabilitar
+Servicio de copia de seguridad y restauración en la nube_aa3c0,CloudBackupRestoreSvc_aa3c0,,Disabled,CONFIRM_DISABLED,Cloud backup restore per-session - deshabilitar
+CaptureService_aa3c0,CaptureService_aa3c0,,Disabled,CONFIRM_DISABLED,Screen capture per-session - deshabilitar
+Agent Activation Runtime_aa3c0,AarSvc_aa3c0,,Disabled,CONFIRM_DISABLED,Agent activation per-session - deshabilitar
+MessagingService_aa3c0,MessagingService_aa3c0,,Disabled,CONFIRM_DISABLED,Messaging per-session service - innecesario
+PrintWorkflow_aa3c0,PrintWorkflow_aa3c0,,Disabled,CONFIRM_DISABLED,Print workflow per-session - innecesario sin impresora
+PenService_aa3c0,PenService_aa3c0,,Disabled,CONFIRM_DISABLED,Pen service per-session - innecesario sin tablet/lapiz
+P9RdrService_aa3c0,P9RdrService_aa3c0,,Disabled,CONFIRM_DISABLED,Plan9 file redirector per-session - innecesario
+WSAIFabricSvc,WSAIFabricSvc,,Automatic,DISABLE_MISC,Windows Subsystem Android AI Fabric - innecesario
+VM3DService,VM3DService,,Automatic,DISABLE_MISC,VMware 3D video driver service - innecesario si no hay GPU VMware
+Servicio Interfaz de almacenamiento en red,Nsi,,Automatic,SYSTEM_CRITICAL,Network Store Interface - mantener
+Servicio de administración de entrada de texto,TextInputManagementService,,Automatic,CONFIRM_DISABLED,Text input mgmt - innecesario sin tablet/touch
+Estado y experiencias optimizadas de Windows,PushNotifications,,Automatic,DISABLE_TELEMETRY,Windows Spotlight/push notifications telemetria
+Servicio auxiliar de ZTDNS,ZtdSvc,,Disabled,CONFIRM_DISABLED,Zero Trust DNS helper - innecesario
+Servicio del módulo de copia de seguridad a nivel de bloque,wbengine,,Manual,REVIEW,Block-level backup engine - Manual si se usa backup
+Servicio de desduplicación de ReFS,RefsDedup,,Disabled,CONFIRM_DISABLED,ReFS dedup - innecesario workstation
+PrintScanBrokerService,PrintScanBrokerService,,Disabled,CONFIRM_DISABLED,Print scan broker - innecesario sin impresora
+Centro de distribución de claves local de Kerberos,KKDCP,,Disabled,CONFIRM_DISABLED,Local Kerberos KDC - innecesario no-dominio
+Hotpatch Monitoring Service,HotpatchSvc,,Disabled,CONFIRM_DISABLED,Hotpatch monitoring - innecesario
+Servicio de plataforma de datos agregados,AggregatorHost,,Disabled,DISABLE_TELEMETRY,Aggregated data platform - telemetria
+Insights de calidad y uso de Microsoft,MicrosoftMQUservice,,Disabled,DISABLE_TELEMETRY,Microsoft quality/usage telemetria
+Servicio de defensa contra amenazas web,WebThreatDefSvc,,Manual,SECURITY_KEEP,Web Threat Defense endpoint - mantener Manual
+Servicio de configuración de dispositivos de impresión,PrintConfigurationService,,Disabled,CONFIRM_DISABLED,Print device config - innecesario sin impresora
+Servicio MIDI de Windows,MidiSrv,,Disabled,CONFIRM_DISABLED,Windows MIDI service - innecesario sin MIDI
+Servicio de administración de conectividad móvil,McmSvc,,Disabled,DISABLE_NETWORK,Mobile connectivity mgmt - innecesario
+Monitor del servidor de marco de la Cámara de Windows,FrameServerMonitor,,Disabled,CONFIRM_DISABLED,Camera frame server monitor - innecesario
+Servicio FrameServer de la Cámara de Windows,FrameServer,,Disabled,CONFIRM_DISABLED,Camera frame server - innecesario sin camara
+Servicio de proxy de dispositivo de audio virtual de Windows,VirtualAudioDevProxy,,Disabled,CONFIRM_DISABLED,Virtual audio device proxy - innecesario
+Copilot Runtime Service,CopilotRuntimeSvc,,Disabled,DISABLE_TELEMETRY,Copilot runtime - IA telemetria y privacidad
+Windows Recall Service,RecallSvc,,Disabled,DISABLE_TELEMETRY,Windows Recall - captura pantalla con IA - CRITICO privacidad
+Windows AI Fabric Service,AIFabricSvc,,Disabled,DISABLE_TELEMETRY,Windows AI Fabric backend (Recall/Copilot)
+OneDrive Updater Service,OneDriveUpdaterService,,Disabled,DISABLE_TELEMETRY,OneDrive auto-updater service - innecesario
+Windows Widgets Service,WidgetService,,Disabled,DISABLE_TELEMETRY,Windows Widgets - noticias y telemetria personalizada
+Cortana Service,CortanaSvc,,Disabled,DISABLE_TELEMETRY,Cortana assistant service - telemetria y privacidad
+Cross Device Experience Service,CrossDeviceSvc,,Disabled,DISABLE_NETWORK,Sincronizacion entre dispositivos Microsoft - innecesario
+Device Health Attestation,DeviceHealthAttestation,,Disabled,DISABLE_NETWORK,Device Health Attestation - MDM corporativo innecesario en doméstico
+Windows Subsystem for Android,WsaService,,Disabled,DISABLE_MISC,WSA - innecesario si no se usan apps Android en PC
+Windows MIDI Service,MidiSrvc,,Disabled,CONFIRM_DISABLED,Windows MIDI service - innecesario sin dispositivos MIDI

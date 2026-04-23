@@ -77,11 +77,13 @@ gblame() {
 }
 
 # --- EXTERNAL FUNCTIONS ---
+alias todepall="/home/user/Documents/Scripts/todep/todep_portable.sh"
 alias todep="/home/user/Documents/Scripts/todep/todep.sh"
 alias syslog="/home/user/Documents/Scripts/syslog.sh"
 alias formatcpp="/home/user/Documents/Scripts/format_cpp.sh"
 alias formatpython="/home/user/Documents/Scripts/format_py.sh"
 alias runkitty="/home/user/Documents/Scripts/run_kitty.sh"
+alias help="/home/user/Documents/Scripts/alias_help.sh"
 
 # --- INTERNAL FUNCTIONS ---
 myip() { echo "Public IP: $(curl --max-time 3 --silent ipinfo.io/ip 2>/dev/null || echo 'Unable to fetch')" }
@@ -190,6 +192,26 @@ fzfname() {
         --preview="bat --color=always --style=numbers {} 2>/dev/null || head -100 {} 2>/dev/null" \
         --preview-window=right:60%:wrap
 }
+# secure remove
+secrm() {
+    for f in "$@"; do
+        if [ ! -e "$f" ]; then
+            echo "No existe: $f"
+            continue
+        fi
+        read -p "¿Seguro de borrar de forma segura '$f'? [s/N] " conf
+        if [[ "$conf" =~ ^[Ss]$ ]]; then
+            echo "Borrando: $f"
+            if [ -d "$f" ]; then
+                find "$f" -type f -exec shred -u -v -z {} \; && rm -r "$f"
+            else
+                shred -u -v -z "$f"
+            fi
+        else
+            echo "Omitido: $f"
+        fi
+    done
+}
 
 # --- 42 SPECIFIC ---
 #alias francinette="/home/user/francinette/tester.sh"
@@ -208,6 +230,6 @@ alias cdbox="cd ~/Documents/box"
 alias cdscr="cd ~/Documents/Scripts"
 alias cdpro="cd ~/Documents/Projects"
 alias cdrep="cd ~/Documents/Repository"
-alias cdsha="cd /mnt/hgfs"
+alias cdext="cd /mnt/hgfs"
 alias cdtmp="cd /tmp"
 alias cdocs="cd ~/Documents"

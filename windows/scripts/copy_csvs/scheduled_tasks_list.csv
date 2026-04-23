@@ -1,0 +1,39 @@
+Categoria,TaskPath,TaskName,Descripcion,Accion
+Telemetria,\Microsoft\Windows\Application Experience\,Microsoft Compatibility Appraiser,Recopila datos de compatibilidad de apps para Microsoft,DESHABILITAR
+Telemetria,\Microsoft\Windows\Application Experience\,ProgramDataUpdater,Envia datos de uso de programas a Microsoft,DESHABILITAR
+Telemetria,\Microsoft\Windows\Application Experience\,StartupAppTask,Monitoriza apps al inicio para telemetria,DESHABILITAR
+Telemetria,\Microsoft\Windows\Autochk\,Proxy,Proxy de telemetria de chkdsk,DESHABILITAR
+Telemetria,\Microsoft\Windows\Customer Experience Improvement Program\,Consolidator,Consolida datos del programa CEIP de Microsoft,DESHABILITAR
+Telemetria,\Microsoft\Windows\Customer Experience Improvement Program\,KernelCeipTask,Recopila datos del kernel para CEIP,DESHABILITAR
+Telemetria,\Microsoft\Windows\Customer Experience Improvement Program\,Uploader,Sube datos CEIP a Microsoft,DESHABILITAR
+Telemetria,\Microsoft\Windows\Customer Experience Improvement Program\,UsbCeip,Datos de uso de USB para CEIP,DESHABILITAR
+Telemetria,\Microsoft\Windows\DiskDiagnostic\,Microsoft-Windows-DiskDiagnosticDataCollector,Envia datos de diagnostico del disco a Microsoft,DESHABILITAR
+Telemetria,\Microsoft\Windows\NetTrace\,GatherNetworkInfo,Recopila informacion de red para telemetria,DESHABILITAR
+Feedback,\Microsoft\Windows\Feedback\Siuf\,DmClient,Envia peticiones de feedback al usuario,DESHABILITAR
+Feedback,\Microsoft\Windows\Feedback\Siuf\,DmClientOnScenarioDownload,Descarga escenarios de feedback de Microsoft,DESHABILITAR
+Feedback,\Microsoft\Windows\Windows Error Reporting\,QueueReporting,Envia informes de errores a Microsoft,DESHABILITAR
+Ubicacion y Mapas,\Microsoft\Windows\Maps\,MapsToastTask,Notificaciones de actualizacion de mapas,DESHABILITAR
+Ubicacion y Mapas,\Microsoft\Windows\Maps\,MapsUpdateTask,Descarga actualizaciones de mapas offline,DESHABILITAR
+Ubicacion y Mapas,\Microsoft\Windows\Time Zone\,SynchronizeTimeZone,Sincroniza la zona horaria automaticamente,DESHABILITAR
+Ubicacion y Mapas,\Microsoft\Windows\NlaSvc\,WiFiTask,Detecta redes WiFi en segundo plano,DESHABILITAR
+Xbox y Gaming,\Microsoft\XblGameSave\,XblGameSaveTask,Sincroniza guardados de Xbox en la nube,DESHABILITAR
+Xbox y Gaming,\Microsoft\XblGameSave\,XblGameSaveTaskLogon,Sincroniza guardados Xbox al iniciar sesion,DESHABILITAR
+Seguridad SmartScreen,\Microsoft\Windows\AppID\,SmartScreenSpecific,Analisis SmartScreen de aplicaciones especificas,DESHABILITAR
+Defender,\Microsoft\Windows\Windows Defender\,Windows Defender Scheduled Scan,Analisis programado de Windows Defender,DESHABILITAR
+Desfragmentacion,\Microsoft\Windows\Defrag\,ScheduledDefrag,Desfragmentacion programada del disco (innecesaria en SSD),DESHABILITAR
+Windows Update,\Microsoft\Windows\WindowsUpdate\,Automatic App Update,Actualizacion automatica de apps de la Store,DESHABILITAR
+Windows Update,\Microsoft\Windows\WindowsUpdate\,Scheduled Start,Inicio programado de Windows Update,DESHABILITAR
+Windows Update,\Microsoft\Windows\WindowsUpdate\,sih,Server Initiated Healing - reparacion remota,DESHABILITAR
+Windows Update,\Microsoft\Windows\WindowsUpdate\,sihboot,Server Initiated Healing en el arranque,DESHABILITAR
+Bluetooth,\Microsoft\Windows\Bluetooth\,UninstallDeviceTask,Desinstala dispositivos Bluetooth en segundo plano,DESHABILITAR
+Asistencia Remota,\Microsoft\Windows\RemoteAssistance\,RemoteAssistanceTask,Monitoriza solicitudes de asistencia remota,DESHABILITAR
+Sincronizacion Hora,\Microsoft\Windows\Time Synchronization\,ForceSynchronizeTime,Fuerza sincronizacion horaria con servidor MS,DESHABILITAR
+Sincronizacion Hora,\Microsoft\Windows\Time Synchronization\,SynchronizeTime,Sincronizacion periodica de hora con internet,DESHABILITAR
+Multimedia,\Microsoft\Windows\Windows Media Sharing\,UpdateLibrary,Actualiza la biblioteca de Windows Media Player,DESHABILITAR
+Multimedia,\Microsoft\Windows\Speech\,SpeechModelDownloadTask,Descarga modelos de reconocimiento de voz,DESHABILITAR
+Red Movil,\Microsoft\Windows\Mobile Broadband Accounts\,MNO Metadata Parser,Parsea metadatos de operadores de red movil,DESHABILITAR
+Disco,\Microsoft\Windows\Chkdsk\,ProactiveScan,Escaneo proactivo del disco en busca de errores,DESHABILITAR
+Nube,\Microsoft\Windows\CloudExperienceHost\,CreateObjectTask,Tareas de la experiencia en la nube de Microsoft,DESHABILITAR
+Texto e Input,\Microsoft\Windows\TextServicesFramework\,MsCtfMonitor,Monitor del framework de servicios de texto,DESHABILITAR
+Terceros,\,CCleanerSkipUAC,CCleaner saltandose el UAC (riesgo de seguridad),DESHABILITAR
+Terceros,\,OneDrive Standalone Update Task v2,Actualizacion autonoma de OneDrive,DESHABILITAR

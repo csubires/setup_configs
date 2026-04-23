@@ -1,0 +1,85 @@
+﻿TaskName,TaskPath,Descripcion,Categoria
+RemoteAssistanceTask,\Microsoft\Windows\RemoteAssistance\,Monitoriza solicitudes de asistencia remota,Asistencia Remota
+UninstallDeviceTask,\Microsoft\Windows\Bluetooth\,Desinstala dispositivos Bluetooth en segundo plano,Bluetooth
+Windows Defender Scheduled Scan,\Microsoft\Windows\Windows Defender\,Analisis programado de Windows Defender,Defender
+ScheduledDefrag,\Microsoft\Windows\Defrag\,Desfragmentacion programada del disco (innecesaria en SSD),Desfragmentacion
+ProactiveScan,\Microsoft\Windows\Chkdsk\,Escaneo proactivo del disco en busca de errores,Disco
+RecommendedTroubleshootingScanner,\Microsoft\Windows\Diagnosis\,Comprueba resolución de problemas recomendada de Microsoft (envía datos),Feedback
+UnexpectedCodepath,\Microsoft\Windows\Diagnosis\,Telemetría de rutas de código inesperadas,Feedback
+DmClient,\Microsoft\Windows\Feedback\Siuf\,Envia peticiones de feedback al usuario,Feedback
+DmClientOnScenarioDownload,\Microsoft\Windows\Feedback\Siuf\,Descarga escenarios de feedback de Microsoft,Feedback
+WinSAT,\Microsoft\Windows\Maintenance\,Mide rendimiento del sistema y lo envía a Microsoft (Windows Assessment Tool),Feedback
+FamilySafetyMonitor,\Microsoft\Windows\Shell\,Supervisa y aplica configuración de Protección infantil de Microsoft,Feedback
+FamilySafetyRefreshTask,\Microsoft\Windows\Shell\,Sincroniza configuración del servicio de características de familia Microsoft,Feedback
+QueueReporting,\Microsoft\Windows\Windows Error Reporting\,Envia informes de errores a Microsoft,Feedback
+SoftLandingCreativeManagementTask,\SoftLanding\S-1-5-21-1306727280-3045863218-242321344-1001\,Gestión de contenido creativo SoftLanding (anuncios y sugerencias de Microsoft),Feedback
+SpeechModelDownloadTask,\Microsoft\Windows\Speech\,Descarga modelos de reconocimiento de voz,Multimedia
+UpdateLibrary,\Microsoft\Windows\Windows Media Sharing\,Actualiza la biblioteca de Windows Media Player,Multimedia
+OneDrive Reporting Task-S-1-5-21-1306727280-3045863218-242321344-1001,\,Tarea de informes de OneDrive (telemetría OneDrive),Nube
+CreateObjectTask,\Microsoft\Windows\CloudExperienceHost\,Tareas de la experiencia en la nube de Microsoft,Nube
+Backup,\Microsoft\Windows\CloudRestore\,Copia de seguridad de configuración desde la nube (CloudRestore),Nube
+Restore,\Microsoft\Windows\CloudRestore\,Restauración de configuración desde la nube (CloudRestore),Nube
+LoginCheck,\Microsoft\Windows\PushToInstall\,Comprueba login para instalación push desde Microsoft Store,Nube
+Registration,\Microsoft\Windows\PushToInstall\,Registro del dispositivo para instalación push Microsoft Store,Nube
+Work Folders Logon Synchronization,\Microsoft\Windows\Work Folders\,Sincronización de carpetas de trabajo al inicio de sesión (corporativo),Nube
+Work Folders Maintenance Work,\Microsoft\Windows\Work Folders\,Mantenimiento de carpetas de trabajo (corporativo),Nube
+MobilityManager,\Microsoft\Windows\Ras\,Compatibilidad para cambio de conexión VPN con movilidad (innecesario en PC fijo),Red Movil
+UPnPHostConfig,\Microsoft\Windows\UPnP\,Establece UPnPHost en inicio automático (innecesario si no se usa UPnP),Red Movil
+WiFiTask,\Microsoft\Windows\WCM\,Tarea de configuración de red WiFi en segundo plano,Red Movil
+CDSSync,\Microsoft\Windows\WlanSvc\,Sincronización CDS de WLAN,Red Movil
+MoProfileManagement,\Microsoft\Windows\WlanSvc\,Gestión de perfiles de red móvil WLAN,Red Movil
+NotificationTask,\Microsoft\Windows\WwanSvc\,Tarea de notificaciones WWAN (red móvil),Red Movil
+OobeDiscovery,\Microsoft\Windows\WwanSvc\,Descubrimiento OOBE de red móvil WWAN,Red Movil
+Background Synchronization,\Microsoft\Windows\Offline Files\,Sincronización periódica de archivos sin conexión (uso corporativo),Sincronizacion Hora
+ForceSynchronizeTime,\Microsoft\Windows\Time Synchronization\,Fuerza sincronizacion horaria con servidor MS,Sincronizacion Hora
+SynchronizeTime,\Microsoft\Windows\Time Synchronization\,Sincronizacion periodica de hora con internet,Sincronizacion Hora
+MareBackup,\Microsoft\Windows\Application Experience\,Recopila datos de aplicaciones Win32 para el escenario Copia de seguridad de aplicaciones,Telemetria
+Microsoft Compatibility Appraiser Exp,\Microsoft\Windows\Application Experience\,Recopila telemetría de programas si participa en el Programa de mejora de la experiencia,Telemetria
+SdbinstMergeDbTask,\Microsoft\Windows\Application Experience\,Combina bases de datos shim pendientes. Relacionado con telemetría de compatibilidad,Telemetria
+StartupAppTask,\Microsoft\Windows\Application Experience\,Monitoriza apps al inicio para telemetria,Telemetria
+Proxy,\Microsoft\Windows\Autochk\,Proxy de telemetria de chkdsk,Telemetria
+UnifiedConsentSyncTask,\Microsoft\Windows\ConsentUX\UnifiedConsent\,Sincroniza preferencias de consentimiento de diagnóstico,Telemetria
+Consolidator,\Microsoft\Windows\Customer Experience Improvement Program\,Consolida datos del programa CEIP de Microsoft,Telemetria
+UsbCeip,\Microsoft\Windows\Customer Experience Improvement Program\,Datos de uso de USB para CEIP,Telemetria
+HandleCommand,\Microsoft\Windows\DeviceDirectoryClient\,Maneja comandos del directorio de dispositivos (Entra ID corporativo),Telemetria
+HandleWnsCommand,\Microsoft\Windows\DeviceDirectoryClient\,Maneja comandos WNS del directorio de dispositivos,Telemetria
+IntegrityCheck,\Microsoft\Windows\DeviceDirectoryClient\,Comprobación de integridad de directorio de dispositivos (Entra ID),Telemetria
+LocateCommandUserSession,\Microsoft\Windows\DeviceDirectoryClient\,Localiza sesión de usuario para comandos de directorio,Telemetria
+RegisterDeviceAccountChange,\Microsoft\Windows\DeviceDirectoryClient\,Registra cambio de cuenta de dispositivo en directorio,Telemetria
+RegisterDevicePolicyChange,\Microsoft\Windows\DeviceDirectoryClient\,Registra cambio de política de dispositivo en directorio,Telemetria
+RegisterDeviceProtectionStateChanged,\Microsoft\Windows\DeviceDirectoryClient\,Registra cambio de estado de protección del dispositivo,Telemetria
+RegisterDeviceSettingChange,\Microsoft\Windows\DeviceDirectoryClient\,Registra cambio de configuración del dispositivo en directorio,Telemetria
+RegisterUserDevice,\Microsoft\Windows\DeviceDirectoryClient\,Registra el dispositivo del usuario en el directorio,Telemetria
+Microsoft-Windows-DiskDiagnosticDataCollector,\Microsoft\Windows\DiskDiagnostic\,Envia datos de diagnostico del disco a Microsoft,Telemetria
+GovernedFeatureUsageProcessing,\Microsoft\Windows\Flighting\FeatureConfig\,Concilia periódicamente configuraciones de características (telemetría de uso),Telemetria
+ReconcileConfigs,\Microsoft\Windows\Flighting\FeatureConfig\,Concilia periódicamente configuraciones de características (Flighting),Telemetria
+ReconcileFeatures,\Microsoft\Windows\Flighting\FeatureConfig\,Concilia periódicamente configuraciones de características (Flighting),Telemetria
+UsageDataFlushing,\Microsoft\Windows\Flighting\FeatureConfig\,Conserva datos de uso de características en disco,Telemetria
+UsageDataReceiver,\Microsoft\Windows\Flighting\FeatureConfig\,Conserva datos de uso de características en disco,Telemetria
+UsageDataReporting,\Microsoft\Windows\Flighting\FeatureConfig\,Registra periódicamente informes de uso de características,Telemetria
+RefreshCache,\Microsoft\Windows\Flighting\OneSettings\,Actualiza periódicamente datos para clientes de OneSettings,Telemetria
+Sqm-Tasks,\Microsoft\Windows\PI\,Reúne información sobre TPM y arranque seguro (SQM = telemetría),Telemetria
+PowerGridForecastTask,\Microsoft\Windows\Sustainability\,Pronóstico de red eléctrica para optimización de carga (innecesario en PC doméstico),Telemetria
+SustainabilityTelemetry,\Microsoft\Windows\Sustainability\,Eventos de telemetría para la sostenibilidad,Telemetria
+UsageAndQualityInsights-MaintenanceTask,\Microsoft\Windows\UsageAndQualityInsights\,Insights de uso y calidad de Windows,Telemetria
+PolicyConfiguration,\Microsoft\Windows\WindowsAI\Recall\,Configura políticas de Recall (IA grabación de pantalla de Windows),Telemetria
+InitialConfiguration,\Microsoft\Windows\WindowsAI\Settings\,Configuración inicial de Windows AI Settings,Telemetria
+MicrosoftEdgeUpdateTaskMachineUA{EF64DBD0-C884-4ECC-83C1-A7E441676C6C},\,Comprueba actualizaciones de Microsoft Edge (UA check),Terceros
+Firefox Background Update S-1-5-21-1306727280-3045863218-242321344-1001 308046B0AF4A39CB,\Mozilla\,Actualizaciones en segundo plano de Firefox cuando no está en ejecución,Terceros
+Firefox Default Browser Agent 308046B0AF4A39CB,\Mozilla\,Comprueba si Firefox sigue siendo el navegador por defecto,Terceros
+MsCtfMonitor,\Microsoft\Windows\TextServicesFramework\,Monitor del framework de servicios de texto,Texto e Input
+InputSettingsRestoreDataAvailable,\Microsoft\Windows\input\,Restauración de datos de configuración de entrada,Texto e Input
+MouseSyncDataAvailable,\Microsoft\Windows\input\,Sincronización de datos de ratón entre dispositivos,Texto e Input
+PenSyncDataAvailable,\Microsoft\Windows\input\,Sincronización de datos de lápiz/stylus,Texto e Input
+RemoteMouseSyncDataAvailable,\Microsoft\Windows\input\,Sincronización remota de datos de ratón,Texto e Input
+RemotePenSyncDataAvailable,\Microsoft\Windows\input\,Sincronización remota de datos de lápiz,Texto e Input
+RemoteTouchpadSyncDataAvailable,\Microsoft\Windows\input\,Sincronización remota de datos de touchpad,Texto e Input
+TouchpadSyncDataAvailable,\Microsoft\Windows\input\,Sincronización de datos de touchpad entre dispositivos,Texto e Input
+syncpensettings,\Microsoft\Windows\input\,Sincronización de configuración de lápiz/stylus,Texto e Input
+WindowsActionDialog,\Microsoft\Windows\Location\,Notificaciones de ubicación a aplicaciones,Ubicacion y Mapas
+MapsToastTask,\Microsoft\Windows\Maps\,Notificaciones de actualizacion de mapas,Ubicacion y Mapas
+MapsUpdateTask,\Microsoft\Windows\Maps\,Descarga actualizaciones de mapas offline,Ubicacion y Mapas
+WiFiTask,\Microsoft\Windows\NlaSvc\,Detecta redes WiFi en segundo plano,Ubicacion y Mapas
+SynchronizeTimeZone,\Microsoft\Windows\Time Zone\,Sincroniza la zona horaria automaticamente,Ubicacion y Mapas
+Scheduled Start,\Microsoft\Windows\WindowsUpdate\,Inicio programado de Windows Update,Windows Update
+XblGameSaveTask,\Microsoft\XblGameSave\,Sincroniza guardados de Xbox en la nube,Xbox y Gaming

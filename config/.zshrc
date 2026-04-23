@@ -72,6 +72,7 @@ export PATH=$HOME/.brew/bin:$PATH
 export PATH="$PATH:/usr/local/go/bin"
 export PATH="$PATH:$(go env GOPATH)/bin"
 export PATH="$HOME/.local/bin:$PATH"
+export GITEA_PASS=D0ckercontain3R#hOy
 
 # ============================================
 # NVM Lazy Loading (only loads when needed)

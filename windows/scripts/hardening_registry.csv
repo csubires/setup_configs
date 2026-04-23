@@ -1,0 +1,107 @@
+Menu,Submenu,Funcion,Categoria,RegistryPath,KeyName,Tipo,Valor,Operacion,Descripcion
+1,Privacidad,DisableTelemetry,Telemetria,HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection,AllowTelemetry,DWord,0,SET,Deshabilita la telemetria nivel 0
+1,Privacidad,DisableTelemetry,Telemetria,HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection,AllowTelemetry,DWord,0,SET,Deshabilita telemetria via GPO
+1,Privacidad,DisableTelemetry,Telemetria,HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Policies\DataCollection,AllowTelemetry,DWord,0,SET,Deshabilita telemetria en WOW64
+1,Privacidad,DisableWiFiSense,WiFi Sense,HKLM:\SOFTWARE\Microsoft\PolicyManager\default\WiFi\AllowWiFiHotSpotReporting,Value,DWord,0,SET,Impide reportar hotspots WiFi a Microsoft
+1,Privacidad,DisableWiFiSense,WiFi Sense,HKLM:\SOFTWARE\Microsoft\PolicyManager\default\WiFi\AllowAutoConnectToWiFiSenseHotspots,Value,DWord,0,SET,Impide conexion automatica a hotspots WiFi Sense
+1,Privacidad,DisableWiFiSense,WiFi Sense,HKLM:\SOFTWARE\Microsoft\WcmSvc\wifinetworkmanager\config,AutoConnectAllowedOEM,DWord,0,SET,Bloquea conexion WiFi automatica OEM
+1,Privacidad,DisableWiFiSense,WiFi Sense,HKLM:\SOFTWARE\Microsoft\WcmSvc\wifinetworkmanager\config,WiFISenseAllowed,DWord,0,SET,Deshabilita WiFi Sense completamente
+1,Privacidad,DisableSmartScreen,SmartScreen,HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer,SmartScreenEnabled,String,Off,SET,Deshabilita SmartScreen en el Explorador
+1,Privacidad,DisableSmartScreen,SmartScreen,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost,EnableWebContentEvaluation,DWord,0,SET,Deshabilita evaluacion de contenido web SmartScreen
+1,Privacidad,DisableWebSearch,Busqueda Bing,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search,BingSearchEnabled,DWord,0,SET,Deshabilita busqueda Bing desde el menu inicio
+1,Privacidad,DisableWebSearch,Busqueda Bing,HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search,DisableWebSearch,DWord,1,SET,Deshabilita busqueda web via GPO
+1,Privacidad,DisableAppSuggestions,Sugerencias,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager,ContentDeliveryAllowed,DWord,0,SET,Deshabilita entrega de contenido sugerido
+1,Privacidad,DisableAppSuggestions,Sugerencias,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager,OemPreInstalledAppsEnabled,DWord,0,SET,Impide apps preinstaladas por OEM
+1,Privacidad,DisableAppSuggestions,Sugerencias,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager,PreInstalledAppsEnabled,DWord,0,SET,Impide apps preinstaladas por Microsoft
+1,Privacidad,DisableAppSuggestions,Sugerencias,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager,PreInstalledAppsEverEnabled,DWord,0,SET,Marca apps preinstaladas como nunca habilitadas
+1,Privacidad,DisableAppSuggestions,Sugerencias,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager,SilentInstalledAppsEnabled,DWord,0,SET,Impide instalacion silenciosa de apps
+1,Privacidad,DisableAppSuggestions,Sugerencias,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager,SubscribedContent-338389Enabled,DWord,0,SET,Deshabilita contenido suscrito 338389
+1,Privacidad,DisableAppSuggestions,Sugerencias,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager,SystemPaneSuggestionsEnabled,DWord,0,SET,Deshabilita sugerencias en panel del sistema
+1,Privacidad,DisableAppSuggestions,Sugerencias,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager,SubscribedContent-338388Enabled,DWord,0,SET,Deshabilita contenido suscrito 338388
+1,Privacidad,DisableAppSuggestions,Sugerencias,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager,SubscribedContent-310093Enabled,DWord,0,SET,Deshabilita contenido suscrito 310093
+1,Privacidad,DisableAppSuggestions,Sugerencias,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager,SubscribedContent-338387Enabled,DWord,0,SET,Deshabilita contenido suscrito 338387
+1,Privacidad,DisableAppSuggestions,Sugerencias,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager,SubscribedContent-338393Enabled,DWord,0,SET,Deshabilita contenido suscrito 338393
+1,Privacidad,DisableAppSuggestions,Sugerencias,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager,SubscribedContent-353696Enabled,DWord,0,SET,Deshabilita contenido suscrito 353696
+1,Privacidad,DisableAppSuggestions,Sugerencias,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager,SubscribedContent-353698Enabled,DWord,0,SET,Deshabilita contenido suscrito 353698
+1,Privacidad,DisableAppSuggestions,Sugerencias,HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent,DisableWindowsConsumerFeatures,DWord,1,SET,Deshabilita funciones de consumer cloud de Windows
+1,Privacidad,DisableLockScreenSpotlight,Pantalla Bloqueo,HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager,RotatingLockScreenEnabled,DWord,0,SET,Deshabilita fondo rotatorio en pantalla de bloqueo
+1,Privacidad,DisableLockScreenSpotlight,Pantalla Bloqueo,HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager,RotatingLockScreenOverlayEnabled,DWord,0,SET,Deshabilita overlay de Spotlight en bloqueo
+1,Privacidad,DisableLockScreenSpotlight,Pantalla Bloqueo,HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager,SubscribedContent-338387Enabled,DWord,0,SET,Deshabilita contenido suscrito en pantalla de bloqueo
+1,Privacidad,DisableLocationTracking,Ubicacion,HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Sensor\Overrides\{BFA794E4-F964-4FDB-90F6-51056BFE4B44},SensorPermissionState,DWord,0,SET,Deshabilita permisos del sensor de ubicacion
+1,Privacidad,DisableLocationTracking,Ubicacion,HKLM:\SYSTEM\CurrentControlSet\Services\lfsvc\Service\Configuration,Status,DWord,0,SET,Desactiva el servicio de localizacion lfsvc
+1,Privacidad,DisableLocationTracking,Ubicacion,HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location,Value,String,Deny,SET,Deniega acceso a ubicacion a todas las apps
+1,Privacidad,DisableMapUpdates,Mapas,HKLM:\SYSTEM\Maps,AutoUpdateEnabled,DWord,0,SET,Deshabilita actualizacion automatica de mapas offline
+1,Privacidad,DisableFeedback,Feedback,HKCU:\SOFTWARE\Microsoft\Siuf\Rules,NumberOfSIUFInPeriod,DWord,0,SET,Establece a 0 el numero de peticiones de feedback
+1,Privacidad,DisableFeedback,Feedback,HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection,DoNotShowFeedbackNotifications,DWord,1,SET,Oculta notificaciones de feedback de Microsoft
+1,Privacidad,DisableAdvertisingID,Publicidad,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo,Enabled,DWord,0,SET,Deshabilita el ID publicitario unico de Windows
+1,Privacidad,DisableAdvertisingID,Publicidad,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Privacy,TailoredExperiencesWithDiagnosticDataEnabled,DWord,0,SET,Deshabilita experiencias personalizadas con datos de diagnostico
+1,Privacidad,DisableCortana,Cortana,HKCU:\SOFTWARE\Microsoft\Personalization\Settings,AcceptedPrivacyPolicy,DWord,0,SET,Revoca aceptacion de politica de privacidad de Cortana
+1,Privacidad,DisableCortana,Cortana,HKCU:\SOFTWARE\Microsoft\InputPersonalization,RestrictImplicitTextCollection,DWord,1,SET,Restringe recopilacion implicita de texto para Cortana
+1,Privacidad,DisableCortana,Cortana,HKCU:\SOFTWARE\Microsoft\InputPersonalization,RestrictImplicitInkCollection,DWord,1,SET,Restringe recopilacion implicita de tinta para Cortana
+1,Privacidad,DisableCortana,Cortana,HKCU:\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore,HarvestContacts,DWord,0,SET,Impide a Cortana recopilar contactos del usuario
+1,Privacidad,DisableCortana,Cortana,HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search,AllowCortana,DWord,0,SET,Deshabilita Cortana via GPO
+1,Privacidad,DisableCortana,Cortana,HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search,AllowSearchToUseLocation,DWord,0,SET,Impide que la busqueda use la ubicacion
+1,Privacidad,DisableCortana,Cortana,HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search,DisableWebSearch,DWord,1,SET,Deshabilita busqueda web en Cortana
+1,Privacidad,DisableCortana,Cortana,HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search,ConnectedSearchUseWeb,DWord,0,SET,Impide que la busqueda conectada use internet
+1,Privacidad,DisableCortana,Cortana,HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search,SearchboxTaskbarMode,DWord,0,SET,Oculta el cuadro de busqueda de la barra de tareas
+1,Privacidad,DisableErrorReporting,Error Reporting,HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting,Disabled,DWord,1,SET,Deshabilita el envio de informes de errores a Microsoft
+1,Privacidad,SetP2PUpdateLocal,Windows Update P2P,HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Config,DODownloadMode,DWord,1,SET,Restringe descarga P2P de actualizaciones a la red local (modo 1)
+1,Privacidad,SetP2PUpdateLocal,Windows Update P2P,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization,SystemSettingsDownloadMode,DWord,3,SET,Configura modo de descarga del sistema a red local
+1,Privacidad,SetUACHigh,UAC,HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System,ConsentPromptBehaviorAdmin,DWord,2,SET,Eleva UAC para admins (requiere confirmacion en escritorio seguro)
+1,Privacidad,SetUACHigh,UAC,HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System,ConsentPromptBehaviorUser,DWord,3,SET,Usuarios estandar deben autenticarse para elevar privilegios
+1,Privacidad,SetUACHigh,UAC,HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System,PromptOnSecureDesktop,DWord,1,SET,Muestra prompt UAC en escritorio seguro aislado
+1,Privacidad,SetUACHigh,UAC,HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System,EnableInstallerDetection,DWord,1,SET,Detecta instaladores y eleva UAC automaticamente
+1,Privacidad,SetUACHigh,UAC,HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System,EnableLUA,DWord,1,SET,Fuerza ejecucion como usuario estandar (LUA activado)
+1,Privacidad,DisableSharingMappedDrives,Red,HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System,EnableLinkedConnections,-,-,DELETE,Elimina mapeo de unidades compartidas entre sesiones de usuario
+1,Privacidad,DisableAdminShares,Red,HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters,AutoShareWks,DWord,0,SET,Deshabilita recursos compartidos administrativos implicitos (C$ D$ etc)
+1,Privacidad,DisableFirewall,Firewall,HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\StandardProfile,EnableFirewall,DWord,0,SET,Deshabilita el firewall de Windows (instalar alternativa)
+1,Privacidad,DisableDefenderCloud,Defender Cloud,HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet,SpynetReporting,DWord,0,SET,Deshabilita reporte de SpyNet a Microsoft
+1,Privacidad,DisableDefenderCloud,Defender Cloud,HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet,SubmitSamplesConsent,DWord,2,SET,Impide envio automatico de muestras a Defender Cloud
+1,Privacidad,DisableSharedExperiences,Experiencias,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\CDP,RomeSdkChannelUserAuthzPolicy,DWord,0,SET,Deshabilita experiencias compartidas entre dispositivos (CDP)
+1,Privacidad,DisableRemoteAssistance,Acceso Remoto,HKLM:\SYSTEM\CurrentControlSet\Control\Remote Assistance,fAllowToGetHelp,DWord,0,SET,Deshabilita la asistencia remota entrante
+1,Privacidad,DisableRemoteAssistance,Acceso Remoto,HKLM:\SYSTEM\CurrentControlSet\Control\Remote Assistance,fAllowFullControl,DWord,0,SET,Impide control total en sesiones de asistencia remota
+1,Privacidad,DisableRemoteAssistance,Acceso Remoto,HKLM:\SYSTEM\CurrentControlSet\Control\Remote Assistance,fEnableChatControl,DWord,0,SET,Deshabilita chat en asistencia remota
+1,Privacidad,DisableRemoteDesktop,Acceso Remoto,HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server,fDenyTSConnections,DWord,1,SET,Deniega conexiones de Escritorio Remoto (RDP)
+1,Privacidad,DisableRemoteDesktop,Acceso Remoto,HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp,UserAuthentication,DWord,1,SET,Fuerza NLA (autenticacion previa) para RDP
+1,Privacidad,DisableAutoplay,Medios,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers,DisableAutoplay,DWord,1,SET,Deshabilita la reproduccion automatica de medios
+1,Privacidad,DisableAutorun,Medios,HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer,NoDriveTypeAutoRun,DWord,255,SET,Deshabilita Autorun en todos los tipos de unidad (valor 255)
+1,Privacidad,DisableStorageSense,Sistema,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\StorageSense\Parameters\StoragePolicy,-,-,-,DELETE,Elimina la clave de politica de Storage Sense
+1,Privacidad,DisableFastStartup,Sistema,HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power,HiberbootEnabled,DWord,0,SET,Deshabilita el inicio rapido hibrido de Windows
+1,Privacidad,DisableLastlivedat,Sistema,HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Reliability,TimeStampInterval,DWord,0,SET,Deshabilita escritura del archivo lastlive.dat de fiabilidad
+1,Privacidad,EnableAllPrivacy,Privacidad Extra,HKCU:\SOFTWARE\Microsoft\InputPersonalization,RestrictImplicitInkCollection,DWord,1,SET,Restringe recopilacion implicita de tinta
+1,Privacidad,EnableAllPrivacy,Privacidad Extra,HKCU:\SOFTWARE\Microsoft\InputPersonalization,RestrictImplicitTextCollection,DWord,1,SET,Restringe recopilacion implicita de texto
+1,Privacidad,EnableAllPrivacy,Privacidad Extra,HKCU:\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore,HarvestContacts,DWord,0,SET,Impide recopilacion de contactos para personalizacion
+1,Privacidad,EnableAllPrivacy,Privacidad Extra,HKLM:\SOFTWARE\Policies\Microsoft\Windows\TabletPC,PreventHandwritingDataSharing,DWord,1,SET,Impide compartir datos de escritura a mano con Microsoft
+1,Privacidad,EnableAllPrivacy,Privacidad Extra,HKLM:\SOFTWARE\Policies\Microsoft\Windows\HandwritingErrorReports,PreventHandwritingErrorReports,DWord,1,SET,Impide envio de errores de escritura a mano
+1,Privacidad,EnableAllPrivacy,Privacidad Extra,HKLM:\SOFTWARE\Microsoft\Input\TIPC,Enabled,DWord,0,SET,Deshabilita TIPC (Text Input Privacy Collection) sistema
+1,Privacidad,EnableAllPrivacy,Privacidad Extra,HKCU:\SOFTWARE\Microsoft\Input\TIPC,Enabled,DWord,0,SET,Deshabilita TIPC en contexto de usuario
+1,Privacidad,EnableAllPrivacy,Privacidad Extra,HKCU:\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\PushNotifications,NoTileApplicationNotification,DWord,1,SET,Deshabilita notificaciones push de tiles de aplicaciones
+1,Privacidad,EnableAllPrivacy,Privacidad Extra,HKCU:\SOFTWARE\Microsoft\MediaPlayer\Preferences,UsageTracking,DWord,0,SET,Deshabilita tracking de uso en Windows Media Player
+2,Estetica,EnableFileDeleteConfirm,Explorador,HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer,ConfirmFileDelete,DWord,1,SET,Activa dialogo de confirmacion al eliminar archivos
+2,Estetica,HideTaskbarSearchBox,Explorador,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search,SearchboxTaskbarMode,DWord,0,SET,Oculta la barra de busqueda de Cortana en la taskbar
+2,Estetica,ShowKnownExtensions,Explorador,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced,HideFileExt,DWord,0,SET,Muestra extensiones de archivos conocidos
+2,Estetica,ShowHiddenFiles,Explorador,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced,Hidden,DWord,1,SET,Muestra archivos y carpetas ocultos
+2,Estetica,HideRecentShortcuts,Explorador,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer,ShowRecent,DWord,0,SET,Oculta archivos recientes en el Explorador
+2,Estetica,HideRecentShortcuts,Explorador,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer,ShowFrequent,DWord,0,SET,Oculta carpetas frecuentes en el Explorador
+2,Estetica,SetExplorerThisPC,Explorador,HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced,LaunchTo,DWord,1,SET,El Explorador se abre en Este Equipo en lugar de Acceso Rapido
+2,Estetica,SetVisualFXPerformance,Rendimiento Visual,HKCU:\Control Panel\Desktop,DragFullWindows,String,0,SET,Deshabilita arrastre de ventanas con contenido (mejora rendimiento)
+2,Estetica,SetVisualFXPerformance,Rendimiento Visual,HKCU:\Control Panel\Desktop,MenuShowDelay,String,0,SET,Elimina el retardo en la aparicion de menus
+2,Estetica,SetVisualFXPerformance,Rendimiento Visual,HKCU:\Control Panel\Desktop\WindowMetrics,MinAnimate,String,0,SET,Deshabilita animacion al minimizar y maximizar ventanas
+2,Estetica,SetVisualFXPerformance,Rendimiento Visual,HKCU:\Control Panel\Keyboard,KeyboardDelay,DWord,0,SET,Minimiza el retardo de repeticion del teclado
+2,Estetica,SetVisualFXPerformance,Rendimiento Visual,HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced,ListviewAlphaSelect,DWord,0,SET,Deshabilita seleccion translucida en vistas de lista
+2,Estetica,SetVisualFXPerformance,Rendimiento Visual,HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced,ListviewShadow,DWord,0,SET,Deshabilita sombras en iconos del Explorador
+2,Estetica,SetVisualFXPerformance,Rendimiento Visual,HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced,TaskbarAnimations,DWord,0,SET,Deshabilita animaciones en la barra de tareas
+2,Estetica,SetVisualFXPerformance,Rendimiento Visual,HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects,VisualFXSetting,DWord,3,SET,Establece efectos visuales en modo rendimiento (valor 3)
+2,Estetica,SetVisualFXPerformance,Rendimiento Visual,HKCU:\Software\Microsoft\Windows\DWM,EnableAeroPeek,DWord,0,SET,Deshabilita Aero Peek (vista previa del escritorio)
+2,Estetica,EnableAdminAndHidde,Administrador,HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList,Administrador,DWord,0,SET,Activa cuenta Administrador y la oculta de la pantalla de inicio de sesion
+3,Desinstalacion,DisableOneDrive,OneDrive,HKLM:\SOFTWARE\Policies\Microsoft\Windows\OneDrive,DisableFileSyncNGSC,DWord,1,SET,Deshabilita la sincronizacion de OneDrive via GPO
+4,SSD Optimizacion,DisableHibernation,Hibernacion,HKLM:\System\CurrentControlSet\Control\Session Manager\Power,HibernteEnabled,DWord,0,SET,Deshabilita la hibernacion del sistema
+4,SSD Optimizacion,DisableHibernation,Hibernacion,HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings,ShowHibernateOption,DWord,0,SET,Oculta la opcion Hibernar del menu de inicio/apagado
+4,SSD Optimizacion,DisableHibernation,Hibernacion,HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power,HiberbootEnabled,DWord,0,SET,Deshabilita el arranque hibrido (fast startup + hibernacion)
+4,SSD Optimizacion,DisableSuperfetch,Superfetch,HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters,EnablePrefetcher,DWord,0,SET,Deshabilita el precargador de aplicaciones Prefetch
+4,SSD Optimizacion,DisableSuperfetch,Superfetch,HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters,EnableSuperfetch,DWord,0,SET,Deshabilita SuperFetch (innecesario en SSD con RAM suficiente)
+4,SSD Optimizacion,DisableDefragmentation,Desfragmentacion,HKLM:\SOFTWARE\Microsoft\Dfrg\BootOptimizeFunction,OptimizeComplete,String,No,SET,Marca la optimizacion de arranque como no completada para desactivarla
+4,SSD Optimizacion,DisableDefragmentation,Desfragmentacion,HKLM:\SOFTWARE\Microsoft\Dfrg\BootOptimizeFunction,Enable,String,N,SET,Deshabilita la optimizacion de arranque del desfragmentador
+4,SSD Optimizacion,DisablePageFileLargeCache,Memoria,HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management,ClearPageFileAtShutdown,DWord,0,SET,No limpia el archivo de paginacion al apagar (mejora velocidad)
+4,SSD Optimizacion,DisablePageFileLargeCache,Memoria,HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management,LargeSystemCache,DWord,0,SET,Deshabilita la cache de sistema grande (para sistemas de escritorio)
+4,SSD Optimizacion,DisableSwapFile,Memoria,HKLM:\\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management,SwapfileControl,DWord,0,SET,Deshabilita el archivo de intercambio swapfile.sys (Metro apps)

@@ -1,6 +1,6 @@
 # Documentación de Archivos de Configuración
 
-> Generado automáticamente el Fri Apr  3 09:50:39 AM CEST 2026
+> Generado automáticamente el Tue Apr 21 04:27:02 PM CEST 2026
 
 ## vscode_keybindings
 
@@ -288,11 +288,13 @@ gblame() {
     fi
     find . -name "*.$extension" -exec sh -c 'echo "{}:"; git blame "{}" 2>/dev/null | cut -d" " -f2 | sort | uniq -c | sort -nr' \;
 }
+alias todepall="/home/user/Documents/Scripts/todep/todep_portable.sh"
 alias todep="/home/user/Documents/Scripts/todep/todep.sh"
 alias syslog="/home/user/Documents/Scripts/syslog.sh"
 alias formatcpp="/home/user/Documents/Scripts/format_cpp.sh"
 alias formatpython="/home/user/Documents/Scripts/format_py.sh"
 alias runkitty="/home/user/Documents/Scripts/run_kitty.sh"
+alias help="/home/user/Documents/Scripts/alias_help.sh"
 myip() { echo "Public IP: $(curl --max-time 3 --silent ipinfo.io/ip 2>/dev/null || echo 'Unable to fetch')" }
 texto() { echo "$*" | xclip -selection clipboard }
 meval() { eval "$(ssh-agent -s)" && ssh-add ~/.ssh/darkc_git_ed25519 && ssh-add -l }
@@ -387,6 +389,25 @@ fzfname() {
         --preview="bat --color=always --style=numbers {} 2>/dev/null || head -100 {} 2>/dev/null" \
         --preview-window=right:60%:wrap
 }
+secrm() {
+    for f in "$@"; do
+        if [ ! -e "$f" ]; then
+            echo "No existe: $f"
+            continue
+        fi
+        read -p "¿Seguro de borrar de forma segura '$f'? [s/N] " conf
+        if [[ "$conf" =~ ^[Ss]$ ]]; then
+            echo "Borrando: $f"
+            if [ -d "$f" ]; then
+                find "$f" -type f -exec shred -u -v -z {} \; && rm -r "$f"
+            else
+                shred -u -v -z "$f"
+            fi
+        else
+            echo "Omitido: $f"
+        fi
+    done
+}
 alias cursus="cd ~/Documents/GIT/cursus"
 alias help42="cd ~/Documents/GIT/help"
 alias cdgit="cd ~/Documents/GIT"
@@ -394,9 +415,10 @@ alias cdbox="cd ~/Documents/box"
 alias cdscr="cd ~/Documents/Scripts"
 alias cdpro="cd ~/Documents/Projects"
 alias cdrep="cd ~/Documents/Repository"
-alias cdsha="cd /mnt/hgfs"
+alias cdext="cd /mnt/hgfs"
 alias cdtmp="cd /tmp"
-alias cdocs="cd ~/Documents" 
+alias cdocs="cd ~/Documents"
+ 
 ```
 
 ---
@@ -1045,6 +1067,7 @@ export PATH=$HOME/.brew/bin:$PATH
 export PATH="$PATH:/usr/local/go/bin"
 export PATH="$PATH:$(go env GOPATH)/bin"
 export PATH="$HOME/.local/bin:$PATH"
+export GITEA_PASS=D0ckercontain3R#hOy
 if [ -d "$HOME/.nvm" ]; then
     export NVM_DIR="$HOME/.nvm"
     nvm() {
@@ -1088,7 +1111,7 @@ eval "$(starship init zsh)"
 
 ## vscode_git
 
-**Archivo:** `/home/user/Documents/GIT/commoncore/.vscode/settings.json`
+**Archivo:** `/home/user/Documents/GIT/42_commoncore/.vscode/settings.json`
 
 ### Contenido
 
@@ -1161,22 +1184,22 @@ eval "$(starship init zsh)"
 		"terminal.selectionForeground": "#6aa84f",
 	},
 	"folder-path-color.folders": [
-		{ "path": "libft", "symbol": "00", "tooltip": "PROJECT42" },
-		{ "path": "ft_printf", "symbol": "01", "tooltip": "PROJECT42" },
-		{ "path": "get_next_line", "symbol": "02", "tooltip": "PROJECT42" },
-		{ "path": "born2beroot", "color": "green", "symbol": "03", "tooltip": "PROJECT42" },
-		{ "path": "minitalk", "symbol": "04", "tooltip": "PROJECT42" },
-		{ "path": "fdf", "symbol": "05", "tooltip": "PROJECT42" },
-		{ "path": "push_swap", "symbol": "06", "tooltip": "PROJECT42" },
-		{ "path": "philosophers", "symbol": "07", "tooltip": "PROJECT42" },
-		{ "path": "minishell", "color": "yellow", "symbol": "08", "tooltip": "PROJECT42" },
-		{ "path": "cpp", "symbol": "09", "tooltip": "PROJECT42" },
-		{ "path": "netpractice", "color": "green", "symbol": "10", "tooltip": "PROJECT42" },
-		{ "path": "cub3d", "color": "yellow", "symbol": "11", "tooltip": "PROJECT42" },
-		{ "path": "inception", "color": "green", "symbol": "13", "tooltip": "PROJECT42" },
-		{ "path": "webserv", "color": "yellow", "symbol": "12", "tooltip": "PROJECT42" },
-		{ "path": "ft_transcendence", "color": "red", "symbol": "13", "tooltip": "PROJECT42" },
-		{ "path": "42_Collaborative_resume", "color": "red", "symbol": "14", "tooltip": "PROJECT42" },
+		{ "path": "00-libft", "symbol": "00", "tooltip": "COMMONCORE42" },
+		{ "path": "01-ft_printf", "symbol": "01", "tooltip": "COMMONCORE42" },
+		{ "path": "02-get_next_line", "symbol": "02", "tooltip": "COMMONCORE42" },
+		{ "path": "03-born2beroot", "color": "green", "symbol": "03", "tooltip": "COMMONCORE42" },
+		{ "path": "04-minitalk", "symbol": "04", "tooltip": "COMMONCORE42" },
+		{ "path": "05-fdf", "symbol": "05", "tooltip": "COMMONCORE42" },
+		{ "path": "06-push_swap", "symbol": "06", "tooltip": "COMMONCORE42" },
+		{ "path": "07-philosophers", "symbol": "07", "tooltip": "COMMONCORE42" },
+		{ "path": "08-minishell", "color": "yellow", "symbol": "08", "tooltip": "COMMONCORE42" },
+		{ "path": "09-cpp", "symbol": "09", "tooltip": "COMMONCORE42" },
+		{ "path": "10-netpractice", "color": "green", "symbol": "10", "tooltip": "COMMONCORE42" },
+		{ "path": "11-cub3d", "color": "yellow", "symbol": "11", "tooltip": "COMMONCORE42" },
+		{ "path": "12-inception", "color": "green", "symbol": "12", "tooltip": "COMMONCORE42" },
+		{ "path": "13-webserv", "color": "yellow", "symbol": "13", "tooltip": "COMMONCORE42" },
+		{ "path": "14-ft_transcendence", "color": "red", "symbol": "14", "tooltip": "COMMONCORE42" },
+		{ "path": "15-42_Collaborative_resume", "color": "red", "symbol": "15", "tooltip": "COMMONCORE42" },
 	],
 	"[python]": {
 		"editor.formatOnSave": false,

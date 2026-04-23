@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hardening Report - Windows Services</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #0d0d0d;
+    color: #ccc;
+    margin: 0;
+    padding: 20px;
+  }
+
+  h1 {
+    color: #00d4ff;
+    border-bottom: 2px solid #00d4ff;
+    padding-bottom: 10px;
+    margin-bottom: 4px;
+  }
+
+  h2 {
+    color: #888;
+    font-size: 14px;
+    margin-top: 0;
+  }
+
+  /* --- Summary cards --- */
+  .summary {
+    display: flex;
+    gap: 16px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+
+  .card {
+    background: #1a1a2e;
+    border-radius: 8px;
+    padding: 14px 22px;
+    text-align: center;
+    min-width: 110px;
+  }
+
+  .card .n {
+    font-size: 32px;
+    font-weight: bold;
+    color: #00d4ff;
+  }
+
+  .card .l {
+    font-size: 12px;
+    color: #888;
+    margin-top: 2px;
+  }
+
+  /* --- Filter bar --- */
+  .filterbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .filterbar input[type="text"] {
+    background: #1a1a2e;
+    border: 1px solid #333;
+    color: #ccc;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    min-width: 220px;
+    outline: none;
+  }
+
+  .filterbar input[type="text"]:focus { border-color: #00d4ff; }
+
+  .filterbar select {
+    background: #1a1a2e;
+    border: 1px solid #333;
+    color: #ccc;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .filterbar select:focus { border-color: #00d4ff; }
+
+  /* --- Table --- */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 13px;
+  }
+
+  thead th {
+    background: #1a1a2e;
+    color: #00d4ff;
+    padding: 10px;
+    text-align: left;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    white-space: nowrap;
+  }
+
+  tbody td {
+    padding: 7px 10px;
+    border-bottom: 1px solid #222;
+    vertical-align: middle;
+  }
+
+  tbody tr:hover td { background: #1a1a1a; }
+
+  td.svckey { font-family: monospace; font-size: 12px; }
+  td.notes  { font-size: 11px; color: #888; }
+  td.center { text-align: center; }
+
+  /* --- Category badges --- */
+  .badge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+  }
+
+  .badge-SYSTEM_CRITICAL   { background: #1a5276; }
+  .badge-SECURITY_KEEP     { background: #145a32; }
+  .badge-WARNING           { background: #7d6608; }
+  .badge-UPDATES           { background: #1a5276; }
+  .badge-VMWARE            { background: #4a235a; }
+  .badge-KEEP_AUDIO        { background: #1a5276; }
+  .badge-DISABLE_TELEMETRY { background: #922b21; }
+  .badge-DISABLE_GAMING    { background: #922b21; }
+  .badge-DISABLE_NETWORK   { background: #78281f; }
+  .badge-DISABLE_CRITICAL  { background: #6e2222; }
+  .badge-DISABLE_BT        { background: #922b21; }
+  .badge-DISABLE_IF_UNUSED { background: #a04000; }
+  .badge-DISABLE_MISC      { background: #922b21; }
+  .badge-CONFIRM_DISABLED  { background: #1e8449; }
+  .badge-REVIEW            { background: #7d6608; }
+  .badge-DEFAULT           { background: #333;    }
+
+  /* --- Result status --- */
+  .status-applied   { color: #2ecc71; }
+  .status-skipped   { color: #95a5a6; }
+  .status-error     { color: #e74c3c; }
+  .status-simulated { color: #9b59b6; }
+  .status-notfound  { color: #e67e22; }
+
+  /* --- Hidden rows (filter) --- */
+  tr.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<h1>Windows Services Hardening Report</h1>
+<h2>Generated: {{GEN_DATE}} &nbsp;|&nbsp; Host: {{COMP_NAME}}</h2>
+
+<div class="summary">
+  <div class="card"><div class="n">{{COUNT_TOTAL}}</div><div class="l">Total</div></div>
+  <div class="card"><div class="n status-applied">{{COUNT_APPLIED}}</div><div class="l">Applied</div></div>
+  <div class="card"><div class="n status-skipped">{{COUNT_SKIPPED}}</div><div class="l">No change</div></div>
+  <div class="card"><div class="n status-simulated">{{COUNT_SIMULATED}}</div><div class="l">Simulated</div></div>
+  <div class="card"><div class="n status-error">{{COUNT_ERRORS}}</div><div class="l">Errors</div></div>
+  <div class="card"><div class="n status-notfound">{{COUNT_NOTFOUND}}</div><div class="l">Not found</div></div>
+</div>
+
+<div class="filterbar">
+  <input type="text"   id="searchInput"    placeholder="Search service key or name..." oninput="applyFilters()">
+  <select id="catFilter" onchange="applyFilters()">
+    <option value="">All categories</option>
+    <option>SYSTEM_CRITICAL</option>
+    <option>SECURITY_KEEP</option>
+    <option>WARNING</option>
+    <option>UPDATES</option>
+    <option>VMWARE</option>
+    <option>KEEP_AUDIO</option>
+    <option>DISABLE_TELEMETRY</option>
+    <option>DISABLE_GAMING</option>
+    <option>DISABLE_NETWORK</option>
+    <option>DISABLE_CRITICAL</option>
+    <option>DISABLE_BT</option>
+    <option>DISABLE_IF_UNUSED</option>
+    <option>DISABLE_MISC</option>
+    <option>CONFIRM_DISABLED</option>
+    <option>REVIEW</option>
+  </select>
+  <select id="resultFilter" onchange="applyFilters()">
+    <option value="">All results</option>
+    <option value="applied">Applied</option>
+    <option value="skipped">No change</option>
+    <option value="simulated">Simulated</option>
+    <option value="error">Errors</option>
+    <option value="notfound">Not found</option>
+  </select>
+</div>
+
+<table id="mainTable">
+  <thead>
+    <tr>
+      <th>Service Key</th>
+      <th>Name</th>
+      <th>Category</th>
+      <th>Current</th>
+      <th>Recommended</th>
+      <th>Result</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+{{TABLE_ROWS}}
+  </tbody>
+</table>
+
+<script>
+  function applyFilters() {
+    var search = document.getElementById('searchInput').value.toLowerCase();
+    var cat    = document.getElementById('catFilter').value.toLowerCase();
+    var result = document.getElementById('resultFilter').value.toLowerCase();
+
+    document.querySelectorAll('#mainTable tbody tr').forEach(function(row) {
+      var key    = (row.dataset.key    || '').toLowerCase();
+      var name   = (row.dataset.name   || '').toLowerCase();
+      var rowCat = (row.dataset.cat    || '').toLowerCase();
+      var rowRes = (row.dataset.result || '').toLowerCase();
+
+      var matchSearch = !search || key.includes(search) || name.includes(search);
+      var matchCat    = !cat    || rowCat === cat;
+      var matchResult = !result || rowRes === result;
+
+      row.classList.toggle('hidden', !(matchSearch && matchCat && matchResult));
+    });
+  }
+</script>
+
+</body>
+</html>

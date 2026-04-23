@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+### BEGIN INIT INFO
+# Provides:          ramdisk
+# Required-Start:    $all
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:
+# Short-Description: RAMDISK service
+# Description: This script will start RAMDISK
+### END INIT INFO
+
+SIZE="100M"	# Tamaño del ramdisk
+FOLDER_RAM="/var/ramdisk/RAMDISK"
+FOLDER_HDD="/var/ramdisk/persistent"
+PERMMODE="0755"
+
+# Montar la unidad ramdisk en memoria
+func_mount() {
+	echo "Montando ramdisk of ${SIZE} in \"${FOLDER_RAM}\""
+	if ! mountpoint -q "${FOLDER_RAM}"; then
+		# mount -t tmpfs -o size=${SIZE},mode=${PERMMODE} tmpfs ${FOLDER_RAM}
+		# mount -t tmpfs -o size=${SIZE},rw,nr_inodes=5k,noexec,nodev,noatime,nosuid,uid=user,mode=${PERMMODE},x-gvfs-show ramdisk ${FOLDER_RAM}
+		mount -t tmpfs -o size=${SIZE},rw,nr_inodes=5k,noexec,nodev,noatime,nodiratime,nosuid,mode=${PERMMODE},x-gvfs-show ramdisk ${FOLDER_RAM}
+		echo [`date +"%Y-%m-%d %H:%M"`] Mount RAMDISK >> /var/log/ramdisk.log
+
+		# Mover desde backup a memoria
+		echo "Sincronizando HDD -> RAMDISK"
+		# rsync -av "${FOLDER_HDD}/" ${FOLDER_RAM}
+		tar --lzop -xvf "${FOLDER_HDD}/ramdisk-backup.tar.lzop" -C ${FOLDER_RAM}
+		echo [`date +"%Y-%m-%d %H:%M"`] Sincronizando HDD to RAMDISK >> /var/log/ramdisk.log
+	fi
+}
+
+# Comprobar si no hay una sincronización en curso
+func_backup() {
+	MARKFILE_RUN="${FOLDER_RAM}/.run_sync"
+
+	# Comprobar si hay un backup en curso
+	[[ -e "${MARKFILE_RUN}" ]] && exit 0
+	touch "${MARKFILE_RUN}"
+
+	# Salvar desde la memoria a disco
+	echo "Sincronizando RAMDISK -> HDD"
+	# rsync -av --delete --exclude ${MARKFILE_RUN} "${FOLDER_RAM}/" ${FOLDER_HDD}
+	tar --exclude=".run_sync" --lzop -cvf "${FOLDER_HDD}/ramdisk-backup.tar.lzop" -C ${FOLDER_RAM} .
+	echo [`date +"%Y-%m-%d %H:%M"`] Sincronizando RAMDISK to HDD >> /var/log/ramdisk.log
+
+	rm ${MARKFILE_RUN}
+}
+
+case $1 in
+	start)
+		func_mount
+		;;
+	stop)
+		func_backup
+		umount ${FOLDER_RAM}
+		echo [`date +"%Y-%m-%d %H:%M"`] Umount RAMDISK >> /var/log/ramdisk.log
+		;;
+	sync)
+		func_backup
+		;;
+	restart)
+		umount ${FOLDER_RAM}
+		func_mount
+		;;
+	status)
+		df -h | grep ramdisk
+		findmnt | grep ramdisk
+		systemctl status ramdisk.service
+		;;
+	*)
+		echo "Usage: /etc/init.d/ramdisk {start|stop|sync|restart|status}"
+esac
+
+exit 0
+
+# TODO catch to log
